@@ -1,0 +1,10 @@
+jupyter
+matplotlib
+numpy
+mysqlclient
+mysql-connector-python-rf
+pandas
+scikit-learn
+scipy
+sqlalchemy
+sqlalchemy_utils
