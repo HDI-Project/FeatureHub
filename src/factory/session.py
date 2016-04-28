@@ -11,28 +11,10 @@ from multiprocessing import Pool
 import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound
-from sklearn.cross_validation import cross_val_score
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
+from factory.model import Model
 from orm.sqlalchemy_declarative import Feature, Notebook, Problem, User
 from orm.sqlalchemy_main import ORMManager
-
-
-class Model(object):
-
-    def __init__(self, problem_type):
-        self.model = None
-        if problem_type == 'classification':
-            self.model = DecisionTreeClassifier()
-        elif problem_type == 'regression':
-            self.model = DecisionTreeRegressor()
-        else:
-            raise NotImplementedError
-
-    def cross_validate(self, X, Y):
-        if len(X.shape) == 1:    # 1d arrays are not supported anymore by sklearn
-            X = X.reshape(-1, 1)
-        return cross_val_score(self.model, X, Y, n_jobs=-1).mean()
 
 
 class Session(object):
@@ -42,7 +24,7 @@ class Session(object):
     them directly.
 
     WARNING: The statement above is not completely true.
-    While variables prefixed by '__' are "harder" to access, they are still accessible.
+    Variables prefixed by '__' are "harder" to access, but still accessible!
     For example, __db attribute is still accessible as `session._Session__db`
     """
     def __init__(self, problem, n_jobs=1, database='featurefactory',

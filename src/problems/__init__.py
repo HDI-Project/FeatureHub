@@ -1,7 +1,7 @@
 import imp
 import sys
 
-from factory import Session
+from factory.session import Session
 from orm.admin import Commands
 
 
