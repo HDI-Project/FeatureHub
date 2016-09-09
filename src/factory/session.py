@@ -114,6 +114,9 @@ class Session(object):
         assert isinstance(feature_extractor, collections.Callable), \
                 "feature_extractor must be a function!"
 
+        # If running in docker and receive Errno 28: No space left on device
+        # import os
+        # os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
         print("Obtaining dataset")
         dataset = self.get_sample_dataset()
 
