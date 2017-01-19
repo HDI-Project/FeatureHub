@@ -20,14 +20,10 @@ function print_usage {
     echo
 }
 
-function die {
-    echo "Error: $1"
-    exit 1
-}
-
 function print_usage_and_die {
     print_usage
-    die "$1"
+    echo "Error: $1"
+    exit 1
 }
 
 NODE_VERSION="7"
@@ -48,18 +44,6 @@ MYSQL_CONTAINER_NAME="$4"
 # Install dependencies
 
 echo "Installing dependencies..."
-
-# Detect Debian vs CentOS
-PKG_MGR=""
-if which apt-get >/dev/null 2>&1; then
-    PKG_MGR="apt-get"
-elif which yum >/dev/null 2>&1; then
-    PKG_MGR="yum"
-else
-    die "Package manager not found. yum and apt-get are okay. Are you on a Linux system?"
-fi
-
-echo "Package manager is $PKG_MGR"
 
 if [ "$PKG_MGR" = "apt-get" ]; then
     sudo apt-get update

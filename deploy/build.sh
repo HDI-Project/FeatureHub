@@ -7,6 +7,11 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+function die {
+    echo "Error: $1"
+    exit 1
+}
+
 FF_APP_NAME_DEFAULT="app"
 FF_IMAGE_NAME_DEFAULT="featurefactory"
 FF_DATA_DIR_DEFAULT="/var/lib/featurefactory"
@@ -49,6 +54,18 @@ read MYSQL_ADMIN_USERNAME_PASSWORD
 # ------------------------------------------------------------------------------
 # Some brief validation
 
+# Detect Debian vs CentOS
+PKG_MGR=""
+if which apt-get >/dev/null 2>&1; then
+    PKG_MGR="apt-get"
+elif which yum >/dev/null 2>&1; then
+    PKG_MGR="yum"
+else
+    die "Package manager not found. yum and apt-get are okay. Are you on a Linux system?"
+fi
+echo "Package manager is $PKG_MGR"
+export PKG_MGR
+
 if [ ! -d "$JUPYTERHUB_CONFIG_DIR" ]; then
     sudo mkdir -p "$JUPYTERHUB_CONFIG_DIR"
 fi
@@ -69,3 +86,7 @@ ${SCRIPT_DIR}/install_jupyterhub.sh \
     "$FF_IMAGE_NAME" \
     "$JUPYTERHUB_CONFIG_DIR" \
     "$MYSQL_CONTAINER_NAME"
+
+# Install docker
+
+${SCRIPT_DIR}/install_docker.sh
