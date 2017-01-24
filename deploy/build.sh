@@ -17,8 +17,9 @@ FF_IMAGE_NAME_DEFAULT="featurefactory"
 FF_DATA_DIR_DEFAULT="/var/lib/featurefactory"
 JUPYTERHUB_CONFIG_DIR_DEFAULT="/etc/featurefactory"
 MYSQL_CONTAINER_NAME_DEFAULT="featurefactorymysql"
-MYSQL_ADMIN_USERNAME_DEFAULT="admin"
-MYSQL_ADMIN_USERNAME_PASSWORD_DEFAULT="admin"
+MYSQL_DATABASE_NAME_DEFAULT="featurefactory"
+MYSQL_ADMIN_USERNAME_DEFAULT="featurefactoryadmin"
+MYSQL_ADMIN_PASSWORD_DEFAULT="featurefactoryadmin"
 
 # ------------------------------------------------------------------------------
 # Read user input
@@ -43,13 +44,17 @@ echo -n "Enter FeatureFactory MySQL docker container name [default '$MYSQL_CONTA
 read MYSQL_CONTAINER_NAME
 [ "$MYSQL_CONTAINER_NAME" = "" ] && MYSQL_CONTAINER_NAME=$MYSQL_CONTAINER_NAME_DEFAULT
 
+echo -n "Enter FeatureFactory MySQL database name [default '$MYSQL_DATABASE_NAME_DEFAULT']: "
+read MYSQL_DATABASE_NAME
+[ "$MYSQL_DATABASE_NAME" = "" ] && MYSQL_DATABASE_NAME=$MYSQL_DATABASE_NAME_DEFAULT
+
 echo -n "Enter FeatureFactory MySQL admin username [default '$MYSQL_ADMIN_USERNAME_DEFAULT']: "
 read MYSQL_ADMIN_USERNAME
 [ "$MYSQL_ADMIN_USERNAME" = "" ] && MYSQL_ADMIN_USERNAME=$MYSQL_ADMIN_USERNAME_DEFAULT
 
-echo -n "Enter FeatureFactory MySQL admin password [default '$MYSQL_ADMIN_USERNAME_PASSWORD_DEFAULT']: "
-read MYSQL_ADMIN_USERNAME_PASSWORD
-[ "$MYSQL_ADMIN_USERNAME_PASSWORD" = "" ] && MYSQL_ADMIN_USERNAME_PASSWORD=$MYSQL_ADMIN_USERNAME_PASSWORD_DEFAULT
+echo -n "Enter FeatureFactory MySQL admin password [default '$MYSQL_ADMIN_PASSWORD_DEFAULT']: "
+read MYSQL_ADMIN_PASSWORD
+[ "$MYSQL_ADMIN_PASSWORD" = "" ] && MYSQL_ADMIN_PASSWORD=$MYSQL_ADMIN_PASSWORD_DEFAULT
 
 # ------------------------------------------------------------------------------
 # Some brief validation
@@ -90,3 +95,10 @@ ${SCRIPT_DIR}/install_jupyterhub.sh \
 # Install docker
 
 ${SCRIPT_DIR}/install_docker.sh
+
+# WIP - Install mysql
+exit 1
+${SCRIPT_DIR}/install_mysql.sh \
+    "$MYSQL_CONTAINER_NAME" \
+    "$MYSQL_DATABASE_NAME" \
+    "$MYSQL_ADMIN_USERNAME" \
