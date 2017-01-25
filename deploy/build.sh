@@ -4,6 +4,7 @@
 # Setup
 
 set -e
+set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -80,12 +81,15 @@ fi
 
 # we must have user-writable config directories
 #TODO this solution is sketchy
-sudo chown $USER "$JUPYTERHUB_CONFIG_DIR"
-sudo chown $USER "$FF_DATA_DIR"
+sudo chown -R $USER:$USER "$JUPYTERHUB_CONFIG_DIR"
+sudo chmod -R u+w "$JUPYTERHUB_CONFIG_DIR"
+sudo chown -R $USER:$USER "$FF_DATA_DIR"
+sudo chmod -R u+w "$FF_DATA_DIR"
 
 # ------------------------------------------------------------------------------
-# Install jupyterhub
+# Install and configure application components
 
+# Install jupyterhub
 ${SCRIPT_DIR}/install_jupyterhub.sh \
     "$FF_APP_NAME" \
     "$FF_IMAGE_NAME" \
@@ -93,12 +97,22 @@ ${SCRIPT_DIR}/install_jupyterhub.sh \
     "$MYSQL_CONTAINER_NAME"
 
 # Install docker
-
 ${SCRIPT_DIR}/install_docker.sh
 
-# WIP - Install mysql
-exit 1
+# Install mysql
 ${SCRIPT_DIR}/install_mysql.sh \
     "$MYSQL_CONTAINER_NAME" \
     "$MYSQL_DATABASE_NAME" \
     "$MYSQL_ADMIN_USERNAME" \
+    "$MYSQL_ADMIN_PASSWSORD"
+
+# Create and authenticate a test, non-admin user.
+MYSQL_NEWUSER_USERNAME=testuser
+MYSQL_NEWUSER_PASSWORD=abc123
+${SCRIPT_DIR}/add_user.sh \
+    $MYSQL_CONTAINER_NAME \
+    $MYSQL_DATABASE_NAME \
+    $MYSQL_ADMIN_USERNAME \
+    $MYSQL_ADMIN_PASSWORD \
+    $MYSQL_NEWUSER_USERNAME \
+    $MYSQL_NEWUSER_PASSWORD
