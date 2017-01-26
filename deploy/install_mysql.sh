@@ -27,12 +27,25 @@ ${docker_sudo} docker pull mysql:$MYSQL_VERSION
 # Create a mysql container, initialize the featurefactory database, and create
 # an admin user account. Also create a random root password.
 root_password=$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)
-echo $root_password
+echo $root_password #todo delete
 ${docker_sudo} docker run \
     --name "$MYSQL_CONTAINER_NAME" \
     -e MYSQL_ROOT_PASSWORD=$root_password \
     -e "MYSQL_DATABASE=$MYSQL_DATABASE_NAME" \
-    -e "MYSQL_USER=$MYSQL_ADMIN_USERNAME" \
-    -e "MYSQL_PASSWORD=$MYSQL_ADMIN_PASSWORD" \
-    -d \
+    -t -d \
     mysql
+
+# Wait until mysqld is ready for connections. In the startup process, the
+# message gets printed before we're really ready for connections.
+grep -m 2 "mysqld: ready for connections." <(${docker_sudo} docker logs --follow "$MYSQL_CONTAINER_NAME")
+
+
+${docker_sudo} docker exec -i "$MYSQL_CONTAINER_NAME" \
+    mysql \
+    --user=root \
+    --password=${root_password} <<EOF
+CREATE USER '$MYSQL_ADMIN_USERNAME'@'%' IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
+GRANT ALL ON *.* TO '$MYSQL_ADMIN_USERNAME'@'%' WITH GRANT OPTION;
+EOF
+
+echo "done"

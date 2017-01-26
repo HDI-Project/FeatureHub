@@ -9,10 +9,12 @@ if [ "$(docker ps -a -f name=^/${CONTAINER_NAME}$ | wc -l)" != "1" ]; then
 fi
 
 # Remove mysql containers
-docker ps -a --filter name=^/featurefactorymysql-.*$ \
+mysql_containers=$(docker ps -a --filter name=^/featurefactorymysql-.*$ \
     | awk '{print $NF}' \
-    | tail -n +2 \
-    | xargs docker rm -f
+    | tail -n +2)
+if [ "$mysql_containers" != "" ]; then
+    docker rm -f $mysql_containers
+fi
 
 # Testing
 TEMPDIR=$(mktemp -d)

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -x
+set -e
+
 if [ "$#" != "6" ]; then
     echo "usage: ./add_user.sh mysql_container_name mysql_database_name"
     echo "                     mysql_admin_username mysql_admin_password"
@@ -29,12 +32,12 @@ MYSQL_NEWUSER_PASSWORD=$6
 # TODO research Socker Peer-Credential Authentication Plugin
 #   (https://dev.mysql.com/doc/refman/5.5/en/socket-authentication-plugin.html)
 docker_sudo=sudo
-${docker_sudo} docker exec -it $MYSQL_CONTAINER_NAME \
+${docker_sudo} docker exec -i $MYSQL_CONTAINER_NAME \
     mysql \
-        -u $MYSQL_ADMIN_USERNAME \
-        -p $MYSQL_ADMIN_PASSWORD \
-<<EOF
+        --user=$MYSQL_ADMIN_USERNAME \
+        --password=$MYSQL_ADMIN_PASSWORD <<EOF
 CREATE USER '$MYSQL_NEWUSER_USERNAME'@'%' IDENTIFIED BY '$MYSQL_NEWUSER_PASSWORD';
 GRANT INSERT, SELECT ON $MYSQL_DATABASE_NAME.* TO '$MYSQL_NEWUSER_USERNAME'@'%';
-exit;
 EOF
+
+echo "done"

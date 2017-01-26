@@ -147,33 +147,33 @@ sudo ${PKG_MGR} -y install git python${PYTHON_VERSION}-pip
 # Install docker
 ${SCRIPT_DIR}/install_docker.sh
 
-# # Install mysql
-# ${SCRIPT_DIR}/install_mysql.sh \
-#     "$MYSQL_CONTAINER_NAME" \
-#     "$MYSQL_DATABASE_NAME" \
-#     "$MYSQL_ADMIN_USERNAME" \
-#     "$MYSQL_ADMIN_PASSWORD"
-# 
+# Install mysql
+${SCRIPT_DIR}/install_mysql.sh \
+    "$MYSQL_CONTAINER_NAME" \
+    "$MYSQL_DATABASE_NAME" \
+    "$MYSQL_ADMIN_USERNAME" \
+    "$MYSQL_ADMIN_PASSWORD"
+
 # # Install jupyterhub
 # ${SCRIPT_DIR}/install_jupyterhub.sh \
 #     "$FF_APP_NAME" \
 #     "$FF_IMAGE_NAME" \
 #     "$JUPYTERHUB_CONFIG_DIR" \
 #     "$MYSQL_CONTAINER_NAME"
+# 
+# # Finally, create ff image
+# ${SCRIPT_DIR}/create_ff_image.sh \
+#     $FF_IMAGE_NAME \
+#     $JUPYTERHUB_CONFIG_DIR \
+#     $MYSQL_CONTAINER_NAME
 
-# Finally, create ff image
-${SCRIPT_DIR}/create_ff_image.sh \
-    $FF_IMAGE_NAME \
-    $JUPYTERHUB_CONFIG_DIR \
-    $MYSQL_CONTAINER_NAME
-
-# # Create and authenticate a test, non-admin user.
-# MYSQL_NEWUSER_USERNAME=testuser
-# MYSQL_NEWUSER_PASSWORD=abc123
-# ${SCRIPT_DIR}/add_user.sh \
-#     $MYSQL_CONTAINER_NAME \
-#     $MYSQL_DATABASE_NAME \
-#     $MYSQL_ADMIN_USERNAME \
-#     $MYSQL_ADMIN_PASSWORD \
-#     $MYSQL_NEWUSER_USERNAME \
-#     $MYSQL_NEWUSER_PASSWORD
+# Create and authenticate a test, non-admin user.
+MYSQL_NEWUSER_USERNAME=testuser
+MYSQL_NEWUSER_PASSWORD=abc123
+${SCRIPT_DIR}/add_user.sh \
+    $MYSQL_CONTAINER_NAME \
+    $MYSQL_DATABASE_NAME \
+    $MYSQL_ADMIN_USERNAME \
+    $MYSQL_ADMIN_PASSWORD \
+    $MYSQL_NEWUSER_USERNAME \
+    $MYSQL_NEWUSER_PASSWORD
