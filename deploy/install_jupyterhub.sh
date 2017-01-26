@@ -6,8 +6,6 @@
 set -e
 set -x
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 function print_usage {
     echo "usage: install_jupyterhub.sh ff_app_name ff_image_name"
     echo "                             jupyterhub_config_dir mysql_container_name"
@@ -18,9 +16,6 @@ function print_usage_and_die {
     echo "Error: $1"
     exit 1
 }
-
-NODE_VERSION="7"
-PYTHON_VERSION="3"
 
 # ------------------------------------------------------------------------------
 # App config
@@ -36,16 +31,11 @@ MYSQL_CONTAINER_NAME="$4"
 # ------------------------------------------------------------------------------
 # Install dependencies
 
-echo "Installing dependencies..."
+echo "Installing jupyterhub dependencies..."
 
 if [ "$PKG_MGR" = "apt-get" ]; then
-    sudo apt-get -y update
-    sudo apt-get -y dist-upgrade
-    sudo apt-get -y install npm nodejs-legacy git python${PYTHON_VERSION}-pip
+    sudo apt-get -y install npm nodejs-legacy
 elif [ "$PKG_MGR" = "yum" ]; then
-    sudo yum -y update
-    sudo yum -y install git python${PYTHON_VERSION}-pip
-
     # sketchy!!!!!! untrusted code
     curl --silent --location https://rpm.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
     sudo yum -y install nodejs

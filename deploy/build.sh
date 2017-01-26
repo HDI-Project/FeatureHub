@@ -6,7 +6,7 @@
 set -e
 set -x
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 function die {
     echo "usage: ./build.sh [-y]"
@@ -32,6 +32,13 @@ done
 if [ "$bad" = "bad" ]; then
     die "Invalid options"
 fi
+
+# ------------------------------------------------------------------------------
+# Versions
+
+export MYSQL_VERSION=5.7
+export NODE_VERSION=7
+export PYTHON_VERSION=3
 
 # ------------------------------------------------------------------------------
 # Settings
@@ -81,16 +88,15 @@ MYSQL_ADMIN_PASSWORD="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 # Some brief validation
 
 # Detect Debian vs CentOS
-PKG_MGR=""
+export PKG_MGR=""
 if which apt-get >/dev/null 2>&1; then
     PKG_MGR="apt-get"
 elif which yum >/dev/null 2>&1; then
     PKG_MGR="yum"
 else
-    die "Package manager not found. yum and apt-get are okay. Are you on a Linux system?"
+    die "Package manager not found. yum and apt-get are okay. Which system are you on anyway?"
 fi
 echo "Package manager is $PKG_MGR"
-export PKG_MGR
 
 if [ ! -d "$JUPYTERHUB_CONFIG_DIR" ]; then
     sudo mkdir -p "$JUPYTERHUB_CONFIG_DIR"
@@ -106,25 +112,54 @@ sudo chmod -R u+w "$JUPYTERHUB_CONFIG_DIR"
 sudo chown -R $USER:$USER "$FF_DATA_DIR"
 sudo chmod -R u+w "$FF_DATA_DIR"
 
+# Check MYSQL container does not exist. If does exist, rename. Hope this doesn't mess
+# anything else up.
+if [ "$(docker ps -a -f name=^/${MYSQL_CONTAINER_NAME}$ | wc -l)" != "2" ]; then
+    echo "Container ${MYSQL_CONTAINER_NAME} already exists."
+    suffix="-$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)"
+    MYSQL_CONTAINER_NAME="${MYSQL_CONTAINER_NAME}${suffix}"
+    echo -n "Create container ${MYSQL_CONTAINER_NAME} instead? [y/N] "
+    if [ "$yes" = "yes" ]; then
+        echo
+    else
+        read x
+        if [ "$x" != "y" ]; then
+            "Exiting..."
+            exit 1
+        fi
+    fi
+fi
+
 # ------------------------------------------------------------------------------
 # Install and configure application components
+
+# Install some dependencies for multiple components
+echo "Installing general dependencies..."
+if [ "$PKG_MGR" = "apt-get" ]; then
+    sudo apt-get -y update
+    sudo apt-get -y dist-upgrade
+elif [ "$PKG_MGR" = "yum" ]; then
+    sudo yum -y upgrade yum kernel
+    sudo yum -y update
+fi
+sudo ${PKG_MGR} -y install git python${PYTHON_VERSION}-pip
 
 # Install docker
 ${SCRIPT_DIR}/install_docker.sh
 
-# Install mysql
-${SCRIPT_DIR}/install_mysql.sh \
-    "$MYSQL_CONTAINER_NAME" \
-    "$MYSQL_DATABASE_NAME" \
-    "$MYSQL_ADMIN_USERNAME" \
-    "$MYSQL_ADMIN_PASSWORD"
-
-# Install jupyterhub
-${SCRIPT_DIR}/install_jupyterhub.sh \
-    "$FF_APP_NAME" \
-    "$FF_IMAGE_NAME" \
-    "$JUPYTERHUB_CONFIG_DIR" \
-    "$MYSQL_CONTAINER_NAME"
+# # Install mysql
+# ${SCRIPT_DIR}/install_mysql.sh \
+#     "$MYSQL_CONTAINER_NAME" \
+#     "$MYSQL_DATABASE_NAME" \
+#     "$MYSQL_ADMIN_USERNAME" \
+#     "$MYSQL_ADMIN_PASSWORD"
+# 
+# # Install jupyterhub
+# ${SCRIPT_DIR}/install_jupyterhub.sh \
+#     "$FF_APP_NAME" \
+#     "$FF_IMAGE_NAME" \
+#     "$JUPYTERHUB_CONFIG_DIR" \
+#     "$MYSQL_CONTAINER_NAME"
 
 # Finally, create ff image
 ${SCRIPT_DIR}/create_ff_image.sh \
@@ -132,13 +167,13 @@ ${SCRIPT_DIR}/create_ff_image.sh \
     $JUPYTERHUB_CONFIG_DIR \
     $MYSQL_CONTAINER_NAME
 
-# Create and authenticate a test, non-admin user.
-MYSQL_NEWUSER_USERNAME=testuser
-MYSQL_NEWUSER_PASSWORD=abc123
-${SCRIPT_DIR}/add_user.sh \
-    $MYSQL_CONTAINER_NAME \
-    $MYSQL_DATABASE_NAME \
-    $MYSQL_ADMIN_USERNAME \
-    $MYSQL_ADMIN_PASSWORD \
-    $MYSQL_NEWUSER_USERNAME \
-    $MYSQL_NEWUSER_PASSWORD
+# # Create and authenticate a test, non-admin user.
+# MYSQL_NEWUSER_USERNAME=testuser
+# MYSQL_NEWUSER_PASSWORD=abc123
+# ${SCRIPT_DIR}/add_user.sh \
+#     $MYSQL_CONTAINER_NAME \
+#     $MYSQL_DATABASE_NAME \
+#     $MYSQL_ADMIN_USERNAME \
+#     $MYSQL_ADMIN_PASSWORD \
+#     $MYSQL_NEWUSER_USERNAME \
+#     $MYSQL_NEWUSER_PASSWORD

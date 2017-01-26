@@ -15,6 +15,9 @@ TEMPDIR=$(mktemp -d)
 cp /tmp/deploy/* $TEMPDIR
 chown -R $TESTUSER:$TESTUSER $TEMPDIR
 
+# Also testing
+chown -R $TESTUSER:$TESTUSER /tmp/FeatureFactory_src
+
 # Run build script. We run as login shell to ensure that typical environment
 # variables, which are expected in the build process, are available.
 su --login $TESTUSER -c "$TEMPDIR/build.sh -y"

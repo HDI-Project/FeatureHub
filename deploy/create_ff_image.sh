@@ -5,7 +5,6 @@
 
 set -e
 set -x
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ "$#" != "3" ]; then
     echo "usage: ./create_ff_image.sh ff_image_name jupyterhub_config_dir"
@@ -21,15 +20,18 @@ MYSQL_CONTAINER_NAME=$3
 
 TEMPDIR=$(mktemp -d)
 
-# Download the FeatureFactory package
-git clone https://github.com/HDI-Project/FeatureFactory $TEMPDIR/FeatureFactory
+# Testing: copy the FeatureFactory package into the temporary directory
+cp -r /tmp/FeatureFactory_src $TEMPDIR/FeatureFactory
+
+# # Production: Download the FeatureFactory package
+# git clone https://github.com/HDI-Project/FeatureFactory $TEMPDIR/FeatureFactory
 
 # Download jupyterhub dockerspawner
 git clone https://github.com/jupyterhub/dockerspawner $TEMPDIR/dockerspawner
 
 # Install dockerspawner
-sudo pip3 install requirements -r $TEMPDIR/requirements.txt
-( cd $TEMPDIR/dockerspawner && sudo python3 setup.py install )
+sudo pip${PYTHON_VERSION} install requirements -r $TEMPDIR/dockerspawner/requirements.txt
+( cd $TEMPDIR/dockerspawner && sudo python${PYTHON_VERSION} setup.py install )
 
 # Populate files needed for image
 rm -rf $TEMPDIR/featurefactoryimage
