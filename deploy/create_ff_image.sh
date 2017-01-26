@@ -4,7 +4,6 @@
 # Setup
 
 set -e
-set -x
 
 if [ "$#" != "3" ]; then
     echo "usage: ./create_ff_image.sh ff_image_name jupyterhub_config_dir"

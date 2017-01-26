@@ -4,7 +4,6 @@
 # Setup
 
 set -e
-set -x
 
 export SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -154,18 +153,18 @@ ${SCRIPT_DIR}/install_mysql.sh \
     "$MYSQL_ADMIN_USERNAME" \
     "$MYSQL_ADMIN_PASSWORD"
 
-# # Install jupyterhub
-# ${SCRIPT_DIR}/install_jupyterhub.sh \
-#     "$FF_APP_NAME" \
-#     "$FF_IMAGE_NAME" \
-#     "$JUPYTERHUB_CONFIG_DIR" \
-#     "$MYSQL_CONTAINER_NAME"
-# 
-# # Finally, create ff image
-# ${SCRIPT_DIR}/create_ff_image.sh \
-#     $FF_IMAGE_NAME \
-#     $JUPYTERHUB_CONFIG_DIR \
-#     $MYSQL_CONTAINER_NAME
+# Install jupyterhub
+${SCRIPT_DIR}/install_jupyterhub.sh \
+    "$FF_APP_NAME" \
+    "$FF_IMAGE_NAME" \
+    "$JUPYTERHUB_CONFIG_DIR" \
+    "$MYSQL_CONTAINER_NAME"
+
+# Finally, create ff image
+${SCRIPT_DIR}/create_ff_image.sh \
+    $FF_IMAGE_NAME \
+    $JUPYTERHUB_CONFIG_DIR \
+    $MYSQL_CONTAINER_NAME
 
 # Create and authenticate a test, non-admin user.
 MYSQL_NEWUSER_USERNAME=testuser

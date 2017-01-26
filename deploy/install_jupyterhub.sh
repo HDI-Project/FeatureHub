@@ -4,7 +4,6 @@
 # Setup
 
 set -e
-set -x
 
 function print_usage {
     echo "usage: install_jupyterhub.sh ff_app_name ff_image_name"

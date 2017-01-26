@@ -4,7 +4,6 @@
 # Setup
 
 set -e
-set -x
 
 if [ "$#" != "4"]; then
     echo "usage: ./install_mysql.sh mysql_container_name mysql_database_name"
