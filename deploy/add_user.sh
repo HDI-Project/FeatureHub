@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO
-# Create user on host machine
-# Create directory for user's notebooks
-# Copy notebook templates
-
 if [ "$#" != "6" ]; then
     echo "usage: ./add_user.sh mysql_container_name mysql_database_name"
     echo "                     mysql_admin_username mysql_admin_password"
@@ -18,6 +13,16 @@ MYSQL_ADMIN_USERNAME=$3
 MYSQL_ADMIN_PASSWORD=$4
 MYSQL_NEWUSER_USERNAME=$5
 MYSQL_NEWUSER_PASSWORD=$6
+
+# TODO
+# Create user on host machine
+# sudo useradd -M -N -u $MYSQL_NEWUSER_USERNAME -p $MYSQL_NEWUSER_PASSWORD
+
+# Create directory for user's notebooks
+# mkdir -p $FF_DATA_DIR/$MYSQL_NEWUSER_USERNAME/notebooks
+
+# Copy notebook templates
+# cp ${SCRIPT_DIR}/../notebooks/* $FF_DATA_DIR/$MYSQL_NEWUSER_USERNAME/notebooks
 
 # Create user on in database
 # Grant user permissions
