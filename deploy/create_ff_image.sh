@@ -20,10 +20,7 @@ MYSQL_CONTAINER_NAME=$3
 TEMPDIR=$(mktemp -d)
 
 # Testing: copy the FeatureFactory package into the temporary directory
-cp -r /tmp/FeatureFactory_src $TEMPDIR/FeatureFactory
-
-# # Production: Download the FeatureFactory package
-# git clone https://github.com/HDI-Project/FeatureFactory $TEMPDIR/FeatureFactory
+cp -r /tmp/ff $TEMPDIR/FeatureFactory
 
 # Download jupyterhub dockerspawner
 git clone https://github.com/jupyterhub/dockerspawner $TEMPDIR/dockerspawner
