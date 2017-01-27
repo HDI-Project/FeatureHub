@@ -26,7 +26,7 @@ echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | sudo /usr/sbin/chpasswd
 
 # Create directory for user's notebooks. Make sure to mount this later. Also
 # restrict the user from creating new files in this directory.
-mkdir -p $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
+sudo mkdir -p $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
 sudo chown -R root:root $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
 
 # Copy notebook templates

@@ -9,16 +9,9 @@ adduser --disabled-password --gecos '' $TESTUSER
 adduser $TESTUSER sudo
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-TEMPDIR=$(mktemp -d)
-cp /tmp/deploy/* $TEMPDIR
-chown -R $TESTUSER:$TESTUSER $TEMPDIR
-
-# Also testing
-chown -R $TESTUSER:$TESTUSER /tmp/FeatureFactory_src
-
 # Run build script. We run as login shell to ensure that typical environment
 # variables, which are expected in the build process, are available.
-su --login $TESTUSER -c "$TEMPDIR/build.sh -y"
+su --login $TESTUSER -c "/tmp/ff/deploy/build.sh -y"
 
 # Don't exit application
 tail -F -n0 /etc/hosts

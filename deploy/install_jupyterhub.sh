@@ -18,7 +18,7 @@ function print_usage_and_die {
 
 # ------------------------------------------------------------------------------
 # App config
-if [ "$#" != "4" ]; then
+if [ "$#" != "5" ]; then
     print_usage_and_die "Invalid number of arguments."
 fi
 
