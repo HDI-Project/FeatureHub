@@ -37,24 +37,16 @@ rm -rf $TEMPDIR/featurefactoryimage
 mkdir $TEMPDIR/featurefactoryimage
 cp -r $TEMPDIR/FeatureFactory/src \
       $TEMPDIR/FeatureFactory/requirements.txt \
-      $TEMPDIR/dockerspawner/systemuser/systemuser.sh \
       $TEMPDIR/featurefactoryimage
 
-cat >$TEMPDIR/featurefactoryimage/featurefactory.conf <<EOF
-[mysql]
-host = $MYSQL_CONTAINER_NAME
-EOF
-
 cat >$TEMPDIR/featurefactoryimage/Dockerfile <<EOF
-FROM jupyterhub/singleuser
+FROM jupyterhub/systemuser
 
-USER root
-WORKDIR /home
-RUN userdel jovyan && rm -rf /home/jovyan
-ENV SHELL /bin/bash
+# Install mysql-related packages
 RUN apt-get update && apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
 RUN pip install --egg mysql-connector-python-rf
 
+# Install featurefactory into site-packages
 WORKDIR /opt/conda/lib/python3.5/site-packages
 COPY src featurefactory
 COPY requirements.txt requirements.txt
@@ -62,14 +54,14 @@ RUN pip install -r requirements.txt
 WORKDIR featurefactory
 RUN python setup.py install
 
-RUN conda uninstall terminado
-
-ADD systemuser.sh /srv/singleuser/systemuser.sh
-RUN [ ! -d "$JUPYTERHUB_CONFIG_DIR" ] && mkdir -p "$JUPYTERHUB_CONFIG_DIR"
-ADD featurefactory.conf "$JUPYTERHUB_CONFIG_DIR/featurefactory.conf"
-RUN USER_ID=65000 USER=systemusertest sh /srv/singleuser/systemuser.sh -h && userdel systemusertest
-
+# Same as jupyterhub/systemuser
 CMD ["sh", "/srv/singleuser/systemuser.sh"]
+EOF
+
+# mysql container name
+cat <<EOF >>$JUPYTERHUB_CONFIG_DIR/featurefactory
+[mysql]
+host = $MYSQL_CONTAINER_NAME
 EOF
 
 docker_sudo=sudo

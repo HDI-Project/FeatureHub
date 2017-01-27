@@ -19,3 +19,6 @@ chown -R $TESTUSER:$TESTUSER /tmp/FeatureFactory_src
 # Run build script. We run as login shell to ensure that typical environment
 # variables, which are expected in the build process, are available.
 su --login $TESTUSER -c "$TEMPDIR/build.sh -y"
+
+# Don't exit application
+tail -F -n0 /etc/hosts

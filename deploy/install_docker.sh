@@ -29,4 +29,4 @@ sudo usermod -aG docker $USER
 # even running the script in the first place. Below is a dumb solution.
 docker_sudo=sudo
 
-${docker_sudo} docker pull jupyterhub/singleuser
+${docker_sudo} docker pull jupyterhub/systemuser

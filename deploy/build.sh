@@ -43,6 +43,7 @@ export PYTHON_VERSION=3
 # Settings
 
 #todo redo defaults
+#todo remove config directory as an option
 declare -a setup=("" "app"                     "Enter FeatureFactory app name" \
                   "" "featurefactory"          "Enter FeatureFactory docker image name" \
                   "" "/var/lib/featurefactory" "Enter FeatureFactory data directory" \
@@ -157,6 +158,7 @@ ${SCRIPT_DIR}/install_mysql.sh \
 ${SCRIPT_DIR}/install_jupyterhub.sh \
     "$FF_APP_NAME" \
     "$FF_IMAGE_NAME" \
+    "$FF_DATA_DIR" \
     "$JUPYTERHUB_CONFIG_DIR" \
     "$MYSQL_CONTAINER_NAME"
 
