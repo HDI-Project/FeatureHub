@@ -11,7 +11,7 @@ fi
 
 USERNAME=$1
 
-sudo userdel -r $
+userdel -r $
 
 # # TODO delete user in database
 # cat <<EOF

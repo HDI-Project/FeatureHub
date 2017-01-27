@@ -99,18 +99,18 @@ fi
 echo "Package manager is $PKG_MGR"
 
 if [ ! -d "$JUPYTERHUB_CONFIG_DIR" ]; then
-    sudo mkdir -p "$JUPYTERHUB_CONFIG_DIR"
+    mkdir -p "$JUPYTERHUB_CONFIG_DIR"
 fi
 if [ ! -d "$FF_DATA_DIR" ]; then
-    sudo mkdir -p "$FF_DATA_DIR"
+    mkdir -p "$FF_DATA_DIR"
 fi
 
 # we must have user-writable config directories
 #TODO this solution is sketchy
-sudo chown -R $USER:$USER "$JUPYTERHUB_CONFIG_DIR"
-sudo chmod -R u+w "$JUPYTERHUB_CONFIG_DIR"
-sudo chown -R $USER:$USER "$FF_DATA_DIR"
-sudo chmod -R u+w "$FF_DATA_DIR"
+chown -R $USER:$USER "$JUPYTERHUB_CONFIG_DIR"
+chmod -R u+w "$JUPYTERHUB_CONFIG_DIR"
+chown -R $USER:$USER "$FF_DATA_DIR"
+chmod -R u+w "$FF_DATA_DIR"
 
 # Check MYSQL container does not exist. If does exist, rename. Hope this doesn't mess
 # anything else up.
@@ -136,13 +136,13 @@ fi
 # Install some dependencies for multiple components
 echo "Installing general dependencies..."
 if [ "$PKG_MGR" = "apt-get" ]; then
-    sudo apt-get -y update
-    sudo apt-get -y dist-upgrade
+    apt-get -y update
+    apt-get -y dist-upgrade
 elif [ "$PKG_MGR" = "yum" ]; then
-    sudo yum -y upgrade yum kernel
-    sudo yum -y update
+    yum -y upgrade yum kernel
+    yum -y update
 fi
-sudo ${PKG_MGR} -y install git python${PYTHON_VERSION}-pip
+${PKG_MGR} -y install git python${PYTHON_VERSION}-pip
 
 # Install docker
 ${SCRIPT_DIR}/install_docker.sh

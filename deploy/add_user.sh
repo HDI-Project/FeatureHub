@@ -19,26 +19,25 @@ FF_NEWUSER_PASSWORD=$6
 echo "Creating new user: $FF_NEWUSER_USERNAME"
 
 # Create user on host machine
-sudo useradd -m -U $FF_NEWUSER_USERNAME
+useradd -m -U $FF_NEWUSER_USERNAME
 
 # Change password. This is portable to ubuntu
-echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | sudo /usr/sbin/chpasswd
+echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | /usr/sbin/chpasswd
 
 # Create directory for user's notebooks. Make sure to mount this later. Also
 # restrict the user from creating new files in this directory.
-sudo mkdir -p $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
-sudo chown -R root:root $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
+mkdir -p $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
+chown -R root:root $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
 
 # Copy notebook templates
 cp -r ${SCRIPT_DIR}/../notebooks/* $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME/notebooks
 
 # Restrict user from writing on home directory. This doesn't really do anything.
-sudo chown -R root:root /home/$FF_NEWUSER_USERNAME
+chown -R root:root /home/$FF_NEWUSER_USERNAME
 
 # Create user in database with correct permissions.
 # TODO this could be a random password as it is saved below anyway.
-docker_sudo=sudo
-${docker_sudo} docker exec -i $MYSQL_CONTAINER_NAME \
+docker exec -i $MYSQL_CONTAINER_NAME \
     mysql \
         --user=$MYSQL_ADMIN_USERNAME \
         --password=$MYSQL_ADMIN_PASSWORD <<EOF
@@ -48,7 +47,7 @@ EOF
 
 # Create .my.cnf file for user. Or, can use mysql_config_editor such that
 # password is not saved in plaintext.
-sudo cat >/home/$FF_NEWUSER_USERNAME/.my.cnf <<EOF
+cat >/home/$FF_NEWUSER_USERNAME/.my.cnf <<EOF
 [client]
 host=$MYSQL_CONTAINER_NAME
 user=$FF_NEWUSER_USERNAME

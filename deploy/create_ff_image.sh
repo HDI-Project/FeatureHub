@@ -29,8 +29,8 @@ cp -r /tmp/FeatureFactory_src $TEMPDIR/FeatureFactory
 git clone https://github.com/jupyterhub/dockerspawner $TEMPDIR/dockerspawner
 
 # Install dockerspawner
-sudo pip${PYTHON_VERSION} install requirements -r $TEMPDIR/dockerspawner/requirements.txt
-( cd $TEMPDIR/dockerspawner && sudo python${PYTHON_VERSION} setup.py install )
+pip${PYTHON_VERSION} install requirements -r $TEMPDIR/dockerspawner/requirements.txt
+( cd $TEMPDIR/dockerspawner && python${PYTHON_VERSION} setup.py install )
 
 # Populate files needed for image
 rm -rf $TEMPDIR/featurefactoryimage
@@ -64,5 +64,4 @@ cat <<EOF >>$JUPYTERHUB_CONFIG_DIR/featurefactory
 host = $MYSQL_CONTAINER_NAME
 EOF
 
-docker_sudo=sudo
-${docker_sudo} docker build -t $FF_IMAGE_NAME $TEMPDIR/featurefactoryimage
+docker build -t $FF_IMAGE_NAME $TEMPDIR/featurefactoryimage
