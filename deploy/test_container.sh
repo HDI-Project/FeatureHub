@@ -3,5 +3,8 @@
 # Run build script.
 /tmp/ff/deploy/build.sh -y
 
-# Don't exit application
+# Run server
+/root/ff_app_jupyterhub_launch.sh &
+
+# Stay alive
 tail -F -n0 /etc/hosts

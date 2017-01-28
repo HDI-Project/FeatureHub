@@ -12,6 +12,7 @@ docker run \
     -it -d --name $CONTAINER_NAME \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$BASEDIR:/tmp/ff:ro" \
+    -p 443:443 \
     ubuntu /tmp/ff/deploy/test_container.sh
 
 docker logs --follow $CONTAINER_NAME

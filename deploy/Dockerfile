@@ -1,0 +1,17 @@
+FROM jupyterhub/systemuser
+
+# Install mysql-related packages
+RUN apt-get update && apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
+RUN pip install --egg mysql-connector-python-rf
+
+# Install featurefactory into site-packages
+# TODO make this not python3.5 hardcoded
+WORKDIR /opt/conda/lib/python3.5/site-packages
+COPY src featurefactory
+WORKDIR featurefactory
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+RUN python setup.py install
+
+# Same as jupyterhub/systemuser
+CMD ["sh", "/srv/singleuser/systemuser.sh"]
