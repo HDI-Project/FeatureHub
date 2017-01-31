@@ -20,5 +20,3 @@ fi
 # already mounted the host docker daemon socked to the guest container. On
 # normal Ubuntu, meanwhile, I don't think an additional step to start the daemon
 # is necessary.
-
-docker pull jupyterhub/singleuser

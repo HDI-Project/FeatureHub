@@ -16,6 +16,8 @@ function print_usage_and_die {
     exit 1
 }
 
+SCRIPT_NAME="${BASH_SOURCE[0]}"
+
 # ------------------------------------------------------------------------------
 # App config
 if [ "$#" != "5" ]; then
@@ -27,6 +29,10 @@ FF_IMAGE_NAME="$2"
 FF_DATA_DIR="$3"
 JUPYTERHUB_CONFIG_DIR="$4"
 MYSQL_CONTAINER_NAME="$5"
+
+# ------------------------------------------------------------------------------
+# Pull jupyterhub/systemuser image
+docker pull jupyterhub/systemuser
 
 # ------------------------------------------------------------------------------
 # Install dependencies
@@ -76,10 +82,7 @@ c.JupyterHub.hub_ip = '$HUB_IP'
 c.JupyterHub.ssl_key = '$JUPYTERHUB_CONFIG_DIR/$KEY_NAME'
 c.JupyterHub.ssl_cert = '$JUPYTERHUB_CONFIG_DIR/$CERT_NAME'
 c.DockerSpawner.links = {'$MYSQL_CONTAINER_NAME':'$MYSQL_CONTAINER_NAME'}
-
-notebook_dir = '/home/jovyan/'
-c.DockerSpawner.volumes = {'$FF_DATA_DIR/users/{username}':notebook_dir}
-
+c.DockerSpawner.volumes = {'$FF_DATA_DIR/users/{username}':'/home/{username}'}
 c.DockerSpawner.read_only_volumes = {'$JUPYTERHUB_CONFIG_DIR/featurefactory':'/etc/featurefactory'}
 c.DockerSpawner.container_image = "$FF_IMAGE_NAME"
 EOF

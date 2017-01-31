@@ -5,6 +5,7 @@ BASEDIR=$(realpath ${SCRIPT_DIR}/..)
 CONTAINER_NAME=app
 
 # Testing
+sudo rm -rf /var/lib/featurefactory/*
 ./kill_containers.sh $CONTAINER_NAME featurefactorymysql
 
 # Run build

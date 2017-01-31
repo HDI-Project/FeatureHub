@@ -26,7 +26,10 @@ docker build --tag $FF_IMAGE_NAME -f /tmp/ff/deploy/Dockerfile /tmp/ff
 
 # mysql container name
 # TODO move elsewhere
-cat <<EOF >>$JUPYTERHUB_CONFIG_DIR/featurefactory
+if [ ! -d "$JUPYTERHUB_CONFIG_DIR/featurefactory" ]; then
+    mkdir -p "$JUPYTERHUB_CONFIG_DIR/featurefactory"
+fi
+cat <<EOF >>$JUPYTERHUB_CONFIG_DIR/featurefactory/featurefactory.conf
 [mysql]
 host = $MYSQL_CONTAINER_NAME
 EOF

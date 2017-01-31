@@ -21,7 +21,7 @@ FF_DATA_DIR=$7
 echo "Creating new user: $FF_NEWUSER_USERNAME"
 
 # Create user on host machine
-useradd -M -U $FF_NEWUSER_USERNAME
+useradd -m -s /bin/bash -U $FF_NEWUSER_USERNAME
 
 # Change password. This is portable to ubuntu
 echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | /usr/sbin/chpasswd

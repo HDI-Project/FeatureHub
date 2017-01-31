@@ -1,6 +1,4 @@
-FROM jupyterhub/singleuser
-
-USER root
+FROM jupyterhub/systemuser
 
 # Install mysql-related packages
 RUN apt-get update && apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
@@ -15,5 +13,5 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 RUN python setup.py install
 
-# Same as jupyterhub/singleuser
-CMD ["sh", "/srv/singleuser/singleuser.sh"]
+# Same as jupyterhub/systemuser
+CMD ["sh", "/srv/singleuser/systemuser.sh"]
