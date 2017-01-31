@@ -105,31 +105,6 @@ if [ ! -d "$FF_DATA_DIR" ]; then
     mkdir -p "$FF_DATA_DIR"
 fi
 
-# we must have user-writable config directories
-#TODO this solution is sketchy
-chown -R $USER:$USER "$JUPYTERHUB_CONFIG_DIR"
-chmod -R u+w "$JUPYTERHUB_CONFIG_DIR"
-chown -R $USER:$USER "$FF_DATA_DIR"
-chmod -R u+w "$FF_DATA_DIR"
-
-# Check MYSQL container does not exist. If does exist, rename. Hope this doesn't mess
-# anything else up.
-if [ "$(docker ps -a -f name=^/${MYSQL_CONTAINER_NAME}$ | wc -l)" != "2" ]; then
-    echo "Container ${MYSQL_CONTAINER_NAME} already exists."
-    suffix="-$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)"
-    MYSQL_CONTAINER_NAME="${MYSQL_CONTAINER_NAME}${suffix}"
-    echo -n "Create container ${MYSQL_CONTAINER_NAME} instead? [y/N] "
-    if [ "$yes" = "yes" ]; then
-        echo
-    else
-        read x
-        if [ "$x" != "y" ]; then
-            "Exiting..."
-            exit 1
-        fi
-    fi
-fi
-
 # ------------------------------------------------------------------------------
 # Install and configure application components
 
@@ -146,6 +121,24 @@ ${PKG_MGR} -y install git python${PYTHON_VERSION}-pip
 
 # Install docker
 ${SCRIPT_DIR}/install_docker.sh
+
+# Check MYSQL container does not exist. If does exist, rename. Hope this doesn't mess
+# anything else up.
+if [ "$(docker ps -a -f name=^/${MYSQL_CONTAINER_NAME}$ | wc -l)" != "1" ]; then
+    echo "Container ${MYSQL_CONTAINER_NAME} already exists."
+    suffix="-$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)"
+    MYSQL_CONTAINER_NAME="${MYSQL_CONTAINER_NAME}${suffix}"
+    echo -n "Create container ${MYSQL_CONTAINER_NAME} instead? [y/N] "
+    if [ "$yes" = "yes" ]; then
+        echo
+    else
+        read x
+        if [ "$x" != "y" ]; then
+            "Exiting..."
+            exit 1
+        fi
+    fi
+fi
 
 # Install mysql
 ${SCRIPT_DIR}/install_mysql.sh \

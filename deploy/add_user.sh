@@ -21,18 +21,18 @@ FF_DATA_DIR=$7
 echo "Creating new user: $FF_NEWUSER_USERNAME"
 
 # Create user on host machine
-useradd -m -U $FF_NEWUSER_USERNAME
+useradd -M -U $FF_NEWUSER_USERNAME
 
 # Change password. This is portable to ubuntu
 echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | /usr/sbin/chpasswd
 
-# Create directory for user's notebooks. Make sure to mount this later. Also
-# restrict the user from creating new files in this directory.
-mkdir -p $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME
-chown -R root:root $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME
+# Create home directory for user. notebooks. Will mount this later. Note that "the
+# user ID has to match for mounted files".
+mkdir -p $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
+chown -R $FF_NEWUSER_USERNAME:$FF_NEWUSER_USERNAME $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
 
 # Copy notebook templates
-cp -r ${SCRIPT_DIR}/../notebooks/* $FF_DATA_DIR/notebooks/$FF_NEWUSER_USERNAME
+cp -r ${SCRIPT_DIR}/../notebooks $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks
 
 # Restrict user from writing on home directory. This doesn't really do anything.
 # chown -R root:root /home/$FF_NEWUSER_USERNAME

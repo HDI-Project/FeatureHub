@@ -7,4 +7,7 @@
 /root/ff_app_jupyterhub_launch.sh &
 
 # Stay alive
-tail -F -n0 /etc/hosts
+while true;
+do
+    sleep 60
+done

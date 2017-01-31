@@ -20,3 +20,11 @@ mysql_containers=$(docker ps -a --filter name=^/${MYSQL_CONTAINER_NAME}-.*$ \
 if [ "$mysql_containers" != "" ]; then
     docker rm -f $mysql_containers
 fi
+
+# Remove jupyter containers
+jupyter_containers=$(docker ps -a --filter name=^/jupyter-.*$ \
+    | awk '{print $NF}' \
+    | tail -n +2)
+if [ "$jupyter_containers" != "" ]; then
+    docker rm -f $jupyter_containers
+fi

@@ -31,7 +31,7 @@ MYSQL_CONTAINER_NAME="$5"
 # ------------------------------------------------------------------------------
 # Install dependencies
 
-echo "Installing jupyterhub dependencies..."
+echo "Installing jupyterhub and dependencies..."
 
 if [ "$PKG_MGR" = "apt-get" ]; then
     apt-get -y install npm nodejs-legacy
@@ -42,7 +42,7 @@ elif [ "$PKG_MGR" = "yum" ]; then
 fi
 
 npm install -g configurable-http-proxy
-pip3 install jupyterhub
+pip${PYTHON_VERSION} install jupyterhub
 
 # ------------------------------------------------------------------------------
 # Generate SSL certificate
@@ -76,7 +76,7 @@ c.JupyterHub.hub_ip = '$HUB_IP'
 c.JupyterHub.ssl_key = '$JUPYTERHUB_CONFIG_DIR/$KEY_NAME'
 c.JupyterHub.ssl_cert = '$JUPYTERHUB_CONFIG_DIR/$CERT_NAME'
 c.DockerSpawner.links = {'$MYSQL_CONTAINER_NAME':'$MYSQL_CONTAINER_NAME'}
-c.DockerSpawner.volumes = {'$FF_DATA_DIR/notebooks/{username}':'/home/{username}/notebooks'}
+c.SystemUserSpawner.host_homedir_format_string = '$FF_DATA_DIR/users/{username}'
 c.DockerSpawner.read_only_volumes = {'$JUPYTERHUB_CONFIG_DIR/featurefactory':'/etc/featurefactory'}
 c.SystemUserSpawner.container_image = "$FF_IMAGE_NAME"
 EOF
