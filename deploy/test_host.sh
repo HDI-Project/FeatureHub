@@ -12,6 +12,7 @@ docker run \
     -it -d --name $CONTAINER_NAME \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$BASEDIR:/tmp/ff:ro" \
+    -v /var/lib/featurefactory:/var/lib/featurefactory \
     -p 443:443 \
     ubuntu /tmp/ff/deploy/test_container.sh
 

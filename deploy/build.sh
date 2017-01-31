@@ -44,14 +44,14 @@ export PYTHON_VERSION=3
 
 #todo redo defaults
 #todo remove config directory as an option
-declare -a setup=("" "app"                     "Enter FeatureFactory app name" \
-                  "" "featurefactory"          "Enter FeatureFactory docker image name" \
-                  "" "/var/lib/featurefactory" "Enter FeatureFactory data directory" \
-                  "" "/etc/featurefactory"     "Enter jupyterhub config directory" \
-                  "" "featurefactorymysql"     "Enter FeatureFactory MySQL docker container name (must be unique)" \
-                  "" "featurefactory"          "Enter FeatureFactory MySQL database name" \
-                  "" "featurefactoryadmin"     "Enter FeatureFactory MySQL admin username" \
-                  "" "featurefactoryadmin"     "Enter FeatureFactory MySQL admin password" );
+declare -a setup=("" "app"                            "Enter FeatureFactory app name" \
+                  "" "featurefactory"                 "Enter FeatureFactory docker image name" \
+                  "" "/var/lib/featurefactory"        "Enter FeatureFactory data directory" \
+                  "" "/var/lib/featurefactory/config" "Enter jupyterhub config directory" \
+                  "" "featurefactorymysql"            "Enter FeatureFactory MySQL docker container name (must be unique)" \
+                  "" "featurefactory"                 "Enter FeatureFactory MySQL database name" \
+                  "" "featurefactoryadmin"            "Enter FeatureFactory MySQL admin username" \
+                  "" "featurefactoryadmin"            "Enter FeatureFactory MySQL admin password" );
 
 function read_user_input {
     i=$1
