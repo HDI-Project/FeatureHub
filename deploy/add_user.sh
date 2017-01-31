@@ -26,16 +26,11 @@ useradd -M -U $FF_NEWUSER_USERNAME
 # Change password. This is portable to ubuntu
 echo $FF_NEWUSER_USERNAME:$FF_NEWUSER_PASSWORD | /usr/sbin/chpasswd
 
-# Create home directory for user. notebooks. Will mount this later. Note that "the
-# user ID has to match for mounted files".
+# Create directory for user notebooks and copy in templates. Will mount this
+# later. Note that "the user ID has to match for mounted files".
 mkdir -p $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
-chown -R $FF_NEWUSER_USERNAME:$FF_NEWUSER_USERNAME $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
-
-# Copy notebook templates
 cp -r ${SCRIPT_DIR}/../notebooks $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks
-
-# Restrict user from writing on home directory. This doesn't really do anything.
-# chown -R root:root /home/$FF_NEWUSER_USERNAME
+chown -R $FF_NEWUSER_USERNAME:$FF_NEWUSER_USERNAME $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
 
 # Create user in database with correct permissions.
 # TODO this could be a random password as it is saved below anyway.
@@ -49,7 +44,7 @@ EOF
 
 # Create .my.cnf file for user. Or, can use mysql_config_editor such that
 # password is not saved in plaintext.
-cat >/home/$FF_NEWUSER_USERNAME/.my.cnf <<EOF
+cat >$FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/.my.cnf <<EOF
 [client]
 host=$MYSQL_CONTAINER_NAME
 user=$FF_NEWUSER_USERNAME

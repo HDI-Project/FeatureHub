@@ -76,9 +76,12 @@ c.JupyterHub.hub_ip = '$HUB_IP'
 c.JupyterHub.ssl_key = '$JUPYTERHUB_CONFIG_DIR/$KEY_NAME'
 c.JupyterHub.ssl_cert = '$JUPYTERHUB_CONFIG_DIR/$CERT_NAME'
 c.DockerSpawner.links = {'$MYSQL_CONTAINER_NAME':'$MYSQL_CONTAINER_NAME'}
-c.SystemUserSpawner.host_homedir_format_string = '$FF_DATA_DIR/users/{username}'
+
+notebook_dir = '/home/jovyan/'
+c.DockerSpawner.volumes = {'$FF_DATA_DIR/users/{username}':notebook_dir}
+
 c.DockerSpawner.read_only_volumes = {'$JUPYTERHUB_CONFIG_DIR/featurefactory':'/etc/featurefactory'}
-c.SystemUserSpawner.container_image = "$FF_IMAGE_NAME"
+c.DockerSpawner.container_image = "$FF_IMAGE_NAME"
 EOF
 
 echo "Done."

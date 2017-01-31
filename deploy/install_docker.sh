@@ -21,4 +21,4 @@ fi
 # normal Ubuntu, meanwhile, I don't think an additional step to start the daemon
 # is necessary.
 
-docker pull jupyterhub/systemuser
+docker pull jupyterhub/singleuser
