@@ -26,16 +26,16 @@ docker pull mysql:$MYSQL_VERSION
 root_password=$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)
 echo $root_password #TODO delete
 docker run \
+    -dt \
     --name "$MYSQL_CONTAINER_NAME" \
     -e MYSQL_ROOT_PASSWORD=$root_password \
     -e "MYSQL_DATABASE=$MYSQL_DATABASE_NAME" \
-    -t -d \
+    --network=$DOCKER_NETWORK_NAME \
     mysql
 
 # Wait until mysqld is ready for connections. In the startup process, the
 # message gets printed before we're really ready for connections.
 grep -m 2 "mysqld: ready for connections." <(docker logs --follow "$MYSQL_CONTAINER_NAME")
-
 
 docker exec -i "$MYSQL_CONTAINER_NAME" \
     mysql \

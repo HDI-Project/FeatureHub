@@ -84,6 +84,8 @@ MYSQL_DATABASE_NAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 MYSQL_ADMIN_USERNAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 MYSQL_ADMIN_PASSWORD="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 
+export DOCKER_NETWORK_NAME="featurefactory-network"
+
 # ------------------------------------------------------------------------------
 # Some brief validation
 
