@@ -11,14 +11,13 @@ from orm.sqlalchemy_main import ORMManager
 
 class Commands(object):
 
-    def __init__(self, problem=None, database='featurefactory',
-                 user='featurefactory', password='featurefactory'):
+    def __init__(self, problem=None, database='featurefactory'):
         """Create the ORMManager and connect to DB.
 
         if problem name is given, load it.
         """
 
-        self.__orm = ORMManager(database, user, password)
+        self.__orm = ORMManager(database)
 
         if not database_exists(self.__orm.engine.url):
             print('database {} does not seem to exist.'.format(database))
