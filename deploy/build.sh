@@ -81,8 +81,8 @@ FF_DATA_DIR="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 JUPYTERHUB_CONFIG_DIR="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 MYSQL_CONTAINER_NAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 MYSQL_DATABASE_NAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
-MYSQL_ADMIN_USERNAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
-MYSQL_ADMIN_PASSWORD="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
+FF_ADMIN_USERNAME="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
+FF_ADMIN_PASSWORD="${setup[ $(( (i-1)*3+1-1 )) ]}"; i=$((i+1))
 
 export DOCKER_NETWORK_NAME="featurefactory-network"
 
@@ -146,8 +146,9 @@ fi
 ${SCRIPT_DIR}/install_mysql.sh \
     "$MYSQL_CONTAINER_NAME" \
     "$MYSQL_DATABASE_NAME" \
-    "$MYSQL_ADMIN_USERNAME" \
-    "$MYSQL_ADMIN_PASSWORD"
+    "$FF_ADMIN_USERNAME" \
+    "$FF_ADMIN_PASSWORD" \
+    "$FF_DATA_DIR"
 
 # Install jupyterhub
 ${SCRIPT_DIR}/install_jupyterhub.sh \
@@ -169,8 +170,8 @@ FF_NEWUSER_PASSWORD=abc123
 ${SCRIPT_DIR}/add_user.sh \
     $MYSQL_CONTAINER_NAME \
     $MYSQL_DATABASE_NAME \
-    $MYSQL_ADMIN_USERNAME \
-    $MYSQL_ADMIN_PASSWORD \
+    $FF_ADMIN_USERNAME \
+    $FF_ADMIN_PASSWORD \
     $FF_NEWUSER_USERNAME \
     $FF_NEWUSER_PASSWORD \
     $FF_DATA_DIR

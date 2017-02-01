@@ -5,16 +5,18 @@
 
 set -e
 
-if [ "$#" != "4" ]; then
+if [ "$#" != "5" ]; then
     echo "usage: ./install_mysql.sh mysql_container_name mysql_database_name"
     echo "                          mysql_admin_username mysql_admin_password"
+    echo "                          ff_data_dir"
     exit 1
 fi
 
 MYSQL_CONTAINER_NAME=$1
 MYSQL_DATABASE_NAME=$2
-MYSQL_ADMIN_USERNAME=$3
-MYSQL_ADMIN_PASSWORD=$4
+FF_ADMIN_USERNAME=$3
+FF_ADMIN_PASSWORD=$4
+FF_DATA_DIR=$5
 
 # ------------------------------------------------------------------------------
 # Download mysql
@@ -24,7 +26,6 @@ docker pull mysql:$MYSQL_VERSION
 # Create a mysql container, initialize the featurefactory database, and create
 # an admin user account. Also create a random root password.
 root_password=$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)
-echo $root_password #TODO delete
 docker run \
     -dt \
     --name "$MYSQL_CONTAINER_NAME" \
@@ -37,12 +38,14 @@ docker run \
 # message gets printed before we're really ready for connections.
 grep -m 2 "mysqld: ready for connections." <(docker logs --follow "$MYSQL_CONTAINER_NAME")
 
-docker exec -i "$MYSQL_CONTAINER_NAME" \
-    mysql \
-    --user=root \
-    --password=${root_password} <<EOF
-CREATE USER '$MYSQL_ADMIN_USERNAME'@'%' IDENTIFIED BY '$MYSQL_ADMIN_PASSWORD';
-GRANT ALL ON *.* TO '$MYSQL_ADMIN_USERNAME'@'%' WITH GRANT OPTION;
-EOF
-
 echo "done"
+
+# Create an admin account
+# Create an admin account
+${SCRIPT_DIR}/add_admin.sh $MYSQL_CONTAINER_NAME \
+                           $MYSQL_DATABASE_NAME \
+                           root \
+                           $root_password \
+                           $FF_ADMIN_USERNAME \
+                           $FF_ADMIN_PASSWORD \
+                           $FF_DATA_DIR
