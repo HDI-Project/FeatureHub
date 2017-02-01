@@ -27,9 +27,8 @@ class Session(object):
     Variables prefixed by '__' are "harder" to access, but still accessible!
     For example, __db attribute is still accessible as `session._Session__db`
     """
-    def __init__(self, problem, n_jobs=1, database='featurefactory',
-                 user='featurefactory', password='featurefactory'):
-        self.__orm = ORMManager(database, user, password)
+    def __init__(self, problem, n_jobs=1, database='featurefactory'):
+        self.__orm = ORMManager(database)
         self.__user = None
         self.__dataset = None
 
