@@ -1,5 +1,8 @@
 FROM jupyterhub/systemuser
 
+# Clean up from existing systemuser setup
+RUN rm -rf /home/jovyan
+
 # Install mysql-related packages
 RUN apt-get update && apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
 RUN pip install --egg mysql-connector-python-rf

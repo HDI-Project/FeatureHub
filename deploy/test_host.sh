@@ -2,11 +2,12 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=$(realpath ${SCRIPT_DIR}/..)
-CONTAINER_NAME=app
 
 # Testing
-sudo rm -rf /var/lib/featurefactory/*
-./kill_containers.sh $CONTAINER_NAME featurefactorymysql
+CONTAINER_NAME=app
+MYSQL_CONTAINER_NAME=featurefactorymysql
+sudo rm -rf /var/lib/featurefactory/{users,config}
+./kill_containers.sh $CONTAINER_NAME $MYSQL_CONTAINER_NAME
 
 # Create network
 DOCKER_NETWORK_NAME="featurefactory-network"

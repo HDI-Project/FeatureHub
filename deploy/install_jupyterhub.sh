@@ -6,8 +6,8 @@
 set -e
 
 function print_usage {
-    echo "usage: install_jupyterhub.sh ff_app_name ff_image_name ff_data_dir"
-    echo "                             jupyterhub_config_dir mysql_container_name"
+    echo "usage: ./install_jupyterhub.sh ff_app_name ff_image_name ff_data_dir"
+    echo "                               jupyterhub_config_dir mysql_container_name"
 }
 
 function print_usage_and_die {
@@ -93,8 +93,10 @@ c.DockerSpawner.extra_host_config = { 'network_mode': '$NETWORK_NAME' }
 
 c.JupyterHub.ssl_key = '$JUPYTERHUB_CONFIG_DIR/$KEY_NAME'
 c.JupyterHub.ssl_cert = '$JUPYTERHUB_CONFIG_DIR/$CERT_NAME'
-#c.DockerSpawner.links = {'$MYSQL_CONTAINER_NAME':'$MYSQL_CONTAINER_NAME'}
-c.DockerSpawner.read_only_volumes = {'$JUPYTERHUB_CONFIG_DIR/featurefactory':'/etc/featurefactory'}
+c.DockerSpawner.read_only_volumes = {
+    '$JUPYTERHUB_CONFIG_DIR/featurefactory':'/etc/featurefactory',
+    '$FF_DATA_DIR/data':'/data',
+}
 c.SystemUserSpawner.host_homedir_format_string = '$FF_DATA_DIR/users/{username}'
 c.SystemUserSpawner.container_image = "$FF_IMAGE_NAME"
 EOF
