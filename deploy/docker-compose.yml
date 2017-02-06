@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+    hub:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-hub
+        image: featurefactoryhub
+        container_name: featurefactoryhub
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:rw"
+            - "/var/lib/featurefactory:/var/lib/featurefactory:rw"
+            - "/etc/featurefactory:/etc/featurefactory:ro"
+        ports:
+            - "443:443"
+        command: >
+            jupyterhub -f /etc/featurefactory/jupyterhub/jupyterhub_config.py
+    user:
+        build:
+            context: ..
+            dockerfile: ./Dockerfile-user
+        image: featurefactoryuser
+    db:
+        image: mysql:5.7
+        container_name: featurefactorymysql
+        ports:
+            - "3306:3306"
+        environment:
+
+
+networks:
+    default:
+        external:
+            name: featurefactory-network

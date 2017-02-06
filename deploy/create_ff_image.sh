@@ -17,12 +17,8 @@ MYSQL_CONTAINER_NAME=$3
 
 # ------------------------------------------------------------------------------
 
-# Install dockerspawner
-# TODO move elsewhere
-pip${PYTHON_VERSION} install dockerspawner
-
 # Build image
-docker build --tag $FF_IMAGE_NAME -f /tmp/ff/deploy/Dockerfile /tmp/ff
+docker build --tag $FF_IMAGE_NAME -f ./Dockerfile-user ./..
 
 # mysql container name
 # TODO move elsewhere

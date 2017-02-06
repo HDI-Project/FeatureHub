@@ -1,0 +1,15 @@
+# Adapted from jupyterhub/jupyterhub-deploy-docker
+FROM jupyterhub/jupyterhub-onbuild:0.7.0
+
+# Installed dockerspawner
+RUN /opt/conda/bin/pip install \
+    oauthenticator==0.5.* \
+    dockerspawner==0.5.*
+
+# Install docker on the jupyterhub container
+RUN wget https://get.docker.com -q -O /tmp/getdocker && \
+    chmod +=x /tmp/getdocker && \
+    sh /tmp/getdocker
+
+# Copy TLS certificate and key; or make sure config file is set properly.
+# Copy userlist; or make sure config file is set properly.
