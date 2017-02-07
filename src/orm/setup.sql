@@ -37,7 +37,7 @@ create table features (
     user_id int(11) DEFAULT NULL,
     problem_id int(11) NOT NULL,
     score float DEFAULT NULL,
-    filename varchar(200) DEFAULT NULL,
+    code text NOT NULL,
     md5 varchar(32) DEFAULT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, BigInteger, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, BigInteger, Float, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -23,7 +23,7 @@ class Feature(Base):
     user = relationship('User')
     problem_id = Column(Integer, ForeignKey('problems.id'))
     problem = relationship('Problem')
-    filename = Column(String(200), nullable=True)
+    code = Column(Text, nullable=False)
     md5 = Column(String(32), nullable=True)
     score = Column(Float)
     created_at = Column(DateTime, default=datetime.now)

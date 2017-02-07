@@ -98,7 +98,6 @@ class Commands(object):
             'user': feature.user.name,
             'name': feature.name,
             'md5': feature.md5,
-            'filename': feature.filename,
             'score': feature.score,
             'created_at': feature.created_at
             } for feature in features]
@@ -121,10 +120,9 @@ class Commands(object):
 
         feature = features.order_by(Feature.created_at.desc()).first()
 
-        with open(feature.filename, 'r') as f:
-            print('Name: {}'.format(feature.name))
-            print('Score: {}'.format(feature.score))
-            print('md5: {}'.format(feature.md5))
-            print('created_at: {}'.format(feature.created_at))
-            print('\n')
-            print(f.read())
+        print('Name: {}'.format(feature.name))
+        print('Score: {}'.format(feature.score))
+        print('md5: {}'.format(feature.md5))
+        print('created_at: {}'.format(feature.created_at))
+        print('\n')
+        print(feature.code)

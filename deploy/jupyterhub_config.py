@@ -40,7 +40,6 @@ c.JupyterHub.ssl_cert = os.path.join(jupyterhub_config_dir, 'cert.pem')
 # Data/directories
 c.Spawner.notebook_dir = '~/notebooks'
 c.DockerSpawner.read_only_volumes = {
-    ff_config_dir                     : '/etc/featurefactory',
     os.path.join(ff_data_dir, 'data') : '/data',
 }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')

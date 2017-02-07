@@ -158,8 +158,8 @@ class Session(object):
         name = function.__name__
         assert name != '<lambda>', 'Adding an anonymous function is not allowed'
 
-        code = self.__get_source(function)
-        md5 = hashlib.md5(code.encode('utf-8')).hexdigest()
+        code = self.__get_source(function).encode('utf-8')
+        md5 = hashlib.md5(code).hexdigest()
 
         query = (
             Feature.name == name,
@@ -175,17 +175,9 @@ class Session(object):
         score = float(self.cross_validate(function))
         print("Your feature {} scored {}".format(name, score))
 
-        # if successful
-        dirname = os.path.join(self.__data_path, self.__user.name)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
         now = datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S')
-        filename = os.path.join(dirname, '{}_{}.py'.format(name, now))
-        with open(filename, 'w') as f:
-            f.write(code)
 
-        feature = Feature(name=name, score=score, filename=filename, md5=md5,
+        feature = Feature(name=name, score=score, code=code, md5=md5,
                           user=self.__user, problem=self.__problem)
         self.__orm.session.add(feature)
         self.__orm.session.commit()

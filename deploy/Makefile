@@ -11,7 +11,9 @@ setup:
 	sudo mkdir -p $(FF_DATA_DIR)/config/{jupyterhub,featurefactory}
 	sudo chmod -R 777 $(FF_DATA_DIR)
 
-clean: kill_containers kill_images remove_files
+clean_all: kill_containers remove_files kill_images 
+
+clean: kill_containers remove_files
 
 remove_files:
 	rm -rf $(FF_DATA_DIR)/{users,config}	
