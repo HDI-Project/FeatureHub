@@ -6,7 +6,7 @@ set -e
 source .env
 
 if [ "$#" != "1" ]; then
-    echo "usage: ./delete_user.sh"
+    echo "usage: ./delete_user.sh username"
     exit 1
 fi
 

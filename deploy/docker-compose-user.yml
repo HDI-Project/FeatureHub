@@ -5,4 +5,4 @@ services:
         build:
             context: ..
             dockerfile: deploy/Dockerfile-user
-        image: featurefactoryuser
+        image: ${FF_IMAGE_NAME}

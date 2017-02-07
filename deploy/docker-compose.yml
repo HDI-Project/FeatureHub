@@ -10,18 +10,24 @@ services:
         build:
             context: .
             dockerfile: ./Dockerfile-hub
-        image: featurefactoryhub
-        container_name: featurefactoryhub
+        image: ${HUB_IMAGE_NAME}
+        container_name: ${HUB_CONTAINER_NAME}
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:rw"
-            - "/var/lib/featurefactory:/var/lib/featurefactory:rw"
+            - "${FF_DATA_DIR}:${FF_DATA_DIR}:rw"
         ports:
             - "443:443"
+        environment:
+            DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+            FF_DATA_DIR: ${FF_DATA_DIR}
+            FF_IMAGE_NAME: ${FF_IMAGE_NAME}
+            FF_CONTAINER_NAME: ${FF_CONTAINER_NAME}
+            HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
         command: >
-            jupyterhub -f /var/lib/featurefactory/config/jupyterhub/jupyterhub_config.py
+            jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
     db:
         image: mysql:5.7
-        container_name: featurefactorymysql
+        container_name: ${MYSQL_CONTAINER_NAME}
         ports:
             - "3306:3306"
         environment:
