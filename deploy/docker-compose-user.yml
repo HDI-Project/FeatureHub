@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+    user:
+        build:
+            context: ..
+            dockerfile: deploy/Dockerfile-user
+        image: featurefactoryuser

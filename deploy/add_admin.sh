@@ -1,37 +1,30 @@
 #!/usr/bin/env bash
 
-set -e
+# These environment variables are local
+source .env
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-if [ "$#" != "7" ]; then
-    echo "usage: ./add_admin.sh mysql_container_name mysql_database_name"
-    echo "                     mysql_root_username mysql_root_password"
-    echo "                     ff_newuser_username ff_newuser_password"
-    echo "                     ff_data_dir"
+if [ "$#" != "2" ]; then
+    echo "usage: ./add_admin.sh ff_admin_username ff_admin_password"
     exit 1
 fi
 
-MYSQL_CONTAINER_NAME=$1
-MYSQL_DATABASE_NAME=$2
-MYSQL_ROOT_USERNAME=$3
-MYSQL_ROOT_PASSWORD=$4
-FF_ADMIN_USERNAME=$5
-FF_ADMIN_PASSWORD=$6
-FF_DATA_DIR=$7
+FF_ADMIN_USERNAME=$1
+FF_ADMIN_PASSWORD=$2
 
 echo "Creating new user: $FF_ADMIN_USERNAME"
 
 # Create user on host machine
-useradd -m -s /bin/bash -U $FF_ADMIN_USERNAME
-
 # Change password. This is portable to ubuntu
+docker exec -i $HUB_CONTAINER_NAME \
+    bash <<EOF
+useradd -m -s /bin/bash -U $FF_ADMIN_USERNAME
 echo $FF_ADMIN_USERNAME:$FF_ADMIN_PASSWORD | /usr/sbin/chpasswd
+EOF
 
 # Create directory for user notebooks and copy in templates. Will mount this
 # later. Note that "the user ID has to match for mounted files".
 mkdir -p $FF_DATA_DIR/users/$FF_ADMIN_USERNAME
-cp -r ${SCRIPT_DIR}/../notebooks $FF_DATA_DIR/users/$FF_ADMIN_USERNAME/notebooks
+cp -r ../notebooks $FF_DATA_DIR/users/$FF_ADMIN_USERNAME/notebooks
 
 # Create user in database with correct permissions. Create .my.cnf file for
 # user. The password for mysql db is generated randomly and is not the same as
@@ -51,7 +44,7 @@ user=$FF_ADMIN_USERNAME
 password=$FF_ADMIN_MYSQL_PASSWORD
 EOF
 
-# User own all files in mounted volume
-chown -R $FF_ADMIN_USERNAME:$FF_ADMIN_USERNAME $FF_DATA_DIR/users/$FF_ADMIN_USERNAME
+# Grant all permissions to all files in mounted volume
+sudo chmod -R 777 $FF_DATA_DIR/users/$FF_ADMIN_USERNAME
 
 echo "Creating new admin: $FF_ADMIN_USERNAME: Done."
