@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from orm.sqlalchemy_declarative import Base
 from configparser import ConfigParser
-import os.path
+import os
 
 class ORMManager:
     """Initialize the sqlalchemy ORM engine and starts a database session."""
@@ -10,12 +10,7 @@ class ORMManager:
     def __init__(self, database):
 
         # Host information is the same across users
-        try:
-            config = ConfigParser()
-            config.read('/etc/featurefactory/featurefactory.conf')
-            host = config.get('mysql','host')
-        except IOError:
-            host = 'localhost'
+        host = os.getenv('MYSQL_CONTAINER_NAME', 'localhost')
 
         # User's username/password is user-specific
         try:

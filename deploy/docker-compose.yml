@@ -23,6 +23,7 @@ services:
             FF_IMAGE_NAME: ${FF_IMAGE_NAME}
             FF_CONTAINER_NAME: ${FF_CONTAINER_NAME}
             HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
+            MYSQL_CONTAINER_NAME: ${MYSQL_CONTAINER_NAME}
         command: >
             jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
     db:

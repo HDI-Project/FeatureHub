@@ -8,6 +8,7 @@ ff_data_dir               = os.environ['FF_DATA_DIR']
 ff_image_name             = os.environ['FF_IMAGE_NAME']
 ff_container_name         = os.environ['FF_CONTAINER_NAME']
 hub_container_name        = os.environ['HUB_CONTAINER_NAME']
+mysql_container_name      = os.environ['MYSQL_CONTAINER_NAME']
 
 jupyterhub_config_dir     = os.path.join(ff_data_dir, 'config', 'jupyterhub')
 ff_config_dir             = os.path.join(ff_data_dir, 'config', 'featurefactory')
@@ -26,6 +27,9 @@ c.DockerSpawner.use_internal_ip   = True
 c.DockerSpawner.network_name      = network_name
 c.DockerSpawner.extra_host_config = {
     'network_mode': network_name,
+}
+c.Spawner.environment = {
+    'MYSQL_CONTAINER_NAME':mysql_container_name,
 }
 
 # Security
