@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # These environment variables are local
 source .env
 

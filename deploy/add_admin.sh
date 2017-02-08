@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # These environment variables are local
 source .env
 
@@ -24,7 +26,7 @@ EOF
 # Create directory for user notebooks and copy in templates. Will mount this
 # later. Note that "the user ID has to match for mounted files".
 mkdir -p $FF_DATA_DIR/users/$FF_ADMIN_USERNAME/notebooks
-cp -r ../notebooks/* $FF_DATA_DIR/users/$FF_ADMIN_USERNAME
+cp -r ../notebooks/* $FF_DATA_DIR/users/$FF_ADMIN_USERNAME/notebooks
 
 # Create user in database with correct permissions. Create .my.cnf file for
 # user. The password for mysql db is generated randomly and is not the same as
