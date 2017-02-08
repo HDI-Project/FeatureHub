@@ -44,26 +44,11 @@ class Session(object):
         self.__y_column = self.__problem.y_column
         self.__data_path = self.__problem.data_path
 
-    def login(self):
-        """log a user into the feature factory system."""
-
-        name = os.getenv('USER')
-        try:
-            query = self.__orm.session.query(User)
-            self.__user = query.filter(User.name == name).one()
-        except NoResultFound:
-            pass
-
-    def logout(self):
-        """log a user out of the feature factory system."""
-        if self.__user:
-            self.__user = None
-
-    def create_user(self):
-        """creates a new user entry in database."""
+        # "log in" to the system
         name = os.getenv('USER')
         if not self.__orm.session.query(exists().where(User.name == name)).scalar():
-            self.__orm.session.add(User(name=name))
+            self.__user = User(name=name)
+            self.__orm.session.add(self.__user)
 
     def add_notebook(self, name):
         """creates a new notebook entry in database."""

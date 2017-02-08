@@ -2,15 +2,6 @@ class Commands(object):
     def __init__(self, session):
         self.session = session
 
-    def login(self):
-        self.session.login()
-
-    def logout(self):
-        self.session.logout()
-
-    def create_user(self):
-        self.session.create_user()
-
     def extract_feature(self, fn, name, form):
         self.session.extract_feature(fn, name)
 
