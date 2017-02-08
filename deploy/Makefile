@@ -16,7 +16,7 @@ clean_all: kill_containers remove_files kill_images
 clean: kill_containers remove_files
 
 remove_files:
-	rm -rf $(FF_DATA_DIR)/{users,config}	
+	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
 
 kill_containers:
 	@docker rm -f $(HUB_CONTAINER_NAME) $(MYSQL_CONTAINER_NAME) 2>/dev/null || echo "No hub/db containers found."

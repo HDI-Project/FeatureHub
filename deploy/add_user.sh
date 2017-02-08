@@ -24,8 +24,8 @@ EOF
 # Create directory for user notebooks and copy in templates. Will mount this
 # later. Note that "the user ID has to match for mounted files". Remove admin
 # notebooks.
-mkdir -p $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME
-cp -r ../notebooks $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks
+mkdir -p $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks
+cp -r ../notebooks/* $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks
 rm -r $FF_DATA_DIR/users/$FF_NEWUSER_USERNAME/notebooks/admin
 
 # Create user in database with correct permissions. Create .my.cnf file for
