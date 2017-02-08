@@ -6,8 +6,7 @@ use featurefactory;
 
 create table users (
     id int NOT NULL AUTO_INCREMENT,
-    name varchar(200) NOT NULL,
-    password varchar(200) NOT NULL, primary key (id)
+    name varchar(200) NOT NULL
 );
 
 create table problems (

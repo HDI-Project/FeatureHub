@@ -12,8 +12,6 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(200), nullable=False)
-    password = Column(String(200), nullable=False)
-
 
 class Feature(Base):
     __tablename__ = 'features'

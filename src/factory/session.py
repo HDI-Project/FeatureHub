@@ -44,31 +44,26 @@ class Session(object):
         self.__y_column = self.__problem.y_column
         self.__data_path = self.__problem.data_path
 
-    def login(self, name, password):
+    def login(self):
         """log a user into the feature factory system."""
+
+        name = os.getenv('USER')
         try:
             query = self.__orm.session.query(User)
-            self.__user = query.filter(User.name == name, User.password == password).one()
-            print('user successfully logged in')
+            self.__user = query.filter(User.name == name).one()
         except NoResultFound:
-            print('incorrect user name or password')
+            pass
 
-    def logout(self, name):
-        """ogs a user out of the feature factory system."""
+    def logout(self):
+        """log a user out of the feature factory system."""
         if self.__user:
             self.__user = None
-            print('you have successfully logged out')
-        else:
-            print('no user currently login')
 
-    def create_user(self, name, password):
+    def create_user(self):
         """creates a new user entry in database."""
-        if self.__orm.session.query(exists().where(User.name == name)).scalar():
-            print('username already exists')
-
-        else:
-            self.__orm.session.add(User(name=name, password=password))
-            print('user successfully created')
+        name = os.getenv('USER')
+        if not self.__orm.session.query(exists().where(User.name == name)).scalar():
+            self.__orm.session.add(User(name=name))
 
     def add_notebook(self, name):
         """creates a new notebook entry in database."""
