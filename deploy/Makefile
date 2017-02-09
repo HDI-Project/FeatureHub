@@ -12,7 +12,7 @@ setup_files:
 	sudo chmod -R 777 $(FF_DATA_DIR)
 
 teardown_files:
-	sudo rm -rf $(FF_DATA_DIR)/{users,config}
+	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
 
 clean_all: kill_containers teardown_files kill_images kill_network kill_volumes
 

@@ -40,6 +40,8 @@ c.JupyterHub.ssl_cert = os.path.join(jupyterhub_config_dir, 'cert.pem')
 # c.Authenticator.whitelist = {''}
 
 # Data/directories
+c.JupyterHub.db_url                            = os.path.join('sqlite:///', jupyterhub_config_dir, 'jupyterhub.sqlite')
+c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_dir, 'jupyterhub_cookie_secret')
 c.Spawner.notebook_dir                         = '~/notebooks'
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, 'data') : '/data' }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')
