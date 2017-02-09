@@ -2,21 +2,21 @@ include .env
 
 .DEFAULT_GOAL=build
 
-.PHONY: network build clean clean_all kill_containers log_hub kill_images build_user build_hub ssl help
+.PHONY: help setup_files teardown_files clean_all clean kill_containers kill_images network kill_network volumes kill_volumes build build_user build_hub ssl up down
 
 help:
 	@echo help
 
-setup:
+setup_files:
 	sudo mkdir -p $(FF_DATA_DIR)/config/{jupyterhub,featurefactory}
 	sudo chmod -R 777 $(FF_DATA_DIR)
 
-clean_all: kill_containers remove_files kill_images 
+teardown_files:
+	sudo rm -rf $(FF_DATA_DIR)/{users,config}
 
-clean: kill_containers remove_files
+clean_all: kill_containers teardown_files kill_images kill_network kill_volumes
 
-remove_files:
-	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
+clean: kill_containers teardown_files
 
 kill_containers:
 	@docker rm -f $(HUB_CONTAINER_NAME) $(MYSQL_CONTAINER_NAME) 2>/dev/null || echo "No hub/db containers found."
@@ -28,24 +28,30 @@ kill_images:
 network:
 	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(DOCKER_NETWORK_NAME)
 
-build: network build_user build_hub ssl
+kill_network:
+	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network rm $(DOCKER_NETWORK_NAME)
 
-build_user: setup
-	docker-compose -f docker-compose-user.yml build
+volumes:
+	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(MYSQL_DATA_VOLUME_NAME)
 
-build_hub: setup
-	docker-compose -f docker-compose.yml build
+kill_volumes:
+	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume rm $(MYSQL_DATA_VOLUME_NAME)
+
+build: network volumes build_user build_hub ssl
+
+build_user: setup_files
+	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-user.yml build
+
+build_hub: setup_files
+	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
 	# TODO better way?
 	cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
-
-log_hub:
-	docker logs --follow $(HUB_CONTAINER_NAME)
 
 ssl:
 	./gen_ssl.sh
 
 up:
-	docker-compose -f docker-compose.yml up -d
+	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml up -d
 
 down:
-	docker-compose down
+	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml down

@@ -2,6 +2,8 @@
 
 import os
 
+c = get_config()
+
 # Setup some variables
 network_name              = os.environ['DOCKER_NETWORK_NAME']
 ff_data_dir               = os.environ['FF_DATA_DIR']
@@ -26,20 +28,18 @@ c.JupyterHub.hub_port             = 8080
 c.DockerSpawner.use_internal_ip   = True
 c.DockerSpawner.network_name      = network_name
 c.DockerSpawner.extra_host_config = {
-    'network_mode': network_name,
+    'network_mode' : network_name,
 }
-c.Spawner.environment = {
-    'MYSQL_CONTAINER_NAME':mysql_container_name,
+c.Spawner.environment             = {
+    'MYSQL_CONTAINER_NAME' : mysql_container_name,
 }
 
 # Security
-c.JupyterHub.ssl_key = os.path.join(jupyterhub_config_dir, 'key.pem')
+c.JupyterHub.ssl_key  = os.path.join(jupyterhub_config_dir, 'key.pem')
 c.JupyterHub.ssl_cert = os.path.join(jupyterhub_config_dir, 'cert.pem')
 # c.Authenticator.whitelist = {''}
 
 # Data/directories
-c.Spawner.notebook_dir = '~/notebooks'
-c.DockerSpawner.read_only_volumes = {
-    os.path.join(ff_data_dir, 'data') : '/data',
-}
+c.Spawner.notebook_dir                         = '~/notebooks'
+c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, 'data') : '/data' }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')

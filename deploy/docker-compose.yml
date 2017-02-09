@@ -5,6 +5,9 @@ networks:
         external:
             name: ${DOCKER_NETWORK_NAME}
 
+volumes:
+    db-data:
+
 services:
     hub:
         build:
@@ -34,3 +37,5 @@ services:
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - db-data:/var/lib/mysql
