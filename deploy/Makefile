@@ -1,11 +1,19 @@
 include .env
 
-.DEFAULT_GOAL=build
+.DEFAULT_GOAL=help
 
 .PHONY: help setup_files teardown_files clean_all clean kill_containers kill_images network kill_network volumes kill_volumes build build_user build_hub ssl up down
 
 help:
-	@echo help
+	@echo "Manage FeatureFactory deployment"
+	@echo ""
+	@echo "Options:"
+	@echo "    help: Display this help message."
+	@echo "    build: Build images, create network and volumes, install jupyterhub config"
+	@echo "    up: Launch the app, creating all necessary containers."
+	@echo "    down: Shut down the app, removing all created containers."
+	@echo "    clean: Remove all containers, user files, and config files"
+	@echo "    clean_all: Clean, and additionally remove built images, remove network, and remove volumes"
 
 setup_files:
 	sudo mkdir -p $(FF_DATA_DIR)/config/{jupyterhub,featurefactory}
