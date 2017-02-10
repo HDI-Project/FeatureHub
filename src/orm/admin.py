@@ -54,7 +54,7 @@ class Commands(object):
         """Creates a new problem entry in database."""
 
         try:
-            self.__orm.session.commit()    # forces a refresh
+            self.__orm.session.commit()    # forces a refresh # TODO sketchy
             self.__problem = self.__orm.session.query(Problem).filter(Problem.name == name).one()
             print('Problem already exists: {}'.format(name))
         except NoResultFound:
@@ -68,7 +68,7 @@ class Commands(object):
 
     def get_problems(self):
         try:
-            self.__orm.session.commit()    # forces a refresh
+            self.__orm.session.commit()    # forces a refresh # TODO sketchy
             problems = self.__orm.session.query(Problem.name).all()
             return [problem[0] for problem in problems]
         except NoResultFound:
@@ -76,7 +76,7 @@ class Commands(object):
 
     def _get_features(self, user_name=None, feature_name=None):
         """Get an SQLAlchemy cursor pointing at the requested features."""
-        self.__orm.session.commit()    # forces a refresh
+        self.__orm.session.commit()    # forces a refresh # TODO sketchy
 
         filter_ = [
             Feature.problem == self.__problem,
@@ -115,8 +115,17 @@ class Commands(object):
         Alternatively, the feature md5 can be passed to select a particular feature.
         """
         features = self._get_features(user_name, feature_name)
+
+        if not features:
+            print('No matching features found.')
+            return
+
         if md5:
             features = features.filter(Feature.md5 == md5)
+
+        if not features:
+            print('No matching features found.')
+            return
 
         feature = features.order_by(Feature.created_at.desc()).first()
 
