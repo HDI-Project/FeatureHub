@@ -132,8 +132,8 @@ class Session(object):
         return '\n'.join(x for x in out if not (x in seen or seen.add(x)))
 
     def add_feature(self, function):
-        """creates a new featurek entry in database."""
-        assert self.__user, 'you have to be logged in first in order to add a feature'
+        """creates a new feature entry in database."""
+        assert self.__user, 'user not initialized properly'
 
         name = function.__name__
         assert name != '<lambda>', 'Adding an anonymous function is not allowed'

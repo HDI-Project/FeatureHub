@@ -31,14 +31,14 @@ class Commands(object):
                 print('You might want to create it by calling create_problem method')
 
     def set_up(self, drop=False):
-        """Create a new DB and create the initial schame.
+        """Create a new DB and create the initial scheme.
 
         If the DB already exists, it will be dropped if the drop argument is True.
         """
         url = self.__orm.engine.url
         if database_exists(url):
             if drop:
-                print('Dropping old atabase {}'.format(url))
+                print('Dropping old database {}'.format(url))
                 drop_database(url)
             else:
                 print('WARNING! database {} already exists.'.format(url))
