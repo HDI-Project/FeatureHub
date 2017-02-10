@@ -29,13 +29,13 @@ network:
 	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(DOCKER_NETWORK_NAME)
 
 kill_network:
-	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network rm $(DOCKER_NETWORK_NAME)
+	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 && docker network rm $(DOCKER_NETWORK_NAME) || echo "No network found."
 
 volumes:
 	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(MYSQL_DATA_VOLUME_NAME)
 
 kill_volumes:
-	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume rm $(MYSQL_DATA_VOLUME_NAME)
+	@docker volume inspect $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) || echo "No volumes found."
 
 build: network volumes build_user build_hub ssl
 
