@@ -13,7 +13,7 @@ from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound
 
 from factory.model import Model
-from orm.sqlalchemy_declarative import Feature, Notebook, Problem, User
+from orm.sqlalchemy_declarative import Feature, Problem, User
 from orm.sqlalchemy_main import ORMManager
 
 
@@ -49,25 +49,6 @@ class Session(object):
         self.__user = User(name=name)
         if not self.__orm.session.query(exists().where(User.name == name)).scalar():
             self.__orm.session.add(self.__user)
-
-    def add_notebook(self, name):
-        """creates a new notebook entry in database."""
-        assert self.__user, 'you have to be logged in first in order to add a notebook'
-
-        query = (
-            Notebook.name == name,
-            Notebook.problem == self.__problem,
-            Notebook.user == self.__user
-        )
-
-        if self.__orm.session.query(Notebook.id).filter(*query).scalar():
-            print('Notebook already registered')
-            return
-
-        notebook = Notebook(name=name, user=self.__user, problem=self.__problem)
-        self.__orm.session.add(notebook)
-        self.__orm.session.commit()
-        print('Notebook {} successfully registered'.format(name))
 
     def _load_dataset(self):
         for filename in self.__files:

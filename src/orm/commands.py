@@ -20,8 +20,5 @@ class Commands(object):
     def test(self, X, Y, test_size=0.5):
         return self.session.cross_validate(X, Y, test_size)
 
-    def add_notebook(self, name):
-        self.session.add_notebook(name)
-
     def cross_validate(self, X, Y, test_size):
         return self.session.cross_validate(X, Y, test_size)

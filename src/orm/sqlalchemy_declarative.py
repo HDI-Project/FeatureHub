@@ -26,18 +26,6 @@ class Feature(Base):
     score = Column(Float)
     created_at = Column(DateTime, default=datetime.now)
 
-
-class Notebook(Base):
-    __tablename__ = 'notebooks'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User')
-    problem_id = Column(Integer, ForeignKey('problems.id'))
-    problem = relationship('Problem')
-    created_at = Column(DateTime, default=datetime.now)
-
-
 class Problem(Base):
     __tablename__ = 'problems'
     id = Column(Integer, primary_key=True, autoincrement=True)
