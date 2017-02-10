@@ -46,8 +46,8 @@ class Session(object):
 
         # "log in" to the system
         name = os.getenv('USER')
+        self.__user = User(name=name)
         if not self.__orm.session.query(exists().where(User.name == name)).scalar():
-            self.__user = User(name=name)
             self.__orm.session.add(self.__user)
 
     def add_notebook(self, name):
