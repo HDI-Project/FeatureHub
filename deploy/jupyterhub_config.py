@@ -5,15 +5,15 @@ import os
 c = get_config()
 
 # Setup some variables
-network_name              = os.environ['DOCKER_NETWORK_NAME']
-ff_data_dir               = os.environ['FF_DATA_DIR']
-ff_image_name             = os.environ['FF_IMAGE_NAME']
-ff_container_name         = os.environ['FF_CONTAINER_NAME']
-hub_container_name        = os.environ['HUB_CONTAINER_NAME']
-mysql_container_name      = os.environ['MYSQL_CONTAINER_NAME']
+network_name               = os.environ['DOCKER_NETWORK_NAME']
+ff_data_dir                = os.environ['FF_DATA_DIR']
+ff_image_name              = os.environ['FF_IMAGE_NAME']
+ff_container_name          = os.environ['FF_CONTAINER_NAME']
+hub_container_name         = os.environ['HUB_CONTAINER_NAME']
+mysql_container_name       = os.environ['MYSQL_CONTAINER_NAME']
 
-jupyterhub_config_dir     = os.path.join(ff_data_dir, 'config', 'jupyterhub')
-ff_config_dir             = os.path.join(ff_data_dir, 'config', 'featurefactory')
+jupyterhub_config_dir      = os.path.join(ff_data_dir, 'config', 'jupyterhub')
+ff_config_dir              = os.path.join(ff_data_dir, 'config', 'featurefactory')
 
 # Spawned containers
 c.JupyterHub.spawner_class          = 'dockerspawner.SystemUserSpawner'
@@ -45,3 +45,21 @@ c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_
 c.Spawner.notebook_dir                         = '~/notebooks'
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, 'data') : '/data' }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')
+
+# Whitelist users and admins
+c.Authenticator.whitelist = whitelist = set()
+c.Authenticator.admin_users = admin = set()
+c.JupyterHub.admin_access = True
+
+whitelist.add("root")
+admin.add("root")
+
+with open(os.path.join(jupyterhub_config_dir, 'whitelist')) as f:
+    for line in f:
+        if not line:
+            continue
+        parts = line.split()
+        name = parts[0]
+        whitelist.add(name)
+        if len(parts) > 1 and parts[1] == 'admin':
+            admin.add(name)
