@@ -45,15 +45,16 @@ volumes:
 kill_volumes:
 	@docker volume inspect $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) || echo "No volumes found."
 
-build: network volumes build_user build_hub ssl
+build: build_user build_hub
 
-build_user: setup_files
+build_user: network setup_files
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-user.yml build
 
-build_hub: setup_files
+build_hub: network volumes setup_files ssl
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
 	# TODO better way?
 	cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
+	cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/
 
 ssl:
 	./gen_ssl.sh
