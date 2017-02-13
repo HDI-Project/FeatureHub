@@ -75,6 +75,7 @@ docker exec -i $MYSQL_CONTAINER_NAME \
     mysql \
         --user=$MYSQL_ROOT_USERNAME \
         --password=$MYSQL_ROOT_PASSWORD <<EOF
+DROP USER IF EXISTS '$_USERNAME'@'%';
 CREATE USER '$_USERNAME'@'%' IDENTIFIED BY '$_MYSQL_PASSWORD';
 $cmd2
 EOF

@@ -23,5 +23,5 @@ docker exec -i $MYSQL_CONTAINER_NAME \
     mysql \
         --user=$MYSQL_ROOT_USERNAME \
         --password=$MYSQL_ROOT_PASSWORD <<EOF
-DROP USER '$FF_USERNAME';
+DROP USER IF EXISTS '$FF_USERNAME'@'%';
 EOF
