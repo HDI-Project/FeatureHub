@@ -49,6 +49,7 @@ class Session(object):
         self.__user = User(name=name)
         if not self.__orm.session.query(exists().where(User.name == name)).scalar():
             self.__orm.session.add(self.__user)
+            self.__orm.session.commit()
 
     def _load_dataset(self):
         for filename in self.__files:
@@ -126,7 +127,7 @@ class Session(object):
             Feature.name == name,
             Feature.problem == self.__problem,
             Feature.user == self.__user,
-            Feature.md5 == md5
+            Feature.md5 == md5,
         )
         score = self.__orm.session.query(Feature.score).filter(*query).scalar()
         if score:
@@ -143,3 +144,32 @@ class Session(object):
         self.__orm.session.add(feature)
         self.__orm.session.commit()
         print('Feature {} successfully registered'.format(name))
+
+    def _discover_features(self, code_fragment):
+        assert self.__user, 'user not initialized properly'
+
+        filter_= (
+            Feature.problem == self.__problem,
+            Feature.user != self.__user,
+        )
+
+        if code_fragment is not None:
+            filter_ = filter_ + (Feature.code.contains(code_fragment),)
+
+        return self.__orm.session.query(Feature).filter(*filter_).order_by(Feature.score)
+        
+    def discover_features(self, code_fragment=None):
+        """Discover features written by other users."""
+        query = self._discover_features(code_fragment)
+        features = query.all()
+        
+        feature_dicts = [{
+            'name': feature.name,
+            'score': feature.score,
+            'code': feature.code,
+        } for feature in features]
+
+        if not feature_dicts:
+            print('No features found')
+        else:
+            return pd.DataFrame(feature_dicts)

@@ -99,8 +99,8 @@ class Commands(object):
             'name': feature.name,
             'md5': feature.md5,
             'score': feature.score,
-            'created_at': feature.created_at
-            } for feature in features]
+            'created_at': feature.created_at,
+        } for feature in features]
 
         if not feature_dicts:
             print('No features found')
