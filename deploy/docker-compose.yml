@@ -7,6 +7,11 @@ networks:
 
 volumes:
     db-data:
+        external:
+            name: ${MYSQL_DATA_VOLUME_NAME}
+    secrets:
+        external:
+            name: ${SECRETS_VOLUME_NAME}
 
 services:
     hub:
@@ -16,8 +21,9 @@ services:
         image: ${HUB_IMAGE_NAME}
         container_name: ${HUB_CONTAINER_NAME}
         volumes:
-            - "/var/run/docker.sock:/var/run/docker.sock:rw"
-            - "${FF_DATA_DIR}:${FF_DATA_DIR}:rw"
+            - /var/run/docker.sock:/var/run/docker.sock:rw
+            - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
+            - secrets:/etc/letsencrypt
         ports:
             - "443:443"
         environment:
@@ -27,6 +33,8 @@ services:
             FF_CONTAINER_NAME: ${FF_CONTAINER_NAME}
             HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
             MYSQL_CONTAINER_NAME: ${MYSQL_CONTAINER_NAME}
+            SSL_KEY: "/etc/letsencrypt/ssl_key.pem"
+            SSL_CERT: "/etc/letsencrypt/ssl_cert.pem"
         command: >
             jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
     db:

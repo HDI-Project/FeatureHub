@@ -35,8 +35,10 @@ c.Spawner.environment             = {
 }
 
 # Security
-c.JupyterHub.ssl_key  = os.path.join(jupyterhub_config_dir, 'key.pem')
-c.JupyterHub.ssl_cert = os.path.join(jupyterhub_config_dir, 'cert.pem')
+if "SSL_KEY" in os.environ.keys():
+    c.JupyterHub.ssl_key = os.environ["SSL_KEY"]
+if "SSL_CERT" in os.environ.keys():
+    c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
 # c.Authenticator.whitelist = {''}
 
 # Data/directories

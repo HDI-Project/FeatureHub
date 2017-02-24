@@ -41,9 +41,11 @@ kill_network:
 
 volumes:
 	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(MYSQL_DATA_VOLUME_NAME)
+	@docker volume inspect $(SECRETS_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(SECRETS_VOLUME_NAME)
 
 kill_volumes:
-	@docker volume inspect $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(FF_PROJECT_NAME)_$(MYSQL_DATA_VOLUME_NAME) || echo "No volumes found."
+	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(MYSQL_DATA_VOLUME_NAME) || echo "No volumes found."
+	@docker volume inspect $(SECRETS_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(SECRETS_VOLUME_NAME) || echo "No volumes found."
 
 build: build_user build_hub
 
