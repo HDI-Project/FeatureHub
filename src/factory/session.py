@@ -10,11 +10,11 @@ from multiprocessing import Pool
 
 import pandas as pd
 from sqlalchemy.sql import exists
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from factory.model import Model
-from orm.sqlalchemy_declarative import Feature, Problem, User
 from orm.sqlalchemy_main import ORMManager
+from orm.sqlalchemy_declarative import *
 
 
 class Session(object):
@@ -34,7 +34,7 @@ class Session(object):
 
         try:
             problems = self.__orm.session.query(Problem)
-            self.__problem = problems.filter(Problem.name == problem).one()
+            self.__problem = problems.filter_by(Problem.name == problem).one()
         except NoResultFound:
             raise ValueError('Invalid problem name: {}'.format(problem))
 
@@ -46,10 +46,19 @@ class Session(object):
 
         # "log in" to the system
         name = os.getenv('USER')
-        self.__user = User(name=name)
-        if not self.__orm.session.query(exists().where(User.name == name)).scalar():
+        try:
+            self.__user = self.__orm.session.query(User)\
+                                            .filter_by(User.name == name)\
+                                            .one()
+        except NoResultFound:
+            self.__user = User(name=name)
             self.__orm.session.add(self.__user)
             self.__orm.session.commit()
+        except MultipleResultsFound:
+            # shouldn't happen after bug fix
+            self.__user = self.__orm.session.query(User)\
+                                            .filter_by(User.name == name)\
+                                            .first()
 
     def _load_dataset(self):
         for filename in self.__files:
