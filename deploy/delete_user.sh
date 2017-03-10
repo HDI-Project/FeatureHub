@@ -18,7 +18,7 @@ docker exec -i $HUB_CONTAINER_NAME \
 userdel -f $FF_USERNAME
 EOF
 
-rm -rf $FF_DATA_DIR/users/$FF_USERNAME
+sudo rm -rf $FF_DATA_DIR/users/$FF_USERNAME
 
 docker exec -i $MYSQL_CONTAINER_NAME \
     mysql \

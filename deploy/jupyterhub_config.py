@@ -13,7 +13,6 @@ hub_container_name         = os.environ['HUB_CONTAINER_NAME']
 mysql_container_name       = os.environ['MYSQL_CONTAINER_NAME']
 
 jupyterhub_config_dir      = os.path.join(ff_data_dir, 'config', 'jupyterhub')
-ff_config_dir              = os.path.join(ff_data_dir, 'config', 'featurefactory')
 
 # Spawned containers
 c.JupyterHub.spawner_class          = 'dockerspawner.SystemUserSpawner'
