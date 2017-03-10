@@ -1,4 +1,5 @@
 include .env
+-include .env.local
 
 .DEFAULT_GOAL=help
 

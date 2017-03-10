@@ -4,6 +4,7 @@ set -e
 
 # These environment variables are local
 source .env
+source .env.local >/dev/null 2>&1 || true
 
 usage_and_exit() {
     echo "usage: add_user.sh [-a] username password" 1>&2

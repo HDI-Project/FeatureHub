@@ -4,6 +4,7 @@ set -e
 
 # These environment variables are local
 source .env
+source .env.local >/dev/null 2>&1 || true
 
 if [ "$#" != "1" ]; then
     echo "usage: ./delete_user.sh username"
