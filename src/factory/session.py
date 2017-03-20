@@ -124,7 +124,7 @@ class Session(object):
         seen = set()
         return '\n'.join(x for x in out if not (x in seen or seen.add(x)))
 
-    def add_feature(self, function):
+    def register_feature(self, function):
         """creates a new feature entry in database."""
         assert self.__user, 'user not initialized properly'
 
