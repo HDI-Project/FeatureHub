@@ -11,6 +11,8 @@ help:
 	@echo "    help: Display this help message."
 	@echo "    build: Build images, create network and volumes, install jupyterhub config"
 	@echo "    up: Launch the app, creating all necessary containers."
+	@echo "    stop: Stop the app, stopping all containers."
+	@echo "    start: Restart the app, restarting all containers."
 	@echo "    down: Shut down the app, removing all created containers."
 	@echo "    clean: Remove all containers, user files, and config files"
 	@echo "    clean_all: Clean, and additionally remove built images, remove network, and remove volumes"
@@ -70,7 +72,7 @@ build_hub: network volumes setup_files ssl
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
 	# TODO better way?
 	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
-	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/
+	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
 
 .PHONY: ssl
 ssl:
