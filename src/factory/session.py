@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import collections
-from datetime import datetime
 import gc
 import hashlib
 import inspect
@@ -65,22 +64,25 @@ class Session(object):
             yield pd.read_csv(os.path.join(self.__data_path, filename), low_memory=False)
 
     def get_sample_dataset(self):
+        """
+        Loads sample of problem dataset into memory.
+
+        Returns a list of DataFrames.
+        """
         if not self.__dataset:
             self.__dataset = list(self._load_dataset())
 
         gc.collect()    # make sure that we have enough space for this.
         return [df.copy() for df in self.__dataset]
 
-    def __run_isolated(self, function, *args):
-        pool = Pool(processes=1)
-        try:
-            result = pool.map(function, args)[0]
-        finally:
-            pool.close()
-
-        return result
-
     def cross_validate(self, feature_extractor):
+        """
+        Return score of feature run on dataset sample.
+
+        Runs the feature in an isolated environment to extract the feature
+        values. Then, builds a model on that one feature, performs cross
+        validation, and returns the score.
+        """
         assert isinstance(feature_extractor, collections.Callable), \
                 "feature_extractor must be a function!"
 
@@ -91,7 +93,7 @@ class Session(object):
         dataset = self.get_sample_dataset()
 
         print("Extracting features")
-        X = self.__run_isolated(feature_extractor, dataset)
+        X = __run_isolated(feature_extractor, dataset)
         Y = dataset[self.__y_index].pop(self.__y_column)
 
         print("Cross validating")
@@ -146,39 +148,78 @@ class Session(object):
         score = float(self.cross_validate(function))
         print("Your feature {} scored {}".format(name, score))
 
-        now = datetime.utcnow().strftime('%Y%m%dT%H%M%S')
-
         feature = Feature(name=name, score=score, code=code, md5=md5,
                           user=self.__user, problem=self.__problem)
         self.__orm.session.add(feature)
         self.__orm.session.commit()
         print('Feature {} successfully registered'.format(name))
 
-    def _discover_features(self, code_fragment):
+    def _filter_features(self, code_fragment):
+        """
+        Return a query object that filters features written for the appropriate
+        problem by code snippets.
+
+        This query object can be added to by the caller.
+        """
         assert self.__user, 'user not initialized properly'
 
-        filter_= (
+        filter_ = (
             Feature.problem == self.__problem,
-            Feature.user != self.__user,
         )
 
-        if code_fragment is not None:
-            filter_ = filter_ + (Feature.code.contains(code_fragment),)
+        if code_fragment:
+            filter_ = filter_ + (
+                Feature.code.contains(code_fragment),
+            )
 
         return self.__orm.session.query(Feature).filter(*filter_).order_by(Feature.score)
-        
-    def discover_features(self, code_fragment=None):
-        """Discover features written by other users."""
-        query = self._discover_features(code_fragment)
-        features = query.all()
-        
-        feature_dicts = [{
-            'name': feature.name,
-            'score': feature.score,
-            'code': feature.code,
-        } for feature in features]
 
-        if not feature_dicts:
-            print('No features found')
+    def discover_features(self, code_fragment=None):
+        """
+        Discover features written by other users.
+
+        Print features written by other users, enabling collaboration.
+        A code fragment can be used to filter search results. For each feature,
+        prints feature score and feature code.
+        """
+        query = self._filter_features(code_fragment)
+        query = query.filter(Feature.user != self.__user)
+
+        features = query.all()
+
+        if features:
+            for feature in features:
+                self._print_one_feature(feature)
         else:
-            return pd.DataFrame(feature_dicts)
+            print("No features found.")
+
+    @staticmethod
+    def _print_one_feature(feature):
+        print("""
+        ----------
+        Feature score: {0}
+        Feature code:
+        {1}
+        \n
+        """.format(feature.score, feature.code))
+
+    def print_my_features(self):
+        """Print all features written by this user."""
+        query = self._filter_features(None)
+        features = query.all()
+
+        if features:
+            for feature in features:
+                self._print_one_feature(feature)
+        else:
+            print("No features found.")
+
+def __run_isolated(f, *args):
+    """Apply `f` to arguments in an isolated environment."""
+    pool = Pool(processes=1)
+    try:
+        result = pool.map(f, args)[0]
+    finally:
+        pool.close()
+
+    return result
