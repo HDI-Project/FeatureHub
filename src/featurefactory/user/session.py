@@ -11,10 +11,10 @@ import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from factory.util import run_isolated
-from factory.model import Model
-from orm.sqlalchemy_main import ORMManager
-from orm.sqlalchemy_declarative import *
+from featurefactory.user.util import run_isolated
+from featurefactory.user.model import Model
+from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import *
 
 
 class Session(object):

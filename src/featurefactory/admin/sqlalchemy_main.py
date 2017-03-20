@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from orm.sqlalchemy_declarative import Base
+from featurefactory.admin.sqlalchemy_declarative import Base
 from configparser import ConfigParser
 import os
 

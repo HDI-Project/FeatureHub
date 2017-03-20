@@ -5,8 +5,8 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import database_exists, create_database, drop_database
 
-from orm.sqlalchemy_declarative import Base, Feature, Problem, User
-from orm.sqlalchemy_main import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import Base, Feature, Problem, User
+from featurefactory.admin.sqlalchemy_main import ORMManager
 
 
 class Commands(object):

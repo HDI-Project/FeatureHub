@@ -1,8 +1,8 @@
 import imp
 import sys
 
-from factory.session import Session
-from orm.admin import Commands
+from featurefactory.user.session import Session
+from featurefactory.admin.admin import Commands
 
 
 for problem in Commands().get_problems():

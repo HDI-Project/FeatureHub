@@ -1,7 +1,6 @@
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-
 class Model(object):
 
     def __init__(self, problem_type):
