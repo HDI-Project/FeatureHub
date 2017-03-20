@@ -50,6 +50,8 @@ You can usually leave these variables at their default values:
 - `MYSQL_DATABASE`: competition database name in DB
 - `MYSQL_DATA_VOLUME_NAME`: name for DB data volume
 - `SECRETS_VOLUME_NAME`: name for Hub secrets volume
+- `USE_LETSENCRYPT_CERT`: flag to use Lets Encrypt certificate (`"yes"`). For testing
+    purposes, can use `openssl` to issue a self-signed certificate (`"no"`).
 
 ### Userlist
 
