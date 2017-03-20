@@ -5,8 +5,8 @@ import gc
 import hashlib
 import inspect
 import os
+from textwrap import dedent
 from multiprocessing import Pool
-
 import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -195,13 +195,14 @@ class Session(object):
 
     @staticmethod
     def _print_one_feature(feature):
-        print("""
+        print(dedent("""\
         ----------
         Feature score: {0}
+
         Feature code:
         {1}
         \n
-        """.format(feature.score, feature.code))
+        """.format(feature.score, feature.code)))
 
     def print_my_features(self):
         """Print all features written by this user."""
