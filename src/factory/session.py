@@ -6,11 +6,11 @@ import hashlib
 import inspect
 import os
 from textwrap import dedent
-from multiprocessing import Pool
 import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
+from factory.util import run_isolated
 from factory.model import Model
 from orm.sqlalchemy_main import ORMManager
 from orm.sqlalchemy_declarative import *
@@ -93,7 +93,7 @@ class Session(object):
         dataset = self.get_sample_dataset()
 
         print("Extracting features")
-        X = __run_isolated(feature_extractor, dataset)
+        X = run_isolated(feature_extractor, dataset)
         Y = dataset[self.__y_index].pop(self.__y_column)
 
         print("Cross validating")
@@ -214,13 +214,3 @@ class Session(object):
                 self._print_one_feature(feature)
         else:
             print("No features found.")
-
-def __run_isolated(f, *args):
-    """Apply `f` to arguments in an isolated environment."""
-    pool = Pool(processes=1)
-    try:
-        result = pool.map(f, args)[0]
-    finally:
-        pool.close()
-
-    return result
