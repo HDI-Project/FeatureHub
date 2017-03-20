@@ -55,12 +55,14 @@ c.JupyterHub.admin_access = True
 whitelist.add("root")
 admin.add("root")
 
-with open(os.path.join(jupyterhub_config_dir, 'userlist')) as f:
-    for line in f:
-        if not line:
-            continue
-        parts = line.split()
-        name = parts[0]
-        whitelist.add(name)
-        if len(parts) > 1 and parts[1] == 'admin':
-            admin.add(name)
+userlist_filename = os.path.join(jupyterhub_config_dir, 'userlist')
+if os.path.isfile(userlist_filename):
+    with open(userlist_filename, "r") as f:
+        for line in f:
+            if not line:
+                continue
+            parts = line.split()
+            name = parts[0]
+            whitelist.add(name)
+            if len(parts) > 1 and parts[1] == 'admin':
+                admin.add(name)

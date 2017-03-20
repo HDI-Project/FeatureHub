@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import collections
-import datetime
+from datetime import datetime
 import gc
 import hashlib
 import inspect
@@ -34,7 +34,7 @@ class Session(object):
 
         try:
             problems = self.__orm.session.query(Problem)
-            self.__problem = problems.filter_by(Problem.name == problem).one()
+            self.__problem = problems.filter(Problem.name == problem).one()
         except NoResultFound:
             raise ValueError('Invalid problem name: {}'.format(problem))
 
@@ -48,7 +48,7 @@ class Session(object):
         name = os.getenv('USER')
         try:
             self.__user = self.__orm.session.query(User)\
-                                            .filter_by(User.name == name)\
+                                            .filter(User.name == name)\
                                             .one()
         except NoResultFound:
             self.__user = User(name=name)
@@ -57,7 +57,7 @@ class Session(object):
         except MultipleResultsFound:
             # shouldn't happen after bug fix
             self.__user = self.__orm.session.query(User)\
-                                            .filter_by(User.name == name)\
+                                            .filter(User.name == name)\
                                             .first()
 
     def _load_dataset(self):
@@ -146,7 +146,7 @@ class Session(object):
         score = float(self.cross_validate(function))
         print("Your feature {} scored {}".format(name, score))
 
-        now = datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S')
+        now = datetime.utcnow().strftime('%Y%m%dT%H%M%S')
 
         feature = Feature(name=name, score=score, code=code, md5=md5,
                           user=self.__user, problem=self.__problem)
