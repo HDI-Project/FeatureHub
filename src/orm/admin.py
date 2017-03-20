@@ -83,8 +83,12 @@ class Commands(object):
         ]
 
         if user_name:
-            user = self.__orm.session.query(User).filter(User.name == user_name).one()
-            filter_.append(Feature.user == user)
+            try:
+                # TODO shouldn't need a separate query here
+                user = self.__orm.session.query(User).filter(User.name == user_name).one()
+                filter_.append(Feature.user == user)
+            except NoResultFound:
+                print("No features found from user {}. All users shown.".format(user_name), file=sys.stderr)
 
         if feature_name:
             filter_.append(Feature.name == feature_name)
