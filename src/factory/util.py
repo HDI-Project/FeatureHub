@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+
 def run_isolated(f, *args):
     """Apply `f` to arguments in an isolated environment."""
     pool = Pool(processes=1)

@@ -96,8 +96,14 @@ class Session(object):
         X = run_isolated(feature_extractor, dataset)
         Y = dataset[self.__y_index].pop(self.__y_column)
 
-        print("Cross validating")
-        score = self.__model.cross_validate(X, Y)
+        # confirm that dimensions of feature are appropriate.
+        invalid = self._validate_feature(X)
+        if invalid:
+            print("Feature is not valid: {}".format(invalid))
+            score = 0
+        else:
+            print("Cross validating")
+            score = self.__model.cross_validate(X, Y)
 
         # clean up to avoid filling up the memory
         del X
@@ -106,6 +112,29 @@ class Session(object):
         gc.collect()
 
         return score
+
+    def _validate_feature(self, feature):
+        """
+        Determine if feature values are valid.
+
+        Currently checks if the feature is a DataFrame of the correct
+        dimensions. If the feature is valid, returns an empty string. Otherwise,
+        returns a semicolon-delimited list of reasons that the feature is
+        invalid.
+        """
+        result = []
+
+        # must be a data frame
+        if not isinstance(feature, pd.core.frame.DataFrame):
+            result = result.append("does not return DataFrame")
+            return "; ".join(result)
+
+        dataset = self.get_sample_dataset()
+        expected_shape = (dataset[self.__y_index].shape[0], 1)
+        if feature.shape != expected_shape:
+            result = result.append("returns DataFrame of invalid shape ({} actual, {} expected)".format(feature.shape, expected_shape))
+
+        return "; ".join(result)
 
     def __get_source(self, function):
         out = []
