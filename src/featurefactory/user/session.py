@@ -16,6 +16,8 @@ from featurefactory.user.model import Model
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
 
+MD5_ABBREV_LEN = 8
+
 
 class Session(object):
     """created per user connected, hidden/inaccessible to user.
@@ -27,7 +29,7 @@ class Session(object):
     Variables prefixed by "__" are "harder" to access, but still accessible!
     For example, __db attribute is still accessible as `session._Session__db`
     """
-    def __init__(self, problem, n_jobs=1, database="featurefactory"):
+    def __init__(self, problem, database="featurefactory"):
         self.__orm = ORMManager(database)
         self.__user = None
         self.__dataset = None
@@ -127,35 +129,35 @@ class Session(object):
 
         assert self.__user, "user not initialized properly"
 
-        name = feature.__name__
-        assert name != "<lambda>", "Adding an anonymous function is not allowed"
-
         code = self.__get_source(feature).encode("utf-8")
         md5 = hashlib.md5(code).hexdigest()
+        description = "" # TODO
 
         query = (
-            Feature.name == name,
             Feature.problem == self.__problem,
             Feature.user == self.__user,
             Feature.md5 == md5,
         )
         score = self.__orm.session.query(Feature.score).filter(*query).scalar()
         if score:
-            print("Feature {} already registered with score {}".format(
-                name, score))
+            print("Feature already registered with score {}".format(score))
             return
 
         if self._is_valid_feature(feature):
             score = float(self._cross_validate(feature))
-            print("Your feature {} scored {}".format(name, score))
+            print("Feature scored {}".format(score))
 
-            feature = Feature(name=name, score=score, code=code, md5=md5,
+            feature = Feature(description=description, score=score, code=code, md5=md5,
                               user=self.__user, problem=self.__problem)
             self.__orm.session.add(feature)
             self.__orm.session.commit()
-            print("Feature {} successfully registered".format(name))
+            print("Feature successfully registered")
         else:
-            print("Feature {} is invalid and not registered.", file=sys.stderr)
+            print("Feature is invalid and not registered.", file=sys.stderr)
+
+    def _abbrev_md5(self, md5):
+        """Return first MD5_ABBREV_LEN characters of md5"""
+        return md5[:MD5_ABBREV_LEN]
 
     def _load_dataset(self):
         for filename in self.__files:
@@ -188,14 +190,15 @@ class Session(object):
 
     @staticmethod
     def _print_one_feature(feature):
-        print(dedent("""\
-        ----------
-        Feature score: {0}
+        print(dedent(
+            """
+            ------------------
+            Feature score: {0}
 
-        Feature code:
-        {1}
-        \n
-        """.format(feature.score, feature.code)))
+            Feature code:
+            {1}
+            \n
+            """.format(feature.score, feature.code)))
 
     def _is_valid_feature(self, feature):
         """
@@ -271,10 +274,15 @@ class Session(object):
         return score
 
     def __get_source(self, function):
+        """
+        Extract the source code from a given function.
+        """
         out = []
         try:
+            # Python 2
             func_code, func_globals = function.func_code, function.func_globals
-        except AttributeError:    # Python 3
+        except AttributeError:
+            # Python 3
             func_code, func_globals = function.__code__, function.__globals__
 
         for name in func_code.co_names:
