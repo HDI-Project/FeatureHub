@@ -93,3 +93,15 @@ start:
 .PHONY: down
 down:
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml down
+
+.PHONY: monitor_start
+monitor_start:
+	sudo ./monitor.py start &
+
+.PHONY: monitor_delete
+monitor_delete:
+	sudo ./monitor.py delete
+
+.PHONY: monitor_stop
+monitor_stop:
+	sudo ./monitor.py stop
