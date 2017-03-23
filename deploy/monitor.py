@@ -61,6 +61,9 @@ class Monitor(object):
         logging directory.
         """
 
+        if not os.path.exists(RESOURCES_DIRNAME):
+            os.makedirs(RESOURCES_DIRNAME)
+
         pid_path = os.path.join(RESOURCES_DIRNAME, PID_FILE_NAME)
         if not os.path.isfile(pid_path):
             with open(pid_path, "w") as f:
@@ -74,14 +77,16 @@ class Monitor(object):
         """
         Stop another process that is monitoring. 
         """
-        with open(os.path.join(RESOURCES_DIRNAME, PID_FILE_NAME), "r") as f:
-            pid = f.readline().strip()
+        pid_path = os.path.join(RESOURCES_DIRNAME, PID_FILE_NAME)
+        if os.path.exists(pid_path):
+            with open(os.path.join(RESOURCES_DIRNAME, PID_FILE_NAME), "r") as f:
+                pid = f.readline().strip()
 
-        try:
-            pid = int(pid)
-            os.kill(pid, signal.SIGTERM)
-        except ValueError:
-            print("Could not parse pid '{}'".format(pid))
+            try:
+                pid = int(pid)
+                os.kill(pid, signal.SIGTERM)
+            except ValueError:
+                print("Could not parse pid '{}'".format(pid))
 
     def read_config(self, filename):
         """
@@ -118,9 +123,6 @@ class Monitor(object):
                     RESOURCES_DIRNAME))
                 print("Either delete files or rename existing log directory.")
                 sys.exit(1)
-
-        if not os.path.exists(RESOURCES_DIRNAME):
-            os.makedirs(RESOURCES_DIRNAME)
 
         is_first_write = True
         while True:
