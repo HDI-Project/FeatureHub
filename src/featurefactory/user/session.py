@@ -32,7 +32,7 @@ class Session(object):
     def __init__(self, problem, database="featurefactory"):
         self.__orm = ORMManager(database)
         self.__user = None
-        self.__dataset = None
+        self.__dataset = []
 
         try:
             problems = self.__orm.session.query(Problem)
@@ -65,10 +65,11 @@ class Session(object):
         """
         Loads sample of problem dataset into memory.
 
-        Returns a list of DataFrames.
+        Returns a list of DataFrames, each of which is a *copy* of the class'
+        field. May require a substantial amount of memory.
         """
         if not self.__dataset:
-            self.__dataset = list(self._load_dataset())
+            self._load_dataset()
 
         gc.collect()    # make sure that we have enough space for this.
         return [df.copy() for df in self.__dataset]
@@ -159,10 +160,23 @@ class Session(object):
         """Return first MD5_ABBREV_LEN characters of md5"""
         return md5[:MD5_ABBREV_LEN]
 
+    def _compute_dataset_hash(self):
+        """Return array of hash values of dataset contents (one per DataFrame)."""
+        return [hashlib.md5(d.to_msgpack()).hexdigest() for d in self.__dataset]
+
     def _load_dataset(self):
-        for filename in self.__files:
-            yield pd.read_csv(os.path.join(self.__data_path, filename), 
-                    low_memory=False)
+        # TODO check for dtypes file, assisting in low memory usage
+
+        if not self.__dataset:
+            for filename in self.__files:
+                self.__dataset.append(
+                    pd.read_csv(os.path.join(self.__data_path, filename), 
+                        low_memory=False)
+                )
+
+    def _reload_dataset(self):
+        self.__dataset = []
+        self._load_dataset()
 
     def _filter_features(self, code_fragment):
         """
@@ -212,8 +226,16 @@ class Session(object):
         """
         Extract feature values from feature function, then validate values.
         """
-        dataset = self.get_sample_dataset()
-        feature_values = run_isolated(feature, dataset)
+
+        # Ensure dataset is loaded
+        self._load_dataset()
+
+        # Run feature in isolated env, but reload dataset if changed.
+        dataset_hash = self._compute_dataset_hash()
+        feature_values = run_isolated(feature, self.__dataset)
+        if dataset_hash != self._compute_dataset_hash():
+            self._reload_dataset()
+
         return self._validate_feature_values(feature_values)
 
     def _validate_feature_values(self, feature_values):
@@ -233,8 +255,10 @@ class Session(object):
             result.append("does not return DataFrame")
             return "; ".join(result)
 
-        dataset = self.get_sample_dataset()
-        expected_shape = (dataset[self.__y_index].shape[0], 1)
+        # Ensure dataset is loaded
+        self._load_dataset()
+
+        expected_shape = (self.__dataset[self.__y_index].shape[0], 1)
         if feature_values.shape != expected_shape:
             result.append(
                 "returns DataFrame of invalid shape "
@@ -256,11 +280,17 @@ class Session(object):
         # import os
         # os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
         print("Obtaining dataset...")
-        dataset = self.get_sample_dataset()
+        self._load_dataset()
 
         print("Extracting features...")
-        X = run_isolated(feature, dataset)
-        Y = dataset[self.__y_index].pop(self.__y_column)
+
+        # Run feature in isolated env, but reload dataset if changed.
+        dataset_hash = self._compute_dataset_hash()
+        X = run_isolated(feature, self.__dataset)
+        if dataset_hash != self._compute_dataset_hash():
+            self._reload_dataset()
+
+        Y = self.__dataset[self.__y_index][self.__y_column]
 
         print("Cross validating...")
         score = self.__model.cross_validate(X, Y)
@@ -268,7 +298,6 @@ class Session(object):
         # clean up to avoid filling up the memory
         del X
         del Y
-        del dataset
         gc.collect()
 
         return score
