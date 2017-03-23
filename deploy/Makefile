@@ -14,8 +14,8 @@ help:
 	@echo "    stop: Stop the app, stopping all containers."
 	@echo "    start: Restart the app, restarting all containers."
 	@echo "    down: Shut down the app, removing all created containers."
-	@echo "    clean: Remove all containers, user files, and config files"
-	@echo "    clean_all: Clean, and additionally remove built images, remove network, and remove volumes"
+	@echo "    clean: Remove all containers, data volumes, user files, and config files."
+	@echo "    clean_all: Clean, and additionally remove images and network."
 
 .PHONY: setup_files
 setup_files:
@@ -28,10 +28,10 @@ teardown_files:
 	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
 
 .PHONY: clean_all
-clean_all: kill_containers teardown_files kill_images kill_network kill_volumes
+clean_all: clean kill_images kill_network
 
 .PHONY: clean
-clean: kill_containers teardown_files
+clean: kill_containers teardown_files kill_volumes
 
 .PHONY: kill_containers
 kill_containers:
