@@ -1,10 +1,11 @@
 # Adapted from jupyterhub/jupyterhub-deploy-docker
 FROM jupyterhub/jupyterhub-onbuild:0.7.2
 
-# Installed dockerspawner
+# Install additional packages
 RUN /opt/conda/bin/pip install \
     oauthenticator==0.5.* \
-    dockerspawner==0.5.*
+    dockerspawner==0.5.* \
+    python-dateutil==2.6.*
 
 # Install docker on the jupyterhub container
 RUN wget https://get.docker.com -q -O /tmp/getdocker && \

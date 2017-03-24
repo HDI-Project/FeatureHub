@@ -70,9 +70,9 @@ build_user: network setup_files
 .PHONY: build_hub
 build_hub: network volumes setup_files ssl
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
-	# TODO better way?
 	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
 	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
+	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
 
 .PHONY: ssl
 ssl:

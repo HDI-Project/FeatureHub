@@ -31,6 +31,7 @@ services:
             FF_DATA_DIR: ${FF_DATA_DIR}
             FF_IMAGE_NAME: ${FF_IMAGE_NAME}
             FF_CONTAINER_NAME: ${FF_CONTAINER_NAME}
+            FF_IDLE_SERVER_TIMEOUT: ${FF_IDLE_SERVER_TIMEOUT}
             HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
             MYSQL_CONTAINER_NAME: ${MYSQL_CONTAINER_NAME}
             SSL_KEY: "/etc/letsencrypt/privkey.pem"

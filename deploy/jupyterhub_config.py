@@ -47,6 +47,24 @@ c.Spawner.notebook_dir                         = '~/notebooks'
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, 'data') : '/data' }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')
 
+# Services - setup
+cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
+if "FF_IDLE_SERVER_TIMEOUT" in os.environ.keys():
+    cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
+else:
+    cull_idle_timeout = 3600
+
+# Services - definitions
+c.JupyterHub.services = [
+    {
+        "name": "cull-idle",
+        "admin": True,
+        "command": ["python", cull_idle_filename,
+                    "--timeout="+cull_idle_timeout,
+                    "--cull_every=300"],
+    },
+]
+
 # Whitelist users and admins
 c.Authenticator.whitelist = whitelist = set()
 c.Authenticator.admin_users = admin = set()

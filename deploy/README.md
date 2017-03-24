@@ -45,6 +45,9 @@ You can usually leave these variables at their default values:
     `-username` appended.
 - `FF_DATA_DIR`: path to data directory on *host machine* (deployment machine)
 - `FF_PROJECT_NAME`: name for docker-compose app
+- `FF_IDLE_SERVER_TIMEOUT`: timeout interval for idle servers. If a server is idle for this
+    amount of time, then it will be automatically stopped. Due to some JupyterHub defaults,
+    this value should be set to at least 5m 30s (`330`).
 - `MYSQL_CONTAINER_NAME`: name for docker DB container
 - `MYSQL_ROOT_USERNAME`: username for DB root user
 - `MYSQL_DATABASE`: competition database name in DB
