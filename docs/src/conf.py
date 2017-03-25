@@ -26,6 +26,9 @@ sys.path.insert(0, os.path.abspath('../../src/featurefactory/user'))
 sys.path.insert(0, os.path.abspath('../../src/featurefactory/admin'))
 sys.path.insert(0, os.path.abspath('../../src/featurefactory/problems'))
 
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -50,9 +53,18 @@ templates_path = ['_templates']
 
 source_suffix = ['.md', '.rst']
 
-source_parser = {
-    '.md': 'recommonmark.parser.CommonMarkParser',
+source_parsers = {
+    '.md': CommonMarkParser,
 }
+
+# app setup hook
+github_doc_root = "https://github.com/HDI-Project/FeatureFactory"
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)
 
 # The master toctree document.
 master_doc = 'index'
@@ -165,5 +177,3 @@ texinfo_documents = [
      author, 'FeatureFactory', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-

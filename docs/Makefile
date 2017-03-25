@@ -17,13 +17,21 @@ help:
 
 .PHONY: clean
 clean:
-	@echo Not implemented
 	@find "$(BUILDDIR)" \
+		-type f \
+		-not -path '.' \
 		-not -path "./$(SOURCEDIR)" \
 		-not -path './$(SOURCEDIR)/*' \
 	        -not -path "./Makefile" \
-		-execdir echo /bin/rm -r '{}' +
-		#-print
+		-execdir /bin/rm '{}' + >/dev/null 2>&1 || true
+	@find "$(BUILDDIR)" \
+		-type d \
+		-not -path '.' \
+		-not -path "./$(SOURCEDIR)" \
+		-not -path './$(SOURCEDIR)/*' \
+	        -not -path "./Makefile" \
+		-execdir /bin/rm -r '{}' + >/dev/null 2>&1 || true
+	@echo "Removed files."
 
 .PHONY: html
 html:
