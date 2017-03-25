@@ -19,11 +19,11 @@ The Feature Factory app includes a JupyterHub server, containerized Jupyter note
 each user with the Feature Factory package installed, a database backend to store the
 features, and data- and user-management tools.
 
-**Table of Contents**
+Contents:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Table of Contents
 
    intro.md
    deployment.md

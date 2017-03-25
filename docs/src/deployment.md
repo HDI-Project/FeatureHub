@@ -1,6 +1,7 @@
-# Deploy Feature Factory
+# Deployment
 
 A variety of resources facilitate easy deployment of Feature Factory:
+
 - `Makefile` to manage all resources
 - `docker`
 - `docker-compose`, for actual deployment of Hub, User, and DB containers
@@ -94,11 +95,13 @@ authentication for each user with the DB.
 
 Most files are stored directly on the host machine and mounted in the Hub and User
 containers:
+
 - Experiment data: `FF_DATA_DIR/data`
 - Notebooks and other user-created files: `FF_DATA_DIR/users`
 - Configuration files for FeatureFactory and JupyterHub: `FF_DATA_DIR/config`
 
 The MySQL database is mounted on a docker data volume:
+
 - `db-data`
 
 ## App administration
@@ -110,6 +113,7 @@ experiment without needing access to the host machine.
 Create an admin user using `add_user.sh -a admin_username admin_password`.
 
 App admin
+
 - Can log into JupyterHub via the admin web interface and add/remove users, restart/shutdown
     notebooks, and more.
 - Can also create/remove users from the host machine command line using `add_user.sh` and
@@ -117,6 +121,7 @@ App admin
 - Can modify the experiment database.
 
 Experiment admin
+
 - Can log into JupyterHub and use the `notebooks/admin/Admin.ipynb` notebook to initialize
     experiments, restart experiments, and view features created.
 - To create an experiment, the admin user must store data on the server, then execute

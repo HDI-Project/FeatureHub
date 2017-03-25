@@ -18,18 +18,12 @@ help:
 .PHONY: clean
 clean:
 	@echo Not implemented
-	# @find "$(BUILDDIR)" \
-	# 	-type f \
-	# 	-path "$(SOURCEDIR)" -prune -o \
-	#         -not -name "Makefile" \
-	# 	-print
-	# 	#-execdir /bin/rm '{}' +
-	# @find "$(BUILDDIR)" \
-	# 	-type d \
-	# 	-path "$(SOURCEDIR)" -prune -o \
-	#         -not -name '.' \
-	# 	-print
-	# 	#-execdir /bin/rm -r '{}' +
+	@find "$(BUILDDIR)" \
+		-not -path "./$(SOURCEDIR)" \
+		-not -path './$(SOURCEDIR)/*' \
+	        -not -path "./Makefile" \
+		-execdir echo /bin/rm -r '{}' +
+		#-print
 
 .PHONY: html
 html:
