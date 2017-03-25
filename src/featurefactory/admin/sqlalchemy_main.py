@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from featurefactory.admin.sqlalchemy_declarative import Base
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError
 import os
 
 class ORMManager:
@@ -19,7 +19,7 @@ class ORMManager:
             config.read(user_conf)
             user     = config.get('client','user')
             password = config.get('client','password')
-        except IOError:
+        except (IOError, NoSectionError) as e:
             # TODO should throw error
             user     = 'root'
             password = ''

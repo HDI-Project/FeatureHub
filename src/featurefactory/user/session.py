@@ -11,13 +11,13 @@ import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from featurefactory.user.util import run_isolated
+
+from featurefactory.user.util import run_isolated, DescriptionStore
 from featurefactory.user.model import Model
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
 
 MD5_ABBREV_LEN = 8
-
 
 class Session(object):
     """created per user connected, hidden/inaccessible to user.
@@ -61,6 +61,10 @@ class Session(object):
             self.__user = self.__orm.session.query(User)\
                                             .filter(User.name == name)\
                                             .first()
+
+        # initialize description store for interacting with IPython kernel
+        self.__description_store = DescriptionStore()
+
     def get_sample_dataset(self):
         """
         Loads sample of problem dataset into memory.
@@ -132,7 +136,6 @@ class Session(object):
 
         code = self.__get_source(feature).encode("utf-8")
         md5 = hashlib.md5(code).hexdigest()
-        description = "" # TODO
 
         query = (
             Feature.problem == self.__problem,
@@ -147,6 +150,8 @@ class Session(object):
         if self._is_valid_feature(feature):
             score = float(self._cross_validate(feature))
             print("Feature scored {}".format(score))
+
+            description = self._prompt_description()
 
             feature = Feature(description=description, score=score, code=code, md5=md5,
                               user=self.__user, problem=self.__problem)
@@ -201,6 +206,11 @@ class Session(object):
                 .filter(*filter_)
                 .order_by(Feature.score)
         )
+
+    def _prompt_description(self):
+        with open("prompt_description.js", "r") as f:
+            Javascript(f.read())
+        return self.description_store.get_description()
 
     @staticmethod
     def _print_one_feature(feature):
