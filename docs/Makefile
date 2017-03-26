@@ -8,7 +8,7 @@ SPHINXAPIDOC  = sphinx-apidoc
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = FeatureFactory
 SOURCEDIR     = src
-BUILDDIR      = .
+BUILDDIR      = _build
 PROJDIR       = ../src/featurefactory
 
 .PHONY: help
@@ -17,32 +17,23 @@ help:
 
 .PHONY: clean
 clean:
-	@find "$(BUILDDIR)" \
-		-type f \
-		-not -path '.' \
-		-not -path "./$(SOURCEDIR)" \
-		-not -path './$(SOURCEDIR)/*' \
-	        -not -path "./Makefile" \
-		-execdir /bin/rm '{}' + >/dev/null 2>&1 || true
-	@find "$(BUILDDIR)" \
-		-type d \
-		-not -path '.' \
-		-not -path "./$(SOURCEDIR)" \
-		-not -path './$(SOURCEDIR)/*' \
-	        -not -path "./Makefile" \
-		-execdir /bin/rm -r '{}' + >/dev/null 2>&1 || true
-	@echo "Removed files."
-
-.PHONY: html
-html:
-	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" "$(PROJDIR)"
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	@rsync -a html/ ./
-	@rm -r html
-	@echo "Html files built to $(BUILDDIR)"
+	@if [ "$(BUILDDIR)" != "." ]; then \
+	     rm -r "$(BUILDDIR)"; \
+	     echo "Removed files."; \
+	 else \
+	     echo "Remove those files yourself, silly."; \
+	 fi
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 .PHONY: Makefile
-%: Makefile
+%: Makefile apidoc
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+.PHONY: apidoc
+apidoc:
+	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" "$(PROJDIR)"
+
+.PHONY: publish
+publish: html
+	ghp-import -n -m "Update documentation" -b gh-pages "$(BUILDDIR)/html"
