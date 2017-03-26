@@ -1,5 +1,7 @@
 # FeatureFactory
 
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://HDI-Project.github.io/FeatureFactory)
+
 *FeatureFactory* is a web application built on top of JupyterHub and an accompanying Python
 package that together facilitate collaborative data science efforts as well as data collection
 experiments on those efforts.
