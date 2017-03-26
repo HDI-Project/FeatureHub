@@ -1,0 +1,20 @@
+featurefactory package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    featurefactory.admin
+    featurefactory.problems
+    featurefactory.tests
+    featurefactory.user
+
+Module contents
+---------------
+
+.. automodule:: featurefactory
+    :members:
+    :undoc-members:
+    :show-inheritance:

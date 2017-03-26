@@ -1,0 +1,7 @@
+featurefactory
+==============
+
+.. toctree::
+   :maxdepth: 4
+
+   featurefactory

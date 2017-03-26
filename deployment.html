@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Deployment &#8212; Feature Factory 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Intro" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Intro"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="deployment">
+<span id="deployment"></span><h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
+<p>A variety of resources facilitate easy deployment of Feature Factory:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">Makefile</span></code> to manage all resources</li>
+<li><code class="docutils literal"><span class="pre">docker</span></code></li>
+<li><code class="docutils literal"><span class="pre">docker-compose</span></code>, for actual deployment of Hub, User, and DB containers</li>
+<li>shell utilities<ul>
+<li>create/delete users</li>
+<li>use LetsEncrypt to generate SSL certificate</li>
+</ul>
+</li>
+<li>configuration files</li>
+</ul>
+<div class="section" id="installation">
+<span id="installation"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<ol>
+<li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
+</li>
+<li><p class="first">Download the FeatureFactory repository.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">HDI</span><span class="o">-</span><span class="n">Project</span><span class="o">/</span><span class="n">FeatureFactory</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="configuration">
+<span id="configuration"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Feature Factory allows configuration in several places.</p>
+<div class="section" id="app-deployment">
+<span id="app-deployment"></span><h3>App Deployment<a class="headerlink" href="#app-deployment" title="Permalink to this headline">¶</a></h3>
+<p>Default app configuration variables are provided in <code class="docutils literal"><span class="pre">deploy/.env</span></code>.</p>
+<p>To override any of these defaults, set these variables in a new file <code class="docutils literal"><span class="pre">deploy/.env.local</span></code>.</p>
+<p>Definitely override values for these variables:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let&#8217;s Encrypt.</li>
+<li><code class="docutils literal"><span class="pre">FF_DOMAIN_EMAIL</span></code>: email associated with domain name registration</li>
+<li><code class="docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
+</ul>
+<p>You can usually leave these variables at their default values:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">DOCKER_NETWORK_NAME</span></code>: name for docker network used for networking containers</li>
+<li><code class="docutils literal"><span class="pre">HUB_IMAGE_NAME</span></code>: name for docker Hub image</li>
+<li><code class="docutils literal"><span class="pre">HUB_CONTAINER_NAME</span></code>: name for docker Hub container</li>
+<li><code class="docutils literal"><span class="pre">FF_IMAGE_NAME</span></code>: name for docker User notebook server image</li>
+<li><code class="docutils literal"><span class="pre">FF_CONTAINER_NAME</span></code>: prefix for docker User containers. Actual containers will have
+<code class="docutils literal"><span class="pre">-username</span></code> appended.</li>
+<li><code class="docutils literal"><span class="pre">FF_DATA_DIR</span></code>: path to data directory on <em>host machine</em> (deployment machine)</li>
+<li><code class="docutils literal"><span class="pre">FF_PROJECT_NAME</span></code>: name for docker-compose app</li>
+<li><code class="docutils literal"><span class="pre">FF_IDLE_SERVER_TIMEOUT</span></code>: timeout interval for idle servers. If a server is idle for this
+amount of time, then it will be automatically stopped. Due to some JupyterHub defaults,
+this value should be set to at least 5m 30s (<code class="docutils literal"><span class="pre">330</span></code>).</li>
+<li><code class="docutils literal"><span class="pre">MYSQL_CONTAINER_NAME</span></code>: name for docker DB container</li>
+<li><code class="docutils literal"><span class="pre">MYSQL_ROOT_USERNAME</span></code>: username for DB root user</li>
+<li><code class="docutils literal"><span class="pre">MYSQL_DATABASE</span></code>: competition database name in DB</li>
+<li><code class="docutils literal"><span class="pre">MYSQL_DATA_VOLUME_NAME</span></code>: name for DB data volume</li>
+<li><code class="docutils literal"><span class="pre">SECRETS_VOLUME_NAME</span></code>: name for Hub secrets volume</li>
+<li><code class="docutils literal"><span class="pre">USE_LETSENCRYPT_CERT</span></code>: flag to use Lets Encrypt certificate (<code class="docutils literal"><span class="pre">&quot;yes&quot;</span></code>). For testing
+purposes, can use <code class="docutils literal"><span class="pre">openssl</span></code> to issue a self-signed certificate (<code class="docutils literal"><span class="pre">&quot;no&quot;</span></code>).</li>
+</ul>
+</div>
+<div class="section" id="userlist">
+<span id="userlist"></span><h3>Userlist<a class="headerlink" href="#userlist" title="Permalink to this headline">¶</a></h3>
+<p><em>Currently, this method does not allow setup of template notebooks and DB credentials. Thus,
+it should be avoided entirely in favor of <a class="reference external" href="#user-and-data-management">User and data
+management</a>.</em></p>
+<p>Optionally, you can provide a userlist in <code class="docutils literal"><span class="pre">deploy/userlist</span></code>. Include one user per row.</p>
+<ul class="simple">
+<li>Specify normal users by their username only: <code class="docutils literal"><span class="pre">testuser</span></code></li>
+<li>Specify admin users by appending an indicator: <code class="docutils literal"><span class="pre">adminuser</span> <span class="pre">admin</span></code></li>
+</ul>
+</div>
+<div class="section" id="jupyterhub-and-jupyter-notebook">
+<span id="jupyterhub-and-jupyter-notebook"></span><h3>Jupyterhub and Jupyter Notebook<a class="headerlink" href="#jupyterhub-and-jupyter-notebook" title="Permalink to this headline">¶</a></h3>
+<p>You may want to modify the default <code class="docutils literal"><span class="pre">deploy/jupyterhub_config.py</span></code> file. However, you should
+know what you&#8217;re doing to not break things.</p>
+</div>
+</div>
+<div class="section" id="build-the-app">
+<span id="build-the-app"></span><h2>Build the app<a class="headerlink" href="#build-the-app" title="Permalink to this headline">¶</a></h2>
+<p>Build the necessary docker images.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">build</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="launch-the-app">
+<span id="launch-the-app"></span><h2>Launch the app<a class="headerlink" href="#launch-the-app" title="Permalink to this headline">¶</a></h2>
+<p>Launch the app.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">up</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="user-and-data-management">
+<span id="user-and-data-management"></span><h2>User and data management<a class="headerlink" href="#user-and-data-management" title="Permalink to this headline">¶</a></h2>
+<p>Users can be added or deleted using <code class="docutils literal"><span class="pre">deploy/add_user.sh</span></code> and <code class="docutils literal"><span class="pre">deploy/delete_user.sh</span></code>. These
+commands create user accounts on the hub container, setup notebooks templates, and setup
+authentication for each user with the DB.</p>
+<p>Most files are stored directly on the host machine and mounted in the Hub and User
+containers:</p>
+<ul class="simple">
+<li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data</span></code></li>
+<li>Notebooks and other user-created files: <code class="docutils literal"><span class="pre">FF_DATA_DIR/users</span></code></li>
+<li>Configuration files for FeatureFactory and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
+</ul>
+<p>The MySQL database is mounted on a docker data volume:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">db-data</span></code></li>
+</ul>
+</div>
+<div class="section" id="app-administration">
+<span id="app-administration"></span><h2>App administration<a class="headerlink" href="#app-administration" title="Permalink to this headline">¶</a></h2>
+<p>Admins can perform administrative tasks with respect to the Feature Factory app as well as
+the Feature Factory data science experiment. Admin users can manage and organize an
+experiment without needing access to the host machine.</p>
+<p>Create an admin user using <code class="docutils literal"><span class="pre">add_user.sh</span> <span class="pre">-a</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
+<p>App admin</p>
+<ul class="simple">
+<li>Can log into JupyterHub via the admin web interface and add/remove users, restart/shutdown
+notebooks, and more.</li>
+<li>Can also create/remove users from the host machine command line using <code class="docutils literal"><span class="pre">add_user.sh</span></code> and
+<code class="docutils literal"><span class="pre">delete_user.sh</span></code>.</li>
+<li>Can modify the experiment database.</li>
+</ul>
+<p>Experiment admin</p>
+<ul class="simple">
+<li>Can log into JupyterHub and use the <code class="docutils literal"><span class="pre">notebooks/admin/Admin.ipynb</span></code> notebook to initialize
+experiments, restart experiments, and view features created.</li>
+<li>To create an experiment, the admin user must store data on the server, then execute
+Python commands to initialize the experiment and database, provide paths to the
+experiment data, and configure experiment parameters.</li>
+</ul>
+</div>
+<div class="section" id="manage-app-lifecycle">
+<span id="manage-app-lifecycle"></span><h2>Manage app lifecycle<a class="headerlink" href="#manage-app-lifecycle" title="Permalink to this headline">¶</a></h2>
+<p>The available tasks can be viewed with</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">help</span>
+</pre></div>
+</div>
+<div class="section" id="restarting-the-server">
+<span id="restarting-the-server"></span><h3>Restarting the server<a class="headerlink" href="#restarting-the-server" title="Permalink to this headline">¶</a></h3>
+<p>You may want to restart the server to modify configuration of JupyterHub, update the
+Feature Factory code, or some other reason.</p>
+<p>Stop the app. This stops, but does <em>not</em> remove, the hub, user, and DB containers. Note that hub
+state files, user notebooks, and the database dump persist on the filesystem or in data
+volumes.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">stop</span>
+</pre></div>
+</div>
+<p>Restart the app.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>Down the app. This stops and removes the hub, user, and database containers. Note that hub
+state files persist, user notebooks, and the database dump persist on the filesystem.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">down</span>
+</pre></div>
+</div>
+<p><em>Optional</em>: Clean filesystem and containers. This stops and removes all Feature Factory
+containers, if not been already done. Additionally, user notebooks and config files are
+removed. Note that this <em>does not clear the database</em>, which may then retain information
+relating to non-existent users and expect user credentials that have been deleted.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
+</pre></div>
+</div>
+<p><em>Optional</em>: Clean images, network, and volumes, in addition to filesystem and containers.
+This removes all trace of Feature Factory beside the source repository and the experiment
+data directory. Built images are removed, the docker internal network is shut down, and the
+database volume is removed.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean_all</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Deployment</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#app-deployment">App Deployment</a></li>
+<li><a class="reference internal" href="#userlist">Userlist</a></li>
+<li><a class="reference internal" href="#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#build-the-app">Build the app</a></li>
+<li><a class="reference internal" href="#launch-the-app">Launch the app</a></li>
+<li><a class="reference internal" href="#user-and-data-management">User and data management</a></li>
+<li><a class="reference internal" href="#app-administration">App administration</a></li>
+<li><a class="reference internal" href="#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li><a class="reference internal" href="#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Intro</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/deployment.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Intro"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Micah Smith.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

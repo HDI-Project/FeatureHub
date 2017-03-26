@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>featurefactory.admin package &#8212; Feature Factory 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="featurefactory-admin-package">
+<h1>featurefactory.admin package<a class="headerlink" href="#featurefactory-admin-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurefactory.admin.admin">
+<span id="featurefactory-admin-admin-module"></span><h2>featurefactory.admin.admin module<a class="headerlink" href="#module-featurefactory.admin.admin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.admin.admin.Commands">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.admin.</code><code class="descname">Commands</code><span class="sig-paren">(</span><em>problem=None</em>, <em>database='featurefactory'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Admin interface for the database.</p>
+<p>Create the schema, add or remove problems, and view problems, users, and
+features.</p>
+<dl class="method">
+<dt id="featurefactory.admin.admin.Commands.create_problem">
+<code class="descname">create_problem</code><span class="sig-paren">(</span><em>name</em>, <em>problem_type</em>, <em>data_path</em>, <em>files</em>, <em>y_index</em>, <em>y_column</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.create_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.create_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new problem entry in database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.admin.admin.Commands.get_features">
+<code class="descname">get_features</code><span class="sig-paren">(</span><em>user_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.get_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.get_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a DataFrame with the details about all registered features.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.admin.admin.Commands.get_problems">
+<code class="descname">get_problems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.get_problems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.get_problems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of problems in the database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.admin.admin.Commands.print_feature">
+<code class="descname">print_feature</code><span class="sig-paren">(</span><em>user_name</em>, <em>md5=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.print_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.print_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the code of the requested feature.</p>
+<p>If there is more than one feature with the same name, only the
+latest version is printed.
+Alternatively, the feature md5 can be passed to select a particular feature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.admin.admin.Commands.set_up">
+<code class="descname">set_up</code><span class="sig-paren">(</span><em>drop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.set_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new DB and create the initial scheme.</p>
+<p>If the DB already exists, it will be dropped if the drop argument is True.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurefactory.admin.sqlalchemy_declarative">
+<span id="featurefactory-admin-sqlalchemy-declarative-module"></span><h2>featurefactory.admin.sqlalchemy_declarative module<a class="headerlink" href="#module-featurefactory.admin.sqlalchemy_declarative" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">Feature</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.code">
+<code class="descname">code</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.created_at">
+<code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.description">
+<code class="descname">description</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.id">
+<code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.md5">
+<code class="descname">md5</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.md5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.problem">
+<code class="descname">problem</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.problem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.problem_id">
+<code class="descname">problem_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.problem_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.score">
+<code class="descname">score</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.user">
+<code class="descname">user</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.user_id">
+<code class="descname">user_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">Problem</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.created_at">
+<code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.data_path">
+<code class="descname">data_path</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.data_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.files">
+<code class="descname">files</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.id">
+<code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.name">
+<code class="descname">name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.problem_type">
+<code class="descname">problem_type</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.problem_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_column">
+<code class="descname">y_column</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_column" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_index">
+<code class="descname">y_index</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">User</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User.id">
+<code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User.name">
+<code class="descname">name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurefactory.admin.sqlalchemy_main">
+<span id="featurefactory-admin-sqlalchemy-main-module"></span><h2>featurefactory.admin.sqlalchemy_main module<a class="headerlink" href="#module-featurefactory.admin.sqlalchemy_main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_main.ORMManager">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_main.</code><code class="descname">ORMManager</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_main.html#ORMManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_main.ORMManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Initialize the sqlalchemy ORM engine and starts a database session.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurefactory.admin">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurefactory.admin" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">featurefactory.admin package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-featurefactory.admin.admin">featurefactory.admin.admin module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.admin.sqlalchemy_declarative">featurefactory.admin.sqlalchemy_declarative module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.admin.sqlalchemy_main">featurefactory.admin.sqlalchemy_main module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.admin">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/featurefactory.admin.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Micah Smith.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>
