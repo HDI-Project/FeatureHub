@@ -11,8 +11,8 @@ import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from IPython.display import display_javascript
-from IPython.core.magics.display import Javascript
+from IPython.display import display
+import ipywidgets as widgets
 
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
@@ -213,53 +213,25 @@ class Session(object):
     def _prompt_description(self):
         self.__description_store.before_prompt()
 
-        prompt_description_js = dedent("""\
-        // Guard against re-execution.
-        if (IPython.notebook.kernel) {
-            var handle_output = function(out){
-                console.log(out.msg_type);
-                console.log(out);
+        # create widget
+        w = widgets.Text(
+            value = "",
+            placeholder = "Type something",
+            description = "Enter feature description. Your feature " +
+                          "description should be clear, concise, " +
+                          "and meaningful to non-data scientists. ",
+            disabled = False,
+        )
+        display(w)
 
-                var res = null;
-                if (out.msg_type == "stream"){
-                    res = out.content.text;
-                }
-                // if output is a python object
-                else if(out.msg_type === "execute_result"){
-                    res = out.content.data["text/plain"];
-                }
-                // if output is a python error
-                else if(out.msg_type == "error"){
-                    res = out.content.ename + ": " + out.content.evalue;
-                }
-                // if output is something we haven't thought of
-                else{
-                    res = "[out type not implemented]";
-                }
-                console.log(res);
-            };
-            var callback = {
-                iopub: {
-                    output : handle_output,
-                }
-            };
-            var options = {
-                silent : false,
-            };
+        def widget_callback(sender):
+            print("on_submit callback")
+            sender.disabled = True
+            self.__description_store.set_description(sender.value)
 
-            var description = prompt("Enter feature description. Your feature " +
-                                     "description should be clear, concise, " +
-                                     "and meaningful to non-data scientists",
-                                     "");
-            var command = "commands._Session__description_store.set_description('" + description + "')";
-            console.log("executing " + command);
-            var kernel = IPython.notebook.kernel
-            kernel.execute(command, callback, options);
-        }
-        """)
-        jso = Javascript(prompt_description_js)
-        display_javascript(jso)
+        w.on_submit(widget_callback)
 
+        # hangs on widget submission
         description = self.__description_store.get_description()
         print("Description: {}".format(description))
         return description

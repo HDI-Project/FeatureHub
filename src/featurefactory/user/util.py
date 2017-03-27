@@ -13,7 +13,7 @@ def run_isolated(f, *args):
     return result
 
 class DescriptionStore:
-    TIMEOUT = 5
+    TIMEOUT = 30
 
     def __init__(self):
         self.description = ""
