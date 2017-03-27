@@ -11,11 +11,13 @@ import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
+from IPython.display import display_javascript
+from IPython.core.magics.display import Javascript
 
-from featurefactory.user.util import run_isolated, DescriptionStore
-from featurefactory.user.model import Model
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
+from featurefactory.user.model import Model
+from featurefactory.user.util import run_isolated, DescriptionStore
 
 MD5_ABBREV_LEN = 8
 
@@ -127,7 +129,7 @@ class Session(object):
 
         return score
 
-    def register_feature(self, feature):
+    def register_feature(self, feature, description=""):
         """
         Creates a new feature entry in database.
         """
@@ -151,7 +153,8 @@ class Session(object):
             score = float(self._cross_validate(feature))
             print("Feature scored {}".format(score))
 
-            description = self._prompt_description()
+            if not description:
+                description = self._prompt_description()
 
             feature = Feature(description=description, score=score, code=code, md5=md5,
                               user=self.__user, problem=self.__problem)
@@ -208,9 +211,58 @@ class Session(object):
         )
 
     def _prompt_description(self):
-        with open("prompt_description.js", "r") as f:
-            Javascript(f.read())
-        return self.description_store.get_description()
+        self.__description_store.before_prompt()
+
+        prompt_description_js = dedent("""\
+        // Guard against re-execution.
+        if (IPython.notebook.kernel) {
+            var handle_output = function(out){
+                console.log(out.msg_type);
+                console.log(out);
+
+                var res = null;
+                if (out.msg_type == "stream"){
+                    res = out.content.text;
+                }
+                // if output is a python object
+                else if(out.msg_type === "execute_result"){
+                    res = out.content.data["text/plain"];
+                }
+                // if output is a python error
+                else if(out.msg_type == "error"){
+                    res = out.content.ename + ": " + out.content.evalue;
+                }
+                // if output is something we haven't thought of
+                else{
+                    res = "[out type not implemented]";
+                }
+                console.log(res);
+            };
+            var callback = {
+                iopub: {
+                    output : handle_output,
+                }
+            };
+            var options = {
+                silent : false,
+            };
+
+            var description = prompt("Enter feature description. Your feature " +
+                                     "description should be clear, concise, " +
+                                     "and meaningful to non-data scientists",
+                                     "");
+            var command = "commands._Session__description_store.set_description('" + description + "')";
+            console.log("executing " + command);
+            var kernel = IPython.notebook.kernel
+            kernel.execute(command, callback, options);
+        }
+        """)
+        jso = Javascript(prompt_description_js)
+        display_javascript(jso)
+
+        description = self.__description_store.get_description()
+        print("Description: {}".format(description))
+        return description
 
     @staticmethod
     def _print_one_feature(feature):
