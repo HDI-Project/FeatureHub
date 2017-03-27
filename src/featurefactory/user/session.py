@@ -22,15 +22,12 @@ from .util import run_isolated
 MD5_ABBREV_LEN = 8
 
 class Session(object):
-    """created per user connected, hidden/inaccessible to user.
-
-    Note: use "__" prefix to make variables private so that users cannot read
-    them directly.
-
-    WARNING: The statement above is not completely true.
-    Variables prefixed by "__" are "harder" to access, but still accessible!
-    For example, __db attribute is still accessible as `session._Session__db`
     """
+    Represents a user's session within Feature Factory.
+
+    Includes commands for discovering, testing, and registering new features.
+    """
+
     def __init__(self, problem, database="featurefactory"):
         self.__orm = ORMManager(database)
         self.__user = None
@@ -66,10 +63,8 @@ class Session(object):
 
     def get_sample_dataset(self):
         """
-        Loads sample of problem dataset into memory.
-
-        Returns a list of DataFrames, each of which is a *copy* of the class'
-        field. May require a substantial amount of memory.
+        Loads sample of problem dataset, returning a list of
+        DataFrames.
         """
         if not self.__dataset:
             self._load_dataset()
@@ -131,7 +126,7 @@ class Session(object):
         Creates a new feature entry in database.
         """
 
-        assert self.__user, "user not initialized properly"
+        assert self.__user, "User not initialized properly."
 
         code = self.__get_source(feature).encode("utf-8")
         md5 = hashlib.md5(code).hexdigest()
@@ -298,21 +293,26 @@ class Session(object):
         # If running in docker and receive Errno 28: No space left on device
         # import os
         # os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
-        print("Obtaining dataset...")
+        print("Obtaining dataset...", end='')
         self._load_dataset()
+        print("done")
 
-        print("Extracting features...")
 
         # Run feature in isolated env, but reload dataset if changed.
         dataset_hash = self._compute_dataset_hash()
+        print("Extracting features...", end='')
         X = run_isolated(feature, self.__dataset)
+        print("done")
+        print("Verifying dataset integrity...", end='')
         if dataset_hash != self._compute_dataset_hash():
             self._reload_dataset()
+        print("done")
 
         Y = self.__dataset[self.__y_index][self.__y_column]
 
-        print("Cross validating...")
+        print("Cross validating...", end='')
         score = self.__model.cross_validate(X, Y)
+        print("done")
 
         # clean up to avoid filling up the memory
         del X

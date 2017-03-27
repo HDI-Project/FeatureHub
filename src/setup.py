@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='featurefactory',
-    version='0.1.0',
+    version='0.2.0',
     description='Feature Factory',
     url='https://github.com/HDI-Project/FeatureFactory',
     packages=find_packages(exclude=["tests"]),

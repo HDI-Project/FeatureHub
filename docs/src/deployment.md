@@ -160,16 +160,15 @@ make down
 
 *Optional*: Clean filesystem and containers. This stops and removes all Feature Factory
 containers, if not been already done. Additionally, user notebooks and config files are
-removed. Note that this *does not clear the database*, which may then retain information
-relating to non-existent users and expect user credentials that have been deleted.
+removed and data volumes are deleted. 
 ```
 make clean
 ```
 
-*Optional*: Clean images, network, and volumes, in addition to filesystem and containers.
-This removes all trace of Feature Factory beside the source repository and the experiment
-data directory. Built images are removed, the docker internal network is shut down, and the
-database volume is removed.
+*Optional*: In addition to the steps taken by `make clean`, cleans images, network, in
+addition to filesystem and containers.  This removes all trace of Feature Factory beside the
+source repository and the experiment data directory. Built images are removed and the docker
+internal network is shut down.
 ```
 make clean_all
 ```
