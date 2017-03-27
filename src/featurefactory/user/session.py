@@ -16,8 +16,8 @@ import ipywidgets as widgets
 
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
-from featurefactory.user.model import Model
-from featurefactory.user.util import run_isolated, DescriptionStore
+from .model import Model
+from .util import run_isolated
 
 MD5_ABBREV_LEN = 8
 
@@ -63,9 +63,6 @@ class Session(object):
             self.__user = self.__orm.session.query(User)\
                                             .filter(User.name == name)\
                                             .first()
-
-        # initialize description store for interacting with IPython kernel
-        self.__description_store = DescriptionStore()
 
     def get_sample_dataset(self):
         """
@@ -156,11 +153,13 @@ class Session(object):
             if not description:
                 description = self._prompt_description()
 
+            print("Feature description is '{}'".format(description))
+
             feature = Feature(description=description, score=score, code=code, md5=md5,
                               user=self.__user, problem=self.__problem)
             self.__orm.session.add(feature)
             self.__orm.session.commit()
-            print("Feature successfully registered")
+            print("Feature successfully registered.")
         else:
             print("Feature is invalid and not registered.", file=sys.stderr)
 
@@ -211,29 +210,15 @@ class Session(object):
         )
 
     def _prompt_description(self):
-        self.__description_store.before_prompt()
+        print(dedent("""Now, enter feature description. Your feature description
+        should be clear, concise, and meaningful to non-data scientists."""))
 
-        # create widget
-        w = widgets.Text(
-            value = "",
-            placeholder = "Type something",
-            description = "Enter feature description. Your feature " +
-                          "description should be clear, concise, " +
-                          "and meaningful to non-data scientists. ",
-            disabled = False,
-        )
-        display(w)
+        try:
+            raw_input
+        except NameError:
+            raw_input = input
 
-        def widget_callback(sender):
-            print("on_submit callback")
-            sender.disabled = True
-            self.__description_store.set_description(sender.value)
-
-        w.on_submit(widget_callback)
-
-        # hangs on widget submission
-        description = self.__description_store.get_description()
-        print("Description: {}".format(description))
+        description = raw_input("Enter description: ")
         return description
 
     @staticmethod
