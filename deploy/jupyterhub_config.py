@@ -2,6 +2,9 @@
 
 import os
 
+import jupyterhub
+jh_ver = [int(v) for v in jupyterhub.__version__.split(".")]
+
 c = get_config()
 
 # Setup some variables
@@ -19,6 +22,8 @@ c.JupyterHub.spawner_class          = 'dockerspawner.SystemUserSpawner'
 c.SystemUserSpawner.container_image = ff_image_name
 c.DockerSpawner.container_prefix    = ff_container_name
 c.DockerSpawner.remove_containers   = True
+if jh_ver[0] >= 0 and jh_ver[1] >= 7:
+    c.Spawner.mem_limit             = os.environ["FF_CONTAINER_MEMLIMIT"]
 
 # Networking
 c.JupyterHub.port                 = 443
@@ -34,10 +39,8 @@ c.Spawner.environment             = {
 }
 
 # Security
-if "SSL_KEY" in os.environ.keys():
-    c.JupyterHub.ssl_key = os.environ["SSL_KEY"]
-if "SSL_CERT" in os.environ.keys():
-    c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
+c.JupyterHub.ssl_key = os.environ["SSL_KEY"]
+c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
 # c.Authenticator.whitelist = {''}
 
 # Data/directories
@@ -49,7 +52,7 @@ c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'user
 
 # Services - setup
 cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
-if "FF_IDLE_SERVER_TIMEOUT" in os.environ.keys():
+if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
     cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
 else:
     cull_idle_timeout = 3600
