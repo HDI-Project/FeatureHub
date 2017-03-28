@@ -3,7 +3,6 @@ from __future__ import print_function
 import collections
 import gc
 import hashlib
-import inspect
 import os
 import sys
 from textwrap import dedent
@@ -11,13 +10,11 @@ import pandas as pd
 from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from IPython.display import display
-import ipywidgets as widgets
-
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
-from .model import Model
-from .util import run_isolated
+from featurefactory.user.model import Model
+from featurefactory.util import run_isolated, get_source, compute_dataset_hash
+from featurefactory.evaluation import EvaluationClient
 
 MD5_ABBREV_LEN = 8
 
@@ -29,8 +26,8 @@ class Session(object):
     """
 
     def __init__(self, problem, database="featurefactory"):
-        self.__orm = ORMManager(database)
-        self.__user = None
+        self.__orm     = ORMManager(database)
+        self.__user    = None
         self.__dataset = []
 
         try:
@@ -39,10 +36,10 @@ class Session(object):
         except NoResultFound:
             raise ValueError("Invalid problem name: {}".format(problem))
 
-        self.__model = Model(self.__problem.problem_type)
-        self.__files = self.__problem.files.split(",")
-        self.__y_index = self.__problem.y_index
-        self.__y_column = self.__problem.y_column
+        self.__model     = Model(self.__problem.problem_type)
+        self.__files     = self.__problem.files.split(",")
+        self.__y_index   = self.__problem.y_index
+        self.__y_column  = self.__problem.y_column
         self.__data_path = self.__problem.data_path
 
         # "log in" to the system
@@ -60,6 +57,13 @@ class Session(object):
             self.__user = self.__orm.session.query(User)\
                                             .filter(User.name == name)\
                                             .first()
+
+        # initialize evaluation client
+        self.__evaluation_client = EvaluationClient(
+            self.__problem,
+            self.__user,
+            self.__orm
+        ) 
 
     def get_sample_dataset(self):
         """
@@ -112,7 +116,8 @@ class Session(object):
         """
 
         # confirm that dimensions of feature are appropriate.
-        invalid = self._validate_feature(feature)
+        invalid = self.__evaluation_client._validate_feature(feature,
+                self.__dataset)
         if invalid:
             print("Feature is not valid: {}".format(invalid), file=sys.stderr)
             score = 0
@@ -128,57 +133,43 @@ class Session(object):
 
         assert self.__user, "User not initialized properly."
 
-        code = self.__get_source(feature).encode("utf-8")
-        md5 = hashlib.md5(code).hexdigest()
+        code    = get_source(feature)
+        problem = self.__problem
+        md5     = hashlib.md5(code).hexdigest()
 
         query = (
             Feature.problem == self.__problem,
-            Feature.user == self.__user,
-            Feature.md5 == md5,
+            Feature.user    == self.__user,
+            Feature.md5     == md5,
         )
         score = self.__orm.session.query(Feature.score).filter(*query).scalar()
         if score:
             print("Feature already registered with score {}".format(score))
             return
 
-        if self._is_valid_feature(feature):
-            score = float(self._cross_validate(feature))
-            print("Feature scored {}".format(score))
 
-            if not description:
-                description = self._prompt_description()
+        if not description:
+            description = self._prompt_description()
 
-            print("Feature description is '{}'".format(description))
-
-            feature = Feature(description=description, score=score, code=code, md5=md5,
-                              user=self.__user, problem=self.__problem)
-            self.__orm.session.add(feature)
-            self.__orm.session.commit()
-            print("Feature successfully registered.")
-        else:
-            print("Feature is invalid and not registered.", file=sys.stderr)
+        result = self.__evaluation_client.register_feature(feature, description)
 
     def _abbrev_md5(self, md5):
         """Return first MD5_ABBREV_LEN characters of md5"""
         return md5[:MD5_ABBREV_LEN]
-
-    def _compute_dataset_hash(self):
-        """Return array of hash values of dataset contents (one per DataFrame)."""
-        return [hashlib.md5(d.to_msgpack()).hexdigest() for d in self.__dataset]
 
     def _load_dataset(self):
         # TODO check for dtypes file, assisting in low memory usage
 
         if not self.__dataset:
             for filename in self.__files:
-                self.__dataset.append(
-                    pd.read_csv(os.path.join(self.__data_path, filename), 
-                        low_memory=False)
-                )
+                abs_filename = os.path.join(self.__data_path, filename)
+                self.__dataset.append( pd.read_csv(abs_filename, low_memory=False))
+
+        return self.__dataset
 
     def _reload_dataset(self):
         self.__dataset = []
-        self._load_dataset()
+        return self._load_dataset()
 
     def _filter_features(self, code_fragment):
         """
@@ -205,8 +196,10 @@ class Session(object):
         )
 
     def _prompt_description(self):
-        print(dedent("""Now, enter feature description. Your feature description
-        should be clear, concise, and meaningful to non-data scientists."""))
+        print(dedent("""
+        Now, enter feature description. Your feature description
+        should be clear, concise, and meaningful to non-data scientists.
+        """))
 
         try:
             raw_input
@@ -228,60 +221,6 @@ class Session(object):
             \n
             """.format(feature.score, feature.code)))
 
-    def _is_valid_feature(self, feature):
-        """
-        Return whether feature values are valid.
-        """
-
-        # _validate_feature returns empty string on success
-        return not bool(self._validate_feature(feature))
-
-    def _validate_feature(self, feature):
-        """
-        Extract feature values from feature function, then validate values.
-        """
-
-        # Ensure dataset is loaded
-        self._load_dataset()
-
-        # Run feature in isolated env, but reload dataset if changed.
-        dataset_hash = self._compute_dataset_hash()
-        feature_values = run_isolated(feature, self.__dataset)
-        if dataset_hash != self._compute_dataset_hash():
-            self._reload_dataset()
-
-        return self._validate_feature_values(feature_values)
-
-    def _validate_feature_values(self, feature_values):
-        """
-        Return validity of feature values.
-
-        Currently checks if the feature is a DataFrame of the correct
-        dimensions. If the feature is valid, returns an empty string. Otherwise,
-        returns a semicolon-delimited list of reasons that the feature is
-        invalid.
-        """
-
-        result = []
-
-        # must be a data frame
-        if not isinstance(feature_values, pd.core.frame.DataFrame):
-            result.append("does not return DataFrame")
-            return "; ".join(result)
-
-        # Ensure dataset is loaded
-        self._load_dataset()
-
-        expected_shape = (self.__dataset[self.__y_index].shape[0], 1)
-        if feature_values.shape != expected_shape:
-            result.append(
-                "returns DataFrame of invalid shape "
-                "(actual {}, expected {})".format(
-                    feature_values.shape, expected_shape)
-            )
-
-        return "; ".join(result)
-
     def _cross_validate(self, feature):
         """
         Return score of feature run on dataset sample, without validating
@@ -299,12 +238,12 @@ class Session(object):
 
 
         # Run feature in isolated env, but reload dataset if changed.
-        dataset_hash = self._compute_dataset_hash()
+        dataset_hash = compute_dataset_hash(self.__dataset)
         print("Extracting features...", end='')
         X = run_isolated(feature, self.__dataset)
         print("done")
         print("Verifying dataset integrity...", end='')
-        if dataset_hash != self._compute_dataset_hash():
+        if dataset_hash != compute_dataset_hash(self.__dataset):
             self._reload_dataset()
         print("done")
 
@@ -320,25 +259,3 @@ class Session(object):
         gc.collect()
 
         return score
-
-    def __get_source(self, function):
-        """
-        Extract the source code from a given function.
-        """
-        out = []
-        try:
-            # Python 2
-            func_code, func_globals = function.func_code, function.func_globals
-        except AttributeError:
-            # Python 3
-            func_code, func_globals = function.__code__, function.__globals__
-
-        for name in func_code.co_names:
-            obj = func_globals.get(name)
-            if obj and inspect.isfunction(obj):
-                out.append(self.__get_source(obj))
-
-        out.append(inspect.getsource(function))
-
-        seen = set()
-        return "\n".join(x for x in out if not (x in seen or seen.add(x)))

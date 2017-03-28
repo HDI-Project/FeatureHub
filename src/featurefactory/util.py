@@ -1,4 +1,6 @@
 from multiprocessing import Pool
+import inspect
+import hashlib
 
 def run_isolated(f, *args):
 
@@ -10,3 +12,30 @@ def run_isolated(f, *args):
         pool.close()
 
     return result
+
+def get_source(function):
+    """
+    Extract the source code from a given function.
+    """
+    out = []
+    try:
+        # Python 2
+        func_code, func_globals = function.func_code, function.func_globals
+    except AttributeError:
+        # Python 3
+        func_code, func_globals = function.__code__, function.__globals__
+
+    for name in func_code.co_names:
+        obj = func_globals.get(name)
+        if obj and inspect.isfunction(obj):
+            out.append(get_source(obj))
+
+    out.append(inspect.getsource(function))
+
+    seen = set()
+    code = "\n".join(x for x in out if not (x in seen or seen.add(x)))
+    return code.encode("utf-8")
+
+def compute_dataset_hash(dataset):
+    """Return array of hash values of dataset contents (one per DataFrame)."""
+    return [hashlib.md5(d.to_msgpack()).hexdigest() for d in dataset]
