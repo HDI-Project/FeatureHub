@@ -17,23 +17,28 @@ def get_source(function):
     """
     Extract the source code from a given function.
     """
-    out = []
-    try:
-        # Python 2
-        func_code, func_globals = function.func_code, function.func_globals
-    except AttributeError:
-        # Python 3
-        func_code, func_globals = function.__code__, function.__globals__
 
-    for name in func_code.co_names:
-        obj = func_globals.get(name)
-        if obj and inspect.isfunction(obj):
-            out.append(get_source(obj))
+    # Use nested function to allow us to ultimately encode as utf-8 string.
+    def _get_source(function):
+        out = []
+        try:
+            # Python 2
+            func_code, func_globals = function.func_code, function.func_globals
+        except AttributeError:
+            # Python 3
+            func_code, func_globals = function.__code__, function.__globals__
 
-    out.append(inspect.getsource(function))
+        for name in func_code.co_names:
+            obj = func_globals.get(name)
+            if obj and inspect.isfunction(obj):
+                out.append(_get_source(obj))
 
-    seen = set()
-    code = "\n".join(x for x in out if not (x in seen or seen.add(x)))
+        out.append(inspect.getsource(function))
+
+        seen = set()
+        return "\n".join(x for x in out if not (x in seen or seen.add(x)))
+
+    code = _get_source(function)
     return code.encode("utf-8")
 
 def compute_dataset_hash(dataset):
