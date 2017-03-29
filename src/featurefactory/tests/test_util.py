@@ -26,9 +26,37 @@ def test_get_source():
     code_g = featurefactory.util.get_source(g)
     code_h = featurefactory.util.get_source(h)
 
-    # TODO # try to recreate functions from the strings
-    # d = {}
-    # exec code_f in d
+# ------------------------------------------------------------------------------ 
+# Test get_function()
+
+def test_get_function():
+    def f():
+        return 0
+
+    def g(a):
+        return a + f()
+
+    def h(a,b,c):
+        x = g(a) + b + c
+
+    def w(h,g):
+        return h+g()
+
+    def x():
+        pass
+
+    def y(a):
+        if a:
+            y(not a)
+
+    def z(a,b,c):
+        import pandas
+        import numpy
+        return pandas.DataFrame(numpy.random.randn(a,b)) * h(a,b,c)
+
+    for fn in [f, g, h, w, x, y, z]:
+        code = featurefactory.util.get_source(fn)
+        function = featurefactory.util.get_function(code)
 
 # ------------------------------------------------------------------------------ 
 # Test run_isolated
