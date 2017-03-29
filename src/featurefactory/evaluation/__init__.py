@@ -1,6 +1,9 @@
-import os
+from __future__ import print_function
+
 import sys
+import os
 import hashlib
+from textwrap import dedent
 import pandas
 
 from featurefactory.util import compute_dataset_hash, run_isolated, get_source
@@ -38,7 +41,10 @@ class EvaluationClient:
             self.orm.session.commit()
             print("Feature successfully registered.")
         else:
-            print("Feature is invalid and not registered.", file=sys.stderr)
+            print(dedent("""
+            Feature is invalid and not registered. Try cross validating
+            it locally to see your problems.
+            """, file=sys.stderr)
 
     def _is_valid_feature(self, feature, dataset):
         """

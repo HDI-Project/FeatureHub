@@ -197,8 +197,9 @@ class Session(object):
 
     def _prompt_description(self):
         print(dedent("""
-        Now, enter feature description. Your feature description
-        should be clear, concise, and meaningful to non-data scientists.
+        First, enter feature description. Your feature description
+        should be clear, concise, and meaningful to non-data scientists. (If
+        your feature fails to register, this description will be discarded.)
         """))
 
         try:
@@ -211,15 +212,14 @@ class Session(object):
 
     @staticmethod
     def _print_one_feature(feature):
-        print(dedent(
-            """
-            ------------------
-            Feature score: {0}
+        print(dedent("""
+        ------------------
+        Feature score: {0}
 
-            Feature code:
-            {1}
-            \n
-            """.format(feature.score, feature.code)))
+        Feature code:
+        {1}
+        \n
+        """.format(feature.score, feature.code)))
 
     def _cross_validate(self, feature):
         """
