@@ -57,6 +57,8 @@ if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
 else:
     cull_idle_timeout = 3600
 
+whoami_flask_filename = os.path.join(jupyterhub_config_dir, "whoami-flask.py")
+
 # Services - definitions
 c.JupyterHub.services = [
     {
@@ -66,6 +68,14 @@ c.JupyterHub.services = [
                     "--timeout="+cull_idle_timeout,
                     "--cull_every=300"],
     },
+    {
+        'name': 'whoami',
+        'url': 'http://127.0.0.1:10101',
+        'command': ['flask', 'run', '--port=10101'],
+        'environment': {
+            'FLASK_APP': whoami_flask_filename,
+        }
+    }
 ]
 
 # Whitelist users and admins

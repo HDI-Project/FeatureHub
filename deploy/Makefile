@@ -22,6 +22,10 @@ setup_files:
 	sudo mkdir -p $(FF_DATA_DIR)/config/jupyterhub
 	sudo chmod -R 777 $(FF_DATA_DIR)
 	sudo chmod 700 $(FF_DATA_DIR)/config/jupyterhub
+	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
+	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
+	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
+	sudo cp ../src/featurefactory/evaluation/whoami-flask.py $(FF_DATA_DIR)/config/jupyterhub/
 
 .PHONY: teardown_files
 teardown_files:
@@ -70,9 +74,6 @@ build_user: network setup_files
 .PHONY: build_hub
 build_hub: network volumes setup_files ssl
 	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
-	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
-	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
-	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
 
 .PHONY: ssl
 ssl:
