@@ -12,6 +12,9 @@ from flask import Flask, redirect, request, Response
 
 from jupyterhub.services.auth import HubAuth
 
+class EvaluationResult:
+    def __init__(self):
+        pass
 
 prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
@@ -42,12 +45,21 @@ def authenticated(f):
 @authenticated
 def evaluate(user):
     # post elements
-    code = request.form["code"]
+    code        = request.form["code"]
     description = request.form["description"]
-    problem = request.form["problem"]
+    problem     = request.form["problem"]
 
     score = -1.0
     return Response(
         json.dumps(score, indent=1, sort_keys=True),
         mimetype="application/json",
         )
+
+@app.route(prefix + '/')
+@authenticated
+def whoami(user):
+    return Response(
+        json.dumps(user, indent=1, sort_keys=True),
+        mimetype='application/json',
+        )
+
