@@ -26,6 +26,7 @@ features, and data- and user-management tools.
    intro.md
    tutorial.md
    user-guide.md
+   faq.md
    deployment.md
 
 
