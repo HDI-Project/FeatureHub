@@ -14,7 +14,7 @@ from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
 from featurefactory.user.model import Model
 from featurefactory.util import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation import EvaluationClient
+from featurefactory.evaluation.client import EvaluationClient
 
 MD5_ABBREV_LEN = 8
 

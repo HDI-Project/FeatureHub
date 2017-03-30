@@ -44,7 +44,7 @@ class EvaluationClient:
             print(dedent("""
             Feature is invalid and not registered. Try cross validating
             it locally to see your problems.
-            """, file=sys.stderr)
+            """), file=sys.stderr)
 
     def _is_valid_feature(self, feature, dataset):
         """

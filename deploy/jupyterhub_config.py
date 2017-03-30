@@ -8,17 +8,17 @@ jh_ver = [int(v) for v in jupyterhub.__version__.split(".")]
 c = get_config()
 
 # Setup some variables
-network_name               = os.environ['DOCKER_NETWORK_NAME']
-ff_data_dir                = os.environ['FF_DATA_DIR']
-ff_image_name              = os.environ['FF_IMAGE_NAME']
-ff_container_name          = os.environ['FF_CONTAINER_NAME']
-hub_container_name         = os.environ['HUB_CONTAINER_NAME']
-mysql_container_name       = os.environ['MYSQL_CONTAINER_NAME']
+network_name               = os.environ["DOCKER_NETWORK_NAME"]
+ff_data_dir                = os.environ["FF_DATA_DIR"]
+ff_image_name              = os.environ["FF_IMAGE_NAME"]
+ff_container_name          = os.environ["FF_CONTAINER_NAME"]
+hub_container_name         = os.environ["HUB_CONTAINER_NAME"]
+mysql_container_name       = os.environ["MYSQL_CONTAINER_NAME"]
 
-jupyterhub_config_dir      = os.path.join(ff_data_dir, 'config', 'jupyterhub')
+jupyterhub_config_dir      = os.path.join(ff_data_dir, "config", "jupyterhub")
 
 # Spawned containers
-c.JupyterHub.spawner_class          = 'dockerspawner.SystemUserSpawner'
+c.JupyterHub.spawner_class          = "dockerspawner.SystemUserSpawner"
 c.SystemUserSpawner.container_image = ff_image_name
 c.DockerSpawner.container_prefix    = ff_container_name
 c.DockerSpawner.remove_containers   = True
@@ -32,23 +32,24 @@ c.JupyterHub.hub_port             = 8080
 c.DockerSpawner.use_internal_ip   = True
 c.DockerSpawner.network_name      = network_name
 c.DockerSpawner.extra_host_config = {
-    'network_mode' : network_name,
+    "network_mode" : network_name,
 }
 c.Spawner.environment             = {
-    'MYSQL_CONTAINER_NAME' : mysql_container_name,
+    "MYSQL_CONTAINER_NAME" : mysql_container_name,
 }
 
 # Security
 c.JupyterHub.ssl_key = os.environ["SSL_KEY"]
 c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
-# c.Authenticator.whitelist = {''}
+# c.Authenticator.whitelist = {""}
 
 # Data/directories
-c.JupyterHub.db_url                            = os.path.join('sqlite:///', jupyterhub_config_dir, 'jupyterhub.sqlite')
-c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_dir, 'jupyterhub_cookie_secret')
-c.Spawner.notebook_dir                         = '~/notebooks'
-c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, 'data') : '/data' }
-c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, 'users', '{username}')
+c.JupyterHub.db_url                            = os.path.join("sqlite:///", jupyterhub_config_dir, "jupyterhub.sqlite")
+c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_dir, "jupyterhub_cookie_secret")
+c.JupyterHub.extra_log_file                    = os.path.join(jupyterhub_config_dir, "jupyterhub.log")
+c.Spawner.notebook_dir                         = "~/notebooks"
+c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, "data") : "/data" }
+c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, "users", "{username}")
 
 # Services - setup
 cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
@@ -69,11 +70,12 @@ c.JupyterHub.services = [
                     "--cull_every=300"],
     },
     {
-        'name': 'evaluation-server',
-        'url': 'http://127.0.0.1:10101',
-        'command': ['flask', 'run', '--port=10101'],
-        'environment': {
-            'FLASK_APP': evaluation_server_filename,
+        "name": "evaluation-server",
+        "url": "http://127.0.0.1:10101",
+        "command": ["flask", "run", "--port=10101"],
+        "environment": {
+            "FLASK_APP": evaluation_server_filename,
+            "FLASK_DEBUG": "1",
         }
     }
 ]
@@ -86,7 +88,7 @@ c.JupyterHub.admin_access = True
 whitelist.add("root")
 admin.add("root")
 
-userlist_filename = os.path.join(jupyterhub_config_dir, 'userlist')
+userlist_filename = os.path.join(jupyterhub_config_dir, "userlist")
 if os.path.isfile(userlist_filename):
     with open(userlist_filename, "r") as f:
         for line in f:
@@ -95,5 +97,5 @@ if os.path.isfile(userlist_filename):
             parts = line.split()
             name = parts[0]
             whitelist.add(name)
-            if len(parts) > 1 and parts[1] == 'admin':
+            if len(parts) > 1 and parts[1] == "admin":
                 admin.add(name)
