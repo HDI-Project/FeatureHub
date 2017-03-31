@@ -1,4 +1,6 @@
+flask>=0.12
 jupyter
+jupyterhub>=0.7.2
 matplotlib
 numpy
 mysqlclient

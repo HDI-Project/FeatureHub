@@ -6,23 +6,29 @@ Evaluation server for Feature Factory user notebooks
 from functools import wraps
 import json
 import os
+import sys
 from urllib.parse import quote
 
 from flask import Flask, redirect, request, Response
 
 from jupyterhub.services.auth import HubAuth
 
-class EvaluationResult:
-    def __init__(self):
-        pass
-
-prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-
+# setup
+prefix = "/services/eval-server"
+hub_api_token = os.environ["EVAL_API_TOKEN"]
+hub_api_url = "http://{}:{}/hub/api".format(
+    os.environ["HUB_CONTAINER_NAME"],
+    os.environ["HUB_API_PORT"]
+)
+print("token: " + hub_api_token, file=sys.stderr)
+print("url: " + hub_api_url, file=sys.stderr)
 auth = HubAuth(
-    api_token=os.environ["JUPYTERHUB_API_TOKEN"],
-    cookie_cache_max_age=60,
+    api_token            = hub_api_token,
+    api_url              = hub_api_url,
+    cookie_cache_max_age = 60,
 )
 
+# app
 app = Flask(__name__)
 
 def authenticated(f):
@@ -63,3 +69,12 @@ def whoami(user):
         mimetype='application/json',
         )
 
+if __name__ == "__main__":
+    host  = "0.0.0.0"
+    port  = int(os.environ.get("EVAL_CONTAINER_PORT", 5000))
+    debug = bool(os.environ.get("EVAL_FLASK_DEBUG", False))
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=debug
+    )

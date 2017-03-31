@@ -1,5 +1,4 @@
-# Adapted from jupyterhub/jupyterhub-deploy-docker
-FROM jupyterhub/jupyterhub-onbuild:0.7.2
+FROM jupyterhub-docker:0.7.2
 
 # Install additional packages
 RUN /opt/conda/bin/pip install \
@@ -7,8 +6,3 @@ RUN /opt/conda/bin/pip install \
     'dockerspawner==0.5.*' \
     'python-dateutil==2.6.*' \
     'flask>=0.12'
-
-# Install docker on the jupyterhub container
-RUN wget https://get.docker.com -q -O /tmp/getdocker && \
-    chmod +=x /tmp/getdocker && \
-    sh /tmp/getdocker

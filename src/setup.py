@@ -11,7 +11,9 @@ setup(
     url='https://github.com/HDI-Project/FeatureFactory',
     packages=find_packages(exclude=["tests"]),
     install_requires=[
+        'flask',
         'jupyter',
+        'jupyterhub',
         'matplotlib',
         'numpy',
         'mysqlclient',

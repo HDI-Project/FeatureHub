@@ -25,7 +25,7 @@ services:
             - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
             - secrets:/etc/letsencrypt
         ports:
-            - "443:443"
+            - 443:443
         environment:
             DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
             FF_DATA_DIR: ${FF_DATA_DIR}
@@ -34,7 +34,11 @@ services:
             FF_IDLE_SERVER_TIMEOUT: ${FF_IDLE_SERVER_TIMEOUT}
             FF_CONTAINER_MEMLIMIT: ${FF_CONTAINER_MEMLIMIT}
             HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
+            HUB_API_PORT: ${HUB_API_PORT}
             MYSQL_CONTAINER_NAME: ${MYSQL_CONTAINER_NAME}
+            EVAL_CONTAINER_NAME: ${EVAL_CONTAINER_NAME}
+            EVAL_CONTAINER_PORT: ${EVAL_CONTAINER_PORT}
+            EVAL_API_TOKEN: ${EVAL_API_TOKEN}
             SSL_KEY: "/etc/letsencrypt/privkey.pem"
             SSL_CERT: "/etc/letsencrypt/cert.pem"
         command: >
@@ -43,9 +47,27 @@ services:
         image: mysql:5.7
         container_name: ${MYSQL_CONTAINER_NAME}
         ports:
-            - "3306:3306"
+            - 3306:3306
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         volumes:
             - db-data:/var/lib/mysql
+    eval-server:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-eval
+        image: ${EVAL_IMAGE_NAME}
+        container_name: ${EVAL_CONTAINER_NAME}
+        volumes:
+            - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
+        ports:
+            - ${EVAL_CONTAINER_PORT}:${EVAL_CONTAINER_PORT}
+        environment:
+            FF_DATA_DIR: ${FF_DATA_DIR}
+            HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
+            HUB_API_PORT: ${HUB_API_PORT}
+            MYSQL_CONTAINER_NAME: ${MYSQL_CONTAINER_NAME}
+            EVAL_CONTAINER_PORT: ${EVAL_CONTAINER_PORT}
+            EVAL_API_TOKEN: ${EVAL_API_TOKEN}
+            EVAL_FLASK_DEBUG: ${EVAL_FLASK_DEBUG}

@@ -13,6 +13,7 @@ ff_data_dir                = os.environ["FF_DATA_DIR"]
 ff_image_name              = os.environ["FF_IMAGE_NAME"]
 ff_container_name          = os.environ["FF_CONTAINER_NAME"]
 hub_container_name         = os.environ["HUB_CONTAINER_NAME"]
+hub_port                   = int(os.environ["HUB_API_PORT"])
 mysql_container_name       = os.environ["MYSQL_CONTAINER_NAME"]
 
 jupyterhub_config_dir      = os.path.join(ff_data_dir, "config", "jupyterhub")
@@ -28,7 +29,7 @@ if jh_ver[0] >= 0 and jh_ver[1] >= 7:
 # Networking
 c.JupyterHub.port                 = 443
 c.JupyterHub.hub_ip               = hub_container_name
-c.JupyterHub.hub_port             = 8080
+c.JupyterHub.hub_port             = hub_port
 c.DockerSpawner.use_internal_ip   = True
 c.DockerSpawner.network_name      = network_name
 c.DockerSpawner.extra_host_config = {
@@ -58,7 +59,10 @@ if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
 else:
     cull_idle_timeout = 3600
 
-evaluation_server_filename = os.path.join(jupyterhub_config_dir, "server.py")
+eval_server_hostname = os.environ["EVAL_CONTAINER_NAME"]
+eval_server_port     = os.environ["EVAL_CONTAINER_PORT"]
+eval_server_url      = "http://{}:{}".format(eval_server_hostname, eval_server_port)
+eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
 # Services - definitions
 c.JupyterHub.services = [
@@ -70,13 +74,9 @@ c.JupyterHub.services = [
                     "--cull_every=300"],
     },
     {
-        "name": "evaluation-server",
-        "url": "http://127.0.0.1:10101",
-        "command": ["flask", "run", "--port=10101"],
-        "environment": {
-            "FLASK_APP": evaluation_server_filename,
-            "FLASK_DEBUG": "1",
-        }
+        "name": "eval-server",
+        "url": eval_server_url,
+        "api_token": eval_server_api_token,
     }
 ]
 
