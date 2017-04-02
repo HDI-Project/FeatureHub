@@ -29,7 +29,7 @@ class EvaluationClient:
             code = get_source(feature)
             md5 = hashlib.md5(code).hexdigest()
 
-            feature = Feature(
+            feature_obj = Feature(
                 description = description,
                 score       = score,
                 code        = code,
@@ -37,7 +37,7 @@ class EvaluationClient:
                 user        = self.user,
                 problem     = self.problem
             )
-            self.orm.session.add(feature)
+            self.orm.session.add(feature_obj)
             self.orm.session.commit()
             print("Feature successfully registered.")
         else:

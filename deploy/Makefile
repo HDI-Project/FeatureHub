@@ -68,14 +68,14 @@ build: build_static build_services
 
 .PHONY: build_static
 build_static: network setup_files
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-static.yml build;\
 	}
 
 .PHONY: build_services
 build_services: network volumes setup_files ssl
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build;\
         }
@@ -86,28 +86,28 @@ ssl:
 
 .PHONY: up
 up:
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml up -d;\
 	}
 
 .PHONY: stop
 stop:
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml stop;\
 	}
 
 .PHONY: start
 start:
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml start;\
 	}
 
 .PHONY: down
 down:
-	{\
+	@{\
 	    export $(shell tr '\n' ' ' < .env.local);\
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml down;\
 	}

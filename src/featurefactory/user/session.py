@@ -26,6 +26,7 @@ class Session(object):
     """
 
     def __init__(self, problem, database="featurefactory"):
+        self.__database = database
         self.__orm     = ORMManager(database)
         self.__user    = None
         self.__dataset = []

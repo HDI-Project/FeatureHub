@@ -13,6 +13,13 @@ from flask import Flask, redirect, request, Response
 
 from jupyterhub.services.auth import HubAuth
 
+# feature factory imports
+import logging
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from featurefactory.evaluation.response import EvaluationResponse
+from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
+
 # setup
 prefix = "/services/eval-server"
 hub_api_token = os.environ["EVAL_API_TOKEN"]
@@ -20,8 +27,6 @@ hub_api_url = "http://{}:{}/hub/api".format(
     os.environ["HUB_CONTAINER_NAME"],
     os.environ["HUB_API_PORT"]
 )
-print("token: " + hub_api_token, file=sys.stderr)
-print("url: " + hub_api_url, file=sys.stderr)
 auth = HubAuth(
     api_token            = hub_api_token,
     api_url              = hub_api_url,
@@ -50,16 +55,70 @@ def authenticated(f):
 @app.route(prefix + "/evaluate", methods=["POST"])
 @authenticated
 def evaluate(user):
-    # post elements
+    # required inputs include
+    # - the database
+    # - the problem id, for lookup in database
+    # - the feature code
+    # - the user-provided feature description
+    database    = request.form["database"]
+    problem_id  = request.form["problem_id"]
     code        = request.form["code"]
     description = request.form["description"]
-    problem     = request.form["problem"]
 
-    score = -1.0
-    return Response(
-        json.dumps(score, indent=1, sort_keys=True),
-        mimetype="application/json",
+    # preprocessing
+    # - look up the problem in the databasse
+    # - look up the user in the database
+    # - compute the md5 hash of the feature code
+    # - convert the feature code into a function
+    orm = ORMManager(database, admin=True)
+    try:
+        problem_obj = orm.session.query(Problem).filter(Problem.id == problem_id).one()
+    except (NoResultFound, MultipleResultsFound) as e:
+        logging.traceback(
+            "Couldn't access problem (id {}) from db".format(problem_id))
+        response = EvaluationResponse(
+            status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
+        return response.to_response()
+    user_name = user["name"]
+    try:
+        user_obj = orm.session.query(User).filter(User.name = user_name).one()
+    except (NoResultFound, MultipleResultsFound) as e:
+        logging.traceback(
+            "Couldn't access user (name {}) from db".format(user_name))
+        response = EvaluationResponse(
+            status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
+        )
+        return response.to_response()
+    md5 = hashlib.md5(code).hexdigest()
+    feature = get_function(code)
+
+    # processing
+    # - compute the CV score
+    # - compute any other metrics
+    score_cv = -1.0
+
+    # write to db
+    # TODO error handling
+    feature_obj = Feature(
+        description = description,
+        score       = score_cv,
+        code        = code,
+        md5         = md5,
+        user        = user_obj,
+        problem     = problem_obj
+    )
+    self.orm.session.add(feature_obj)
+    self.orm.session.commit()
+
+    # return
+    # - status code
+    # - metrics dict
+    status_code = EvaluationResponse.STATUS_CODE_OKAY
+    metrics = {"score_cv" : score_cv}
+
+    return EvaluationResponse(
+            status_code=status_code, metrics=metrics).to_response()
 
 @app.route(prefix + '/')
 @authenticated
@@ -74,7 +133,7 @@ if __name__ == "__main__":
     port  = int(os.environ.get("EVAL_CONTAINER_PORT", 5000))
     debug = bool(os.environ.get("EVAL_FLASK_DEBUG", False))
     app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=debug
+        host  = host,
+        port  = port,
+        debug = debug
     )

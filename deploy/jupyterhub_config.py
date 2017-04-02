@@ -18,6 +18,17 @@ mysql_container_name       = os.environ["MYSQL_CONTAINER_NAME"]
 
 jupyterhub_config_dir      = os.path.join(ff_data_dir, "config", "jupyterhub")
 
+cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
+if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
+    cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
+else:
+    cull_idle_timeout = 3600
+
+eval_container_name   = os.environ["EVAL_CONTAINER_NAME"]
+eval_container_port   = os.environ["EVAL_CONTAINER_PORT"]
+eval_server_url       = "http://{}:{}".format(eval_server_hostname, eval_server_port)
+eval_server_api_token = os.environ["EVAL_API_TOKEN"]
+
 # Spawned containers
 c.JupyterHub.spawner_class          = "dockerspawner.SystemUserSpawner"
 c.SystemUserSpawner.container_image = ff_image_name
@@ -37,6 +48,7 @@ c.DockerSpawner.extra_host_config = {
 }
 c.Spawner.environment             = {
     "MYSQL_CONTAINER_NAME" : mysql_container_name,
+    "EVAL_CONTAINER_NAME"  : eval_container_port,
 }
 
 # Security
@@ -51,18 +63,6 @@ c.JupyterHub.extra_log_file                    = os.path.join(jupyterhub_config_
 c.Spawner.notebook_dir                         = "~/notebooks"
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, "data") : "/data" }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, "users", "{username}")
-
-# Services - setup
-cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
-if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
-    cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
-else:
-    cull_idle_timeout = 3600
-
-eval_server_hostname = os.environ["EVAL_CONTAINER_NAME"]
-eval_server_port     = os.environ["EVAL_CONTAINER_PORT"]
-eval_server_url      = "http://{}:{}".format(eval_server_hostname, eval_server_port)
-eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
 # Services - definitions
 c.JupyterHub.services = [
