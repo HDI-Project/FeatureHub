@@ -47,6 +47,7 @@ c.DockerSpawner.extra_host_config = {
     "network_mode" : network_name,
 }
 c.Spawner.environment             = {
+    "HUB_CONTAINER_NAME"   : hub_container_name,
     "MYSQL_CONTAINER_NAME" : mysql_container_name,
     "EVAL_CONTAINER_NAME"  : eval_container_port,
 }
@@ -81,9 +82,9 @@ c.JupyterHub.services = [
 ]
 
 # Whitelist users and admins
-c.Authenticator.whitelist = whitelist = set()
+c.Authenticator.whitelist   = whitelist = set()
 c.Authenticator.admin_users = admin = set()
-c.JupyterHub.admin_access = True
+c.JupyterHub.admin_access   = True
 
 whitelist.add("root")
 admin.add("root")

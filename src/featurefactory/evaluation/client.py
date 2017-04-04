@@ -5,11 +5,12 @@ import os
 import hashlib
 from textwrap import dedent
 import pandas
+import requests
 
 from featurefactory.util import compute_dataset_hash, run_isolated, get_source
 from featurefactory.admin.sqlalchemy_declarative import Feature
 
-class EvaluationClient:
+class EvaluationClient(object):
     def __init__(self, problem, user, orm):
         self.problem = problem
         self.user = user
@@ -17,6 +18,22 @@ class EvaluationClient:
 
         self.dataset = [] # TODO
         self._load_dataset()
+
+    def register_feature_server(self, feature, description):
+        url = "http://{}:{}/services/eval-server/evaluate".format(
+                os.environ["HUB_CONTAINER_NAME"], 443)
+        code = get_source(feature)
+        data = {
+            "database" : None,
+            "problem_id" : None,
+            "code" : None,
+            "description" : None,
+        }
+
+        response = requests.post(url=url, data=data)
+
+        if response.ok:
+            print(response.text)
 
     def register_feature(self, feature, description):
         dataset = self._load_dataset()

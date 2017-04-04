@@ -15,10 +15,13 @@ from jupyterhub.services.auth import HubAuth
 
 # feature factory imports
 import logging
+from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation.response import EvaluationResponse
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
+from featurefactory.util import get_function
+import hashlib
 
 # setup
 prefix = "/services/eval-server"
@@ -32,9 +35,13 @@ auth = HubAuth(
     api_url              = hub_api_url,
     cookie_cache_max_age = 60,
 )
+log_filename = os.path.join(os.environ["FF_DATA_DIR"], "log", "eval-server",
+        "log.log")
+if not os.path.exists(os.path.dirname(log_filename)):
+    os.makedirs(os.path.dirname(log_filename))
 
 # app
-app = Flask(__name__)
+app = Flask("eval-server")
 
 def authenticated(f):
     """Decorator for authenticating with the Hub"""
@@ -74,22 +81,22 @@ def evaluate(user):
     try:
         problem_obj = orm.session.query(Problem).filter(Problem.id == problem_id).one()
     except (NoResultFound, MultipleResultsFound) as e:
-        logging.traceback(
+        app.logger.exception(
             "Couldn't access problem (id {}) from db".format(problem_id))
-        response = EvaluationResponse(
+        return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
-        return response.to_response()
+
     user_name = user["name"]
     try:
-        user_obj = orm.session.query(User).filter(User.name = user_name).one()
+        user_obj = orm.session.query(User).filter(User.name == user_name).one()
     except (NoResultFound, MultipleResultsFound) as e:
-        logging.traceback(
+        app.logger.exception(
             "Couldn't access user (name {}) from db".format(user_name))
-        response = EvaluationResponse(
+        return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
-        return response.to_response()
+
     md5 = hashlib.md5(code).hexdigest()
     feature = get_function(code)
 
@@ -108,8 +115,8 @@ def evaluate(user):
         user        = user_obj,
         problem     = problem_obj
     )
-    self.orm.session.add(feature_obj)
-    self.orm.session.commit()
+    orm.session.add(feature_obj)
+    orm.session.commit()
 
     # return
     # - status code
@@ -117,8 +124,7 @@ def evaluate(user):
     status_code = EvaluationResponse.STATUS_CODE_OKAY
     metrics = {"score_cv" : score_cv}
 
-    return EvaluationResponse(
-            status_code=status_code, metrics=metrics).to_response()
+    return EvaluationResponse(status_code, metrics)
 
 @app.route(prefix + '/')
 @authenticated
@@ -129,6 +135,15 @@ def whoami(user):
         )
 
 if __name__ == "__main__":
+    handler = RotatingFileHandler(log_filename, maxBytes=1024 * 1024 * 5,
+            backupCount=5)
+    formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} "
+                                  "%(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    handler.setLevel(logging.DEBUG)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.DEBUG)
+
     host  = "0.0.0.0"
     port  = int(os.environ.get("EVAL_CONTAINER_PORT", 5000))
     debug = bool(os.environ.get("EVAL_FLASK_DEBUG", False))
