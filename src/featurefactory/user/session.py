@@ -152,7 +152,34 @@ class Session(object):
         if not description:
             description = self._prompt_description()
 
-        result = self.__evaluation_client.register_feature(feature, description)
+        self.__evaluation_client.register_feature(feature, description)
+
+    def register_feature_server(self, feature, description=""):
+        """
+        Creates a new feature entry in database.
+        """
+
+        assert self.__user, "User not initialized properly."
+
+        code    = get_source(feature)
+        problem = self.__problem
+        md5     = hashlib.md5(code).hexdigest()
+
+        query = (
+            Feature.problem == self.__problem,
+            Feature.user    == self.__user,
+            Feature.md5     == md5,
+        )
+        score = self.__orm.session.query(Feature.score).filter(*query).scalar()
+        if score:
+            print("Feature already registered with score {}".format(score))
+            return
+
+
+        if not description:
+            description = self._prompt_description()
+
+        self.__evaluation_client.register_feature_server(feature, description)
 
     def _abbrev_md5(self, md5):
         """Return first MD5_ABBREV_LEN characters of md5"""

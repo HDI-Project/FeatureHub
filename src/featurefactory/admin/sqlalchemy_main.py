@@ -19,7 +19,7 @@ class ORMManager(object):
     """
 
     def __init__(self, database, admin=False):
-        self.__database = database
+        self.database = database
 
         # Host information is the same across users
         host = os.getenv("MYSQL_CONTAINER_NAME", "localhost")
@@ -40,7 +40,8 @@ class ORMManager(object):
             password = os.environ.get("MYSQL_ROOT_PASSWORD", "")
 
 
-        conn_string = "mysql+mysqlconnector://{}:{}@{}/{}".format(user, password, host, database)
+        conn_string = "mysql+mysqlconnector://{}:{}@{}/{}".format(user,
+                password, host, self.database)
         self.engine = create_engine(conn_string)
 
         # Validate cxn

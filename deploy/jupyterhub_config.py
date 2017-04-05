@@ -1,9 +1,7 @@
 # Configuration file for jupyterhub.
 
 import os
-
 import jupyterhub
-jh_ver = [int(v) for v in jupyterhub.__version__.split(".")]
 
 c = get_config()
 
@@ -26,7 +24,8 @@ else:
 
 eval_container_name   = os.environ["EVAL_CONTAINER_NAME"]
 eval_container_port   = os.environ["EVAL_CONTAINER_PORT"]
-eval_server_url       = "http://{}:{}".format(eval_server_hostname, eval_server_port)
+eval_server_url       = "http://{}:{}".format(eval_container_name,
+    eval_container_port)
 eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
 # Spawned containers
@@ -34,7 +33,7 @@ c.JupyterHub.spawner_class          = "dockerspawner.SystemUserSpawner"
 c.SystemUserSpawner.container_image = ff_image_name
 c.DockerSpawner.container_prefix    = ff_container_name
 c.DockerSpawner.remove_containers   = True
-if jh_ver[0] >= 0 and jh_ver[1] >= 7:
+if jupyterhub.version_info[0:2] >= (0, 7):
     c.Spawner.mem_limit             = os.environ["FF_CONTAINER_MEMLIMIT"]
 
 # Networking
@@ -49,7 +48,8 @@ c.DockerSpawner.extra_host_config = {
 c.Spawner.environment             = {
     "HUB_CONTAINER_NAME"   : hub_container_name,
     "MYSQL_CONTAINER_NAME" : mysql_container_name,
-    "EVAL_CONTAINER_NAME"  : eval_container_port,
+    "EVAL_CONTAINER_NAME"  : eval_container_name,
+    "EVAL_CONTAINER_PORT"  : eval_container_port,
 }
 
 # Security

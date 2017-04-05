@@ -124,4 +124,5 @@ wget  \
 EOF
 fi
 
+echo
 echo "Creating new $user_type: $_USERNAME: Done."

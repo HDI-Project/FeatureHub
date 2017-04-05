@@ -28,7 +28,7 @@ setup_files:
 
 .PHONY: teardown_files
 teardown_files:
-	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
+	sudo rm -rf $(FF_DATA_DIR)/{users,config,log}
 
 .PHONY: clean_all
 clean_all: clean kill_images kill_network

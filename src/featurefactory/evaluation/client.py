@@ -20,19 +20,28 @@ class EvaluationClient(object):
         self._load_dataset()
 
     def register_feature_server(self, feature, description):
+        # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
-                os.environ["HUB_CONTAINER_NAME"], 443)
+            os.environ["EVAL_CONTAINER_NAME"],
+            os.environ["EVAL_CONTAINER_PORT"]
+        )
         code = get_source(feature)
         data = {
-            "database" : None,
-            "problem_id" : None,
-            "code" : None,
-            "description" : None,
+            "database" : self.orm.database,
+            "problem_id" : self.problem.id,
+            "code" : code,
+            "description" : description,
+        }
+        headers = { 
+            "Authorization" : "token {}".format(
+                os.environ["JUPYTERHUB_API_TOKEN"]),
         }
 
-        response = requests.post(url=url, data=data)
+        response = requests.post(url=url, data=data, headers=headers)
 
         if response.ok:
+            print(response.text)
+        else:
             print(response.text)
 
     def register_feature(self, feature, description):

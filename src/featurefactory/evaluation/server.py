@@ -3,15 +3,13 @@
 Evaluation server for Feature Factory user notebooks
 """
 
+# flask, jupyterhub auth imports
 from functools import wraps
 import json
 import os
 import sys
 from urllib.parse import quote
-
 from flask import Flask, redirect, request, Response
-
-from jupyterhub.services.auth import HubAuth
 
 # feature factory imports
 import logging
@@ -21,6 +19,7 @@ from featurefactory.evaluation.response import EvaluationResponse
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
 from featurefactory.util import get_function
+from featurefactory.evaluation.future import HubAuth
 import hashlib
 
 # setup
@@ -36,7 +35,7 @@ auth = HubAuth(
     cookie_cache_max_age = 60,
 )
 log_filename = os.path.join(os.environ["FF_DATA_DIR"], "log", "eval-server",
-        "log.log")
+        "eval-server.log")
 if not os.path.exists(os.path.dirname(log_filename)):
     os.makedirs(os.path.dirname(log_filename))
 
@@ -47,14 +46,46 @@ def authenticated(f):
     """Decorator for authenticating with the Hub"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        cookie = request.cookies.get(auth.cookie_name)
-        if cookie:
-            user = auth.user_for_cookie(cookie)
+        app.logger.debug("printing request...")
+        app.logger.debug("{}\n{}\n{}\n\n".format(
+            '-----------START-----------',
+            request.method + ' ' + request.url,
+            '\n'.join('{}: {}'.format(k, v) for k, v in
+                request.headers.items()),
+        ))
+        if request.method == "POST":
+            try:
+                app.logger.debug("{}".format(
+                    request.body,
+                ))
+            except Exception:
+                pass
+
+        # try to authenticate via token
+        token_header = request.headers.get('Authorization')
+        app.logger.debug("Trying token: {}".format(token_header))
+        if token_header:
+            try:
+                token_str = token_header[:len("token ")]
+                token = token_header[len("token "):]
+                user = auth.user_for_token(token)
+            except Exception:
+                app.logger.exception("Failed to authenticate via token.")
+                user = None
         else:
-            user = None
+            # try to authenticate via cookie
+            cookie = request.cookies.get(auth.cookie_name)
+            app.logger.debug("Trying cookie: {}".format(cookie))
+            if cookie:
+                user = auth.user_for_cookie(cookie)
+            else:
+                app.logger.debug("Failed to authenticate via cookie.")
+                user = None
         if user:
+            app.logger.info("User '{}' authenticated.".format(user["name"]))
             return f(user, *args, **kwargs)
         else:
+            app.logger.info("User NOT authenticated.")
             # redirect to login url on failed auth
             return redirect(auth.login_url + "?next=%s" % quote(request.path))
     return decorated
@@ -82,7 +113,7 @@ def evaluate(user):
         problem_obj = orm.session.query(Problem).filter(Problem.id == problem_id).one()
     except (NoResultFound, MultipleResultsFound) as e:
         app.logger.exception(
-            "Couldn't access problem (id {}) from db".format(problem_id))
+            "Couldn't access problem (id '{}') from db".format(problem_id))
         return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
@@ -92,12 +123,15 @@ def evaluate(user):
         user_obj = orm.session.query(User).filter(User.name == user_name).one()
     except (NoResultFound, MultipleResultsFound) as e:
         app.logger.exception(
-            "Couldn't access user (name {}) from db".format(user_name))
+            "Couldn't access user (name '{}') from db".format(user_name))
         return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
 
+    if not isinstance(code, bytes):
+        code = code.encode("utf-8")
     md5 = hashlib.md5(code).hexdigest()
+
     feature = get_function(code)
 
     # processing
