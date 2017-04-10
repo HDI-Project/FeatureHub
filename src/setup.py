@@ -19,6 +19,7 @@ setup(
         'mysqlclient',
         'mysql-connector-python-rf',
         'pandas',
+        'pathos',
         'scikit-learn',
         'scipy',
         'sqlalchemy',

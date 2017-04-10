@@ -3,23 +3,24 @@
 Evaluation server for Feature Factory user notebooks
 """
 
-# flask, jupyterhub auth imports
+# flask imports
 from functools import wraps
 import json
 import os
 import sys
 from urllib.parse import quote
 from flask import Flask, redirect, request, Response
+import logging
+# from jupyterhub.services.auth import HubAuth
 
 # feature factory imports
-import logging
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from featurefactory.evaluation.response import EvaluationResponse
+from featurefactory.evaluation import EvaluationResponse, Evaluator
+from featurefactory.evaluation.future import HubAuth
 from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
 from featurefactory.util import get_function
-from featurefactory.evaluation.future import HubAuth
 import hashlib
 
 # setup
@@ -46,24 +47,9 @@ def authenticated(f):
     """Decorator for authenticating with the Hub"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        app.logger.debug("printing request...")
-        app.logger.debug("{}\n{}\n{}\n\n".format(
-            '-----------START-----------',
-            request.method + ' ' + request.url,
-            '\n'.join('{}: {}'.format(k, v) for k, v in
-                request.headers.items()),
-        ))
-        if request.method == "POST":
-            try:
-                app.logger.debug("{}".format(
-                    request.body,
-                ))
-            except Exception:
-                pass
-
         # try to authenticate via token
         token_header = request.headers.get('Authorization')
-        app.logger.debug("Trying token: {}".format(token_header))
+        app.logger.debug("Authenticating via  token '{}' ...".format(token_header))
         if token_header:
             try:
                 token_str = token_header[:len("token ")]
@@ -75,7 +61,7 @@ def authenticated(f):
         else:
             # try to authenticate via cookie
             cookie = request.cookies.get(auth.cookie_name)
-            app.logger.debug("Trying cookie: {}".format(cookie))
+            app.logger.debug("Authenticating via cookie '{}' ...".format(cookie))
             if cookie:
                 user = auth.user_for_cookie(cookie)
             else:
@@ -86,8 +72,9 @@ def authenticated(f):
             return f(user, *args, **kwargs)
         else:
             app.logger.info("User NOT authenticated.")
-            # redirect to login url on failed auth
-            return redirect(auth.login_url + "?next=%s" % quote(request.path))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_BAD_AUTH
+            )
     return decorated
 
 @app.route(prefix + "/evaluate", methods=["POST"])
@@ -98,10 +85,17 @@ def evaluate(user):
     # - the problem id, for lookup in database
     # - the feature code
     # - the user-provided feature description
-    database    = request.form["database"]
-    problem_id  = request.form["problem_id"]
-    code        = request.form["code"]
-    description = request.form["description"]
+    try:
+        database    = request.form["database"]
+        problem_id  = request.form["problem_id"]
+        code        = request.form["code"]
+        description = request.form["description"]
+    except Exception:
+        app.logger.exception("Couldn't read parameters from form.")
+        return EvaluationResponse(
+            status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
+        )
+    app.logger.debug("Read parameters from form.")
 
     # preprocessing
     # - look up the problem in the databasse
@@ -112,32 +106,54 @@ def evaluate(user):
     try:
         problem_obj = orm.session.query(Problem).filter(Problem.id == problem_id).one()
     except (NoResultFound, MultipleResultsFound) as e:
-        app.logger.exception(
-            "Couldn't access problem (id '{}') from db".format(problem_id))
+        app.logger.exception("Couldn't access problem (id '{}') from db"
+                .format(problem_id))
         return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
+    app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
 
     user_name = user["name"]
     try:
         user_obj = orm.session.query(User).filter(User.name == user_name).one()
     except (NoResultFound, MultipleResultsFound) as e:
-        app.logger.exception(
-            "Couldn't access user (name '{}') from db".format(user_name))
+        app.logger.exception("Couldn't access user (name '{}') from db"
+                .format(user_name))
         return EvaluationResponse(
             status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
         )
+    app.logger.debug("Accessed user (name '{}') from db".format(user_name))
 
     if not isinstance(code, bytes):
-        code = code.encode("utf-8")
-    md5 = hashlib.md5(code).hexdigest()
+        code_enc = code.encode("utf-8")
+    else:
+        code_enc = code
+    md5 = hashlib.md5(code_enc).hexdigest()
+    app.logger.debug("Computed feature hash.")
 
-    feature = get_function(code)
+    try:
+        feature = get_function(code)
+    except Exception:
+        app.logger.exception("Couldn't extract function (code '{}')"
+                .format(code))
+    app.logger.debug("Extracted function.")
 
     # processing
     # - compute the CV score
     # - compute any other metrics
-    score_cv = -1.0
+    evaluator = Evaluator(problem_obj, user_obj, orm)
+    try:
+        metrics = evaluator.evaluate(feature)
+        score_cv = metrics["score_cv"]
+        # TODO expand schema
+    except ValueError:
+        app.logger.exception("Couldn't evaluate feature (code '{}')"
+                .format(code))
+        # feature is invalid
+        return EvaluationResponse(
+            status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
+        )
+    app.logger.debug("Evaluated feature.")
 
     # write to db
     # TODO error handling
@@ -151,22 +167,23 @@ def evaluate(user):
     )
     orm.session.add(feature_obj)
     orm.session.commit()
+    app.logger.debug("Inserted into database.")
 
     # return
     # - status code
     # - metrics dict
-    status_code = EvaluationResponse.STATUS_CODE_OKAY
-    metrics = {"score_cv" : score_cv}
+    return EvaluationResponse(
+        status_code=EvaluationResponse.STATUS_CODE_OKAY,
+        metrics=metrics
+    )
 
-    return EvaluationResponse(status_code, metrics)
-
-@app.route(prefix + '/')
+@app.route(prefix + '/', methods=["GET"])
 @authenticated
-def whoami(user):
+def test(user):
     return Response(
         json.dumps(user, indent=1, sort_keys=True),
         mimetype='application/json',
-        )
+    )
 
 if __name__ == "__main__":
     handler = RotatingFileHandler(log_filename, maxBytes=1024 * 1024 * 5,

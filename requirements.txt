@@ -1,3 +1,4 @@
+docker>=2.0.0
 flask>=0.12
 jupyter
 jupyterhub>=0.7.2
@@ -6,6 +7,7 @@ numpy
 mysqlclient
 mysql-connector-python-rf
 pandas
+pathos
 scikit-learn
 scipy
 sqlalchemy

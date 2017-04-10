@@ -26,6 +26,7 @@ services:
             - secrets:/etc/letsencrypt
         ports:
             - 443:443
+            - ${HUB_API_PORT}:${HUB_API_PORT}
         environment:
             DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
             FF_DATA_DIR: ${FF_DATA_DIR}
@@ -41,6 +42,7 @@ services:
             EVAL_API_TOKEN: ${EVAL_API_TOKEN}
             SSL_KEY: "/etc/letsencrypt/privkey.pem"
             SSL_CERT: "/etc/letsencrypt/cert.pem"
+            API_CLIENT_API_TOKEN: ${API_CLIENT_API_TOKEN}
         command: >
             jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
     db:
@@ -61,6 +63,7 @@ services:
         container_name: ${EVAL_CONTAINER_NAME}
         volumes:
             - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
+            - ${FF_DATA_DIR}/data:/data:ro
         ports:
             - ${EVAL_CONTAINER_PORT}:${EVAL_CONTAINER_PORT}
         environment:

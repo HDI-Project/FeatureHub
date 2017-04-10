@@ -14,7 +14,7 @@ from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import *
 from featurefactory.user.model import Model
 from featurefactory.util import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation.client import EvaluationClient
+from featurefactory.evaluation import EvaluationClient
 
 MD5_ABBREV_LEN = 8
 
@@ -154,33 +154,6 @@ class Session(object):
 
         self.__evaluation_client.register_feature(feature, description)
 
-    def register_feature_server(self, feature, description=""):
-        """
-        Creates a new feature entry in database.
-        """
-
-        assert self.__user, "User not initialized properly."
-
-        code    = get_source(feature)
-        problem = self.__problem
-        md5     = hashlib.md5(code).hexdigest()
-
-        query = (
-            Feature.problem == self.__problem,
-            Feature.user    == self.__user,
-            Feature.md5     == md5,
-        )
-        score = self.__orm.session.query(Feature.score).filter(*query).scalar()
-        if score:
-            print("Feature already registered with score {}".format(score))
-            return
-
-
-        if not description:
-            description = self._prompt_description()
-
-        self.__evaluation_client.register_feature_server(feature, description)
-
     def _abbrev_md5(self, md5):
         """Return first MD5_ABBREV_LEN characters of md5"""
         return md5[:MD5_ABBREV_LEN]
@@ -224,11 +197,10 @@ class Session(object):
         )
 
     def _prompt_description(self):
-        print(dedent("""
-        First, enter feature description. Your feature description
-        should be clear, concise, and meaningful to non-data scientists. (If
-        your feature fails to register, this description will be discarded.)
-        """))
+        print("First, enter feature description. Your feature description "
+              "should be clear, concise, and meaningful to non-data scientists."
+              " (If your feature fails to register, this description will be "
+              "discarded.)")
 
         try:
             raw_input

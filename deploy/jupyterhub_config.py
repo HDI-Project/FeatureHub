@@ -28,6 +28,8 @@ eval_server_url       = "http://{}:{}".format(eval_container_name,
     eval_container_port)
 eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
+api_client_api_token = os.environ["API_CLIENT_API_TOKEN"]
+
 # Spawned containers
 c.JupyterHub.spawner_class          = "dockerspawner.SystemUserSpawner"
 c.SystemUserSpawner.container_image = ff_image_name
@@ -78,6 +80,12 @@ c.JupyterHub.services = [
         "name": "eval-server",
         "url": eval_server_url,
         "api_token": eval_server_api_token,
+    },
+    {
+        "name": "api-client",
+        "admin": True,
+        "url": "0.0.0.0",
+        "api_token": api_client_api_token,
     }
 ]
 

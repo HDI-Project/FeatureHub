@@ -3,12 +3,12 @@ from __future__ import print_function
 import sys
 import os
 import hashlib
-from textwrap import dedent
 import pandas
 import requests
 
 from featurefactory.util import compute_dataset_hash, run_isolated, get_source
 from featurefactory.admin.sqlalchemy_declarative import Feature
+from featurefactory.evaluation import EvaluationResponse
 
 class EvaluationClient(object):
     def __init__(self, problem, user, orm):
@@ -17,9 +17,8 @@ class EvaluationClient(object):
         self.orm = orm
 
         self.dataset = [] # TODO
-        self._load_dataset()
 
-    def register_feature_server(self, feature, description):
+    def register_feature(self, feature, description):
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
             os.environ["EVAL_CONTAINER_NAME"],
@@ -27,9 +26,9 @@ class EvaluationClient(object):
         )
         code = get_source(feature)
         data = {
-            "database" : self.orm.database,
-            "problem_id" : self.problem.id,
-            "code" : code,
+            "database"    : self.orm.database,
+            "problem_id"  : self.problem.id,
+            "code"        : code,
             "description" : description,
         }
         headers = { 
@@ -40,37 +39,24 @@ class EvaluationClient(object):
         response = requests.post(url=url, data=data, headers=headers)
 
         if response.ok:
-            print(response.text)
+            try:
+                eval_response = EvaluationResponse.from_string(response.text)
+                print(eval_response)
+            except Exception:
+                # TODO
+                print("response failed")
+                try:
+                    print(response.text, file=sys.stderr)
+                except Exception:
+                    pass
         else:
-            print(response.text)
+            # TODO
+            print("response failed")
+            try:
+                print(response.text, file=sys.stderr)
+            except Exception:
+                pass
 
-    def register_feature(self, feature, description):
-        dataset = self._load_dataset()
-
-        if self._is_valid_feature(feature, dataset):
-            score = float(self._cross_validate(feature))
-            print("Feature scored {}".format(score))
-            print("Feature description is '{}'".format(description))
-
-            code = get_source(feature)
-            md5 = hashlib.md5(code).hexdigest()
-
-            feature_obj = Feature(
-                description = description,
-                score       = score,
-                code        = code,
-                md5         = md5,
-                user        = self.user,
-                problem     = self.problem
-            )
-            self.orm.session.add(feature_obj)
-            self.orm.session.commit()
-            print("Feature successfully registered.")
-        else:
-            print(dedent("""
-            Feature is invalid and not registered. Try cross validating
-            it locally to see your problems.
-            """), file=sys.stderr)
 
     def _is_valid_feature(self, feature, dataset):
         """
@@ -135,3 +121,36 @@ class EvaluationClient(object):
 
     def _cross_validate(self, feature):
         return -1.0
+
+class Evaluator(EvaluationClient):
+    def __init__(self, problem, user, orm):
+        super().__init__(problem, user, orm)
+
+    def evaluate(self, feature):
+        """
+        Evaluate feature. Returns a dictionary with (metric => value) entries.
+
+        Args
+        ----
+            feature : function
+                Feature to evaluate
+        """
+        dataset = self._load_dataset()
+
+        if self._is_valid_feature(feature, dataset):
+            score_cv = float(self._cross_validate(feature))
+        else:
+            raise ValueError
+
+        metrics = {
+            "score_cv" : score_cv,
+        }
+
+        return metrics
+
+    def register_feature(self, feature, description):
+        """
+        Register_feature is a no-op in this subclass.
+        """
+
+        pass
