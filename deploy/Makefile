@@ -25,11 +25,10 @@ setup_files:
 	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
 	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
 	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
-	sudo cp ../src/featurefactory/evaluation/whoami-flask.py $(FF_DATA_DIR)/config/jupyterhub/
 
 .PHONY: teardown_files
 teardown_files:
-	sudo rm -rf $(FF_DATA_DIR)/{users,config}	
+	sudo rm -rf $(FF_DATA_DIR)/{users,config,log}
 
 .PHONY: clean_all
 clean_all: clean kill_images kill_network
@@ -39,12 +38,12 @@ clean: kill_containers teardown_files kill_volumes
 
 .PHONY: kill_containers
 kill_containers:
-	@docker rm -f $(HUB_CONTAINER_NAME) $(MYSQL_CONTAINER_NAME) 2>/dev/null || echo "No hub/db containers found."
+	@docker rm -f $(HUB_CONTAINER_NAME) $(MYSQL_CONTAINER_NAME) $(EVAL_CONTAINER_NAME) 2>/dev/null || echo "No hub/db containers found."
 	@docker rm -f $(shell docker ps -a -q --filter name=^/${FF_CONTAINER_NAME}-.*$) 2>/dev/null || echo "No user containers found."
 
 .PHONY: kill_images
 kill_images:
-	@docker rmi -f $(HUB_IMAGE_NAME) $(FF_IMAGE_NAME) 2>/dev/null || echo "No images found."
+	@docker rmi -f $(HUB_IMAGE_NAME) $(FF_IMAGE_NAME) $(EVAL_IMAGE_NAME) 2>/dev/null || echo "No images found."
 
 .PHONY: network
 network:
@@ -65,15 +64,21 @@ kill_volumes:
 	@docker volume inspect $(SECRETS_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(SECRETS_VOLUME_NAME) || echo "No volumes found."
 
 .PHONY: build
-build: build_user build_hub
+build: build_static build_services
 
-.PHONY: build_user
-build_user: network setup_files
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-user.yml build
+.PHONY: build_static
+build_static: network setup_files
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-static.yml build;\
+	}
 
-.PHONY: build_hub
-build_hub: network volumes setup_files ssl
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build
+.PHONY: build_services
+build_services: network volumes setup_files ssl
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml build;\
+        }
 
 .PHONY: ssl
 ssl:
@@ -81,19 +86,31 @@ ssl:
 
 .PHONY: up
 up:
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml up -d
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml up -d;\
+	}
 
 .PHONY: stop
 stop:
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml stop
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml stop;\
+	}
 
 .PHONY: start
 start:
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml start
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml start;\
+	}
 
 .PHONY: down
 down:
-	docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml down
+	@{\
+	    export $(shell tr '\n' ' ' < .env.local);\
+	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose.yml down;\
+	}
 
 .PHONY: monitor_start
 monitor_start:

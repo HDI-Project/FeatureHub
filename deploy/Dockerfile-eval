@@ -1,0 +1,3 @@
+FROM featurefactoryuser
+
+CMD ["/opt/conda/bin/python", "-m", "featurefactory.evaluation.server"]

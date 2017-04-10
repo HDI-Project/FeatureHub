@@ -1,5 +1,6 @@
 import sys
-from multiprocessing import Pool
+#from multiprocessing import Pool
+from pathos.multiprocessing import ProcessPool as Pool
 import inspect
 import hashlib
 from textwrap import dedent
@@ -7,13 +8,11 @@ from textwrap import dedent
 def run_isolated(f, *args):
     """Apply `f` to arguments in an isolated environment."""
 
-    pool = Pool(processes=1)
-    try:
-        result = pool.map(f, args)[0]
-    finally:
+    with Pool(1) as pool:
+        # hack, as pool is somehow not open on further invocations
         pool.close()
-
-    return result
+        pool.restart()
+        return pool.map(f, args)[0]
 
 def get_source(function):
     """
@@ -66,10 +65,19 @@ def get_function(source):
     Note that the source code produced by get_source includes the source for the
     top-level function as well as any other local functions it calls. Here, we
     return the top-level function directly.
+
+    Args
+    ----
+        source : str, bytes
     """
 
     # decode into str
-    code = source.decode("utf-8")
+    if isinstance(source, bytes):
+        code = source.decode("utf-8")
+    elif isinstance(source, str):
+        code = source
+    else:
+        raise ValueError
 
     # exec code in empty namespace
     try:

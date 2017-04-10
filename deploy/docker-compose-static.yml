@@ -1,0 +1,17 @@
+# Build instructions for images for containers that are not spun up/down by
+# docker-compose. Rather, there are FROM images or are spawned by the Hub
+# directly. For this concept, we use the misnomer "static".
+
+version: '2'
+
+services:
+    jupyterhub-docker:
+        build:
+            context: .
+            dockerfile: Dockerfile-jupyterhub-docker
+        image: jupyterhub-docker:0.7.2
+    user:
+        build:
+            context: ..
+            dockerfile: deploy/Dockerfile-user
+        image: ${FF_IMAGE_NAME}

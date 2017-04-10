@@ -26,6 +26,7 @@ class Session(object):
     """
 
     def __init__(self, problem, database="featurefactory"):
+        self.__database = database
         self.__orm     = ORMManager(database)
         self.__user    = None
         self.__dataset = []
@@ -151,7 +152,7 @@ class Session(object):
         if not description:
             description = self._prompt_description()
 
-        result = self.__evaluation_client.register_feature(feature, description)
+        self.__evaluation_client.register_feature(feature, description)
 
     def _abbrev_md5(self, md5):
         """Return first MD5_ABBREV_LEN characters of md5"""
@@ -196,11 +197,10 @@ class Session(object):
         )
 
     def _prompt_description(self):
-        print(dedent("""
-        First, enter feature description. Your feature description
-        should be clear, concise, and meaningful to non-data scientists. (If
-        your feature fails to register, this description will be discarded.)
-        """))
+        print("First, enter feature description. Your feature description "
+              "should be clear, concise, and meaningful to non-data scientists."
+              " (If your feature fails to register, this description will be "
+              "discarded.)")
 
         try:
             raw_input

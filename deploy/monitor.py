@@ -22,7 +22,7 @@ STATS_TYPES = [
 ]
 INTERVAL = 60
 PID_FILE_NAME = "pid.pid"
-REQUIRED_DOCKER_VERSION = "1.10.6"
+MINIMUM_DOCKER_VERSION = (2, 0, 0)
     
 def flatten_dict(obj, prefix=""):
     sep = ":"
@@ -52,8 +52,8 @@ class Monitor(object):
 
         # Use v1 API as it appears to be the version installed along with Docker
         # Engine with yum
-        assert docker.version == REQUIRED_DOCKER_VERSION
-        self.client = docker.from_env()
+        assert docker.version_info >= MINIMUM_DOCKER_VERSION
+        self.client = docker.from_env(version="auto")
 
     def start(self):
         """
@@ -106,10 +106,10 @@ class Monitor(object):
         """
         ids = []
         for container in \
-            self.client.containers(filters={"ancestor": self.c["FF_IMAGE_NAME"]}) + \
-            self.client.containers(filters={"name": self.c["HUB_CONTAINER_NAME"]}) + \
-            self.client.containers(filters={"name": self.c["MYSQL_CONTAINER_NAME"]}):
-            ids.append(container["Id"])
+            self.client.containers.list(filters={"ancestor": self.c["FF_IMAGE_NAME"]}) + \
+            self.client.containers.list(filters={"name": self.c["HUB_CONTAINER_NAME"]}) + \
+            self.client.containers.list(filters={"name": self.c["MYSQL_CONTAINER_NAME"]}):
+            ids.append(container.id)
 
         return ids
 
@@ -128,7 +128,7 @@ class Monitor(object):
         while True:
             matching_containers = self.get_matching_containers()
             for id_ in matching_containers:
-                all_stats = self.client.stats(id_, decode=True, stream=False) 
+                all_stats = self.client.containers.get(id_).stats(decode=True, stream=False) 
                 read_time = all_stats.pop("read")
 
                 for stat in all_stats:
