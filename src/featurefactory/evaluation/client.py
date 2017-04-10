@@ -1,14 +1,12 @@
-from __future__ import print_function
-
 import sys
 import os
-import hashlib
 import pandas
 import requests
 
 from featurefactory.util import compute_dataset_hash, run_isolated, get_source
 from featurefactory.admin.sqlalchemy_declarative import Feature
 from featurefactory.evaluation import EvaluationResponse
+from featurefactory.user.model import Model
 
 class EvaluationClient(object):
     def __init__(self, problem, user, orm):
@@ -120,7 +118,17 @@ class EvaluationClient(object):
         return self.dataset
 
     def _cross_validate(self, feature):
-        return -1.0
+        """
+        Return cross validated score of feature on dataset.
+
+        Does not do any validation or error handling.
+        """
+        self._load_dataset()
+        data = run_isolated(feature, self.dataset)
+        labels = self.dataset[self.problem.y_index][self.problem.y_column]
+        model = Model(self.problem.problem_type)
+        score = model.cross_validate(data, labels)
+        return score
 
 class Evaluator(EvaluationClient):
     def __init__(self, problem, user, orm):

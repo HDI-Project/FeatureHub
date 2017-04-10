@@ -8,13 +8,11 @@ from textwrap import dedent
 def run_isolated(f, *args):
     """Apply `f` to arguments in an isolated environment."""
 
-    pool = Pool(processes=1)
-    try:
-        result = pool.map(f, args)[0]
-    finally:
+    with Pool(1) as pool:
+        # hack, as pool is somehow not open on further invocations
         pool.close()
-
-    return result
+        pool.restart()
+        return pool.map(f, args)[0]
 
 def get_source(function):
     """
