@@ -90,38 +90,10 @@ EOF
 # Finally, add this user to the JupyterHub whitelist/admin list. The JupyterHub
 # authenticator that handles this request will attempt to create the user, but
 # we have already done this above because we wanted to set the password.
-HUB_API_URL="http://$HUB_CONTAINER_NAME:$HUB_API_PORT/hub/api"
-docker exec -u root -i $HUB_CONTAINER_NAME \
-    bash <<EOF
-cd $FF_DATA_DIR/config/jupyterhub
-TOKEN=\$(jupyterhub token root)
-wget \
-    --quiet \
-    -O- \
-    --server-response \
-    --method=POST \
-    --header='Content-Type: application/json' \
-    --header='Accept: application/json' \
-    --header="Authorization: token \$TOKEN" \
-    '$HUB_API_URL/users/$_USERNAME' 2>&1
-EOF
-
 if $admin; then
-    docker exec -u root -i $HUB_CONTAINER_NAME \
-        bash <<EOF
-cd $FF_DATA_DIR/config/jupyterhub
-TOKEN=\$(jupyterhub token root)
-wget  \
-    --quiet \
-    -O- \
-    --server-response \
-    --method=PATCH \
-    --header='Content-Type: application/json' \
-    --header='Accept: application/json' \
-    --header="Authorization: token \$TOKEN" \
-    --body-data='{"admin": true}' \
-    '$HUB_API_URL/users/$_USERNAME' 2>&1
-EOF
+    ./api_client.py create-user --name $_USERNAME --admin True
+else
+    ./api_client.py create-user --name $_USERNAME
 fi
 
 echo
