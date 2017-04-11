@@ -1,20 +1,18 @@
 from __future__ import print_function
 
-import collections
 import gc
 import hashlib
 import os
 import sys
 from textwrap import dedent
 import pandas as pd
-from sqlalchemy.sql import exists
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from featurefactory.admin.sqlalchemy_main import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import *
-from featurefactory.user.model import Model
-from featurefactory.util import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation import EvaluationClient
+from featurefactory.admin.sqlalchemy_main        import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User
+from featurefactory.user.model                   import Model
+from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
+from featurefactory.evaluation                   import EvaluationClient
 
 MD5_ABBREV_LEN = 8
 
@@ -60,11 +58,8 @@ class Session(object):
                                             .first()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluationClient(
-            self.__problem,
-            self.__user,
-            self.__orm
-        ) 
+        self.__evaluation_client = EvaluationClient(self.__problem, self.__user,
+            self.__orm, self.__dataset) 
 
     def get_sample_dataset(self):
         """
@@ -107,7 +102,7 @@ class Session(object):
         else:
             print("No features found.")
 
-    def cross_validate(self, feature):
+    def evaluate(self, feature):
         """
         Return score of feature run on dataset sample.
 
@@ -116,16 +111,7 @@ class Session(object):
         feature, performs cross validation, and returns the score.
         """
 
-        # confirm that dimensions of feature are appropriate.
-        invalid = self.__evaluation_client._validate_feature(feature,
-                self.__dataset)
-        if invalid:
-            print("Feature is not valid: {}".format(invalid), file=sys.stderr)
-            score = 0
-        else:
-            score = self._cross_validate(feature)
-
-        return score
+        return self.__evaluation_client.evaluate(feature)
 
     def register_feature(self, feature, description=""):
         """
@@ -134,20 +120,9 @@ class Session(object):
 
         assert self.__user, "User not initialized properly."
 
-        code    = get_source(feature)
-        problem = self.__problem
-        md5     = hashlib.md5(code).hexdigest()
-
-        query = (
-            Feature.problem == self.__problem,
-            Feature.user    == self.__user,
-            Feature.md5     == md5,
-        )
-        score = self.__orm.session.query(Feature.score).filter(*query).scalar()
-        if score:
-            print("Feature already registered with score {}".format(score))
+        is_registered = self._check_if_registered(feature, description)
+        if is_registered:
             return
-
 
         if not description:
             description = self._prompt_description()
@@ -196,6 +171,24 @@ class Session(object):
                 .order_by(Feature.score)
         )
 
+    def _check_if_registered(self, feature, description, verbose=True):
+        code    = get_source(feature)
+        problem = self.__problem
+        md5     = hashlib.md5(code).hexdigest()
+
+        query = (
+            Feature.problem == self.__problem,
+            Feature.user    == self.__user,
+            Feature.md5     == md5,
+        )
+        score = self.__orm.session.query(Feature.score).filter(*query).scalar()
+        if score:
+            if verbose:
+                print("Feature already registered with score {}".format(score))
+            return True
+
+        return False
+
     def _prompt_description(self):
         print("First, enter feature description. Your feature description "
               "should be clear, concise, and meaningful to non-data scientists."
@@ -220,42 +213,3 @@ class Session(object):
         {1}
         \n
         """.format(feature.score, feature.code)))
-
-    def _cross_validate(self, feature):
-        """
-        Return score of feature run on dataset sample, without validating
-        feature values.
-        """
-        assert isinstance(feature, collections.Callable), \
-                "feature must be a function!"
-
-        # If running in docker and receive Errno 28: No space left on device
-        # import os
-        # os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
-        print("Obtaining dataset...", end='')
-        self._load_dataset()
-        print("done")
-
-
-        # Run feature in isolated env, but reload dataset if changed.
-        dataset_hash = compute_dataset_hash(self.__dataset)
-        print("Extracting features...", end='')
-        X = run_isolated(feature, self.__dataset)
-        print("done")
-        print("Verifying dataset integrity...", end='')
-        if dataset_hash != compute_dataset_hash(self.__dataset):
-            self._reload_dataset()
-        print("done")
-
-        Y = self.__dataset[self.__y_index][self.__y_column]
-
-        print("Cross validating...", end='')
-        score = self.__model.cross_validate(X, Y)
-        print("done")
-
-        # clean up to avoid filling up the memory
-        del X
-        del Y
-        gc.collect()
-
-        return score

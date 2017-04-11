@@ -14,14 +14,14 @@ import logging
 # from jupyterhub.services.auth import HubAuth
 
 # feature factory imports
+import hashlib
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from featurefactory.evaluation import EvaluationResponse, Evaluator
-from featurefactory.evaluation.future import HubAuth
-from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.evaluation                   import EvaluationResponse, Evaluator
+from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
-from featurefactory.util import get_function
-import hashlib
+from featurefactory.util                         import get_function
+from featurefactory.evaluation.future            import HubAuth
 
 # setup
 prefix = "/services/eval-server"
