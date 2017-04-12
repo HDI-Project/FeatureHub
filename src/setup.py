@@ -22,7 +22,7 @@ setup(
     description      = 'Feature Factory',
     long_description = '',
     url              = 'https://github.com/HDI-Project/FeatureFactory',
-    packages         = find_packages(exclude=["tests"]),
+    packages         = find_packages(exclude=["tests", "__pycache__"]),
     install_requires = [
         'flask',
         'jupyter',

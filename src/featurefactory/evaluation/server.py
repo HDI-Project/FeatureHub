@@ -103,71 +103,71 @@ def evaluate(user):
     # - compute the md5 hash of the feature code
     # - convert the feature code into a function
     orm = ORMManager(database, admin=True)
-    try:
-        problem_obj = orm.session.query(Problem).filter(Problem.id == problem_id).one()
-    except (NoResultFound, MultipleResultsFound) as e:
-        app.logger.exception("Couldn't access problem (id '{}') from db"
-                .format(problem_id))
-        return EvaluationResponse(
-            status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
+    with orm.session_scope() as session:
+        try:
+            problem_obj = session.query(Problem).filter(Problem.id == problem_id).one()
+        except (NoResultFound, MultipleResultsFound) as e:
+            app.logger.exception("Couldn't access problem (id '{}') from db"
+                    .format(problem_id))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
+            )
+        app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
+
+        user_name = user["name"]
+        try:
+            user_obj = session.query(User).filter(User.name == user_name).one()
+        except (NoResultFound, MultipleResultsFound) as e:
+            app.logger.exception("Couldn't access user (name '{}') from db"
+                    .format(user_name))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
+            )
+        app.logger.debug("Accessed user (name '{}') from db".format(user_name))
+
+        if not isinstance(code, bytes):
+            code_enc = code.encode("utf-8")
+        else:
+            code_enc = code
+        md5 = hashlib.md5(code_enc).hexdigest()
+        app.logger.debug("Computed feature hash.")
+
+        try:
+            feature = get_function(code)
+        except Exception:
+            app.logger.exception("Couldn't extract function (code '{}')"
+                    .format(code))
+        app.logger.debug("Extracted function.")
+
+        # processing
+        # - compute the CV score
+        # - compute any other metrics
+        evaluator = Evaluator(problem_id, user_name, orm)
+        try:
+            metrics = evaluator.evaluate(feature)
+            score_cv = metrics["score_cv"]
+            # TODO expand schema
+        except ValueError:
+            app.logger.exception("Couldn't evaluate feature (code '{}')"
+                    .format(code))
+            # feature is invalid
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
+            )
+        app.logger.debug("Evaluated feature.")
+
+        # write to db
+        # TODO error handling
+        feature_obj = Feature(
+            description = description,
+            score       = score_cv,
+            code        = code,
+            md5         = md5,
+            user        = user_obj,
+            problem     = problem_obj
         )
-    app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
-
-    user_name = user["name"]
-    try:
-        user_obj = orm.session.query(User).filter(User.name == user_name).one()
-    except (NoResultFound, MultipleResultsFound) as e:
-        app.logger.exception("Couldn't access user (name '{}') from db"
-                .format(user_name))
-        return EvaluationResponse(
-            status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
-        )
-    app.logger.debug("Accessed user (name '{}') from db".format(user_name))
-
-    if not isinstance(code, bytes):
-        code_enc = code.encode("utf-8")
-    else:
-        code_enc = code
-    md5 = hashlib.md5(code_enc).hexdigest()
-    app.logger.debug("Computed feature hash.")
-
-    try:
-        feature = get_function(code)
-    except Exception:
-        app.logger.exception("Couldn't extract function (code '{}')"
-                .format(code))
-    app.logger.debug("Extracted function.")
-
-    # processing
-    # - compute the CV score
-    # - compute any other metrics
-    evaluator = Evaluator(problem_obj, user_obj, orm)
-    try:
-        metrics = evaluator.evaluate(feature)
-        score_cv = metrics["score_cv"]
-        # TODO expand schema
-    except ValueError:
-        app.logger.exception("Couldn't evaluate feature (code '{}')"
-                .format(code))
-        # feature is invalid
-        return EvaluationResponse(
-            status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
-        )
-    app.logger.debug("Evaluated feature.")
-
-    # write to db
-    # TODO error handling
-    feature_obj = Feature(
-        description = description,
-        score       = score_cv,
-        code        = code,
-        md5         = md5,
-        user        = user_obj,
-        problem     = problem_obj
-    )
-    orm.session.add(feature_obj)
-    orm.session.commit()
-    app.logger.debug("Inserted into database.")
+        session.add(feature_obj)
+        app.logger.debug("Inserted into database.")
 
     # return
     # - status code

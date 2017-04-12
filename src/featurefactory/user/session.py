@@ -25,41 +25,49 @@ class Session(object):
 
     def __init__(self, problem, database="featurefactory"):
         self.__database = database
-        self.__orm     = ORMManager(database)
-        self.__user    = None
-        self.__dataset = []
+        self.__orm      = ORMManager(database)
+        self.__username = None
+        self.__dataset  = []
 
-        try:
-            problems = self.__orm.session.query(Problem)
-            self.__problem = problems.filter(Problem.name == problem).one()
-        except NoResultFound:
-            raise ValueError("Invalid problem name: {}".format(problem))
+        with self.__orm.session_scope() as session:
+            try:
+                problem = session.query(Problem)\
+                                 .filter(Problem.name == problem)\
+                                 .one()
+                self.__problemid = problem.id
+                self.__files     = problem.files.split(",")
+                self.__y_index   = problem.y_index
+                self.__y_column  = problem.y_column
+                self.__data_path = problem.data_path
+                self.__model     = Model(problem.problem_type)
+            except NoResultFound:
+                raise ValueError("Invalid problem name: {}".format(problem))
 
-        self.__model     = Model(self.__problem.problem_type)
-        self.__files     = self.__problem.files.split(",")
-        self.__y_index   = self.__problem.y_index
-        self.__y_column  = self.__problem.y_column
-        self.__data_path = self.__problem.data_path
 
         # "log in" to the system
-        name = os.getenv("USER")
-        try:
-            self.__user = self.__orm.session.query(User)\
-                                            .filter(User.name == name)\
-                                            .one()
-        except NoResultFound:
-            self.__user = User(name=name)
-            self.__orm.session.add(self.__user)
-            self.__orm.session.commit()
-        except MultipleResultsFound:
-            # shouldn"t happen after bug fix
-            self.__user = self.__orm.session.query(User)\
-                                            .filter(User.name == name)\
-                                            .first()
+        self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluationClient(self.__problem, self.__user,
-            self.__orm, self.__dataset) 
+        self.__evaluation_client = EvaluationClient(self.__problemid,
+                self.__username, self.__orm, self.__dataset) 
+
+    def _login(self):
+        name = os.environ.get("USER")
+        if not name:
+            raise ValueError("Missing environment variable 'USER'. Feature"
+                             " factory session not initialized.")
+
+        with self.__orm.session_scope() as session:
+            try:
+                user = session.query(User)\
+                              .filter(User.name == name)\
+                              .one()
+                self.__username = user.name
+            except NoResultFound:
+                session.add(User(name=name))
+                self.__username = name
+            except MultipleResultsFound as e:
+                raise e
 
     def get_sample_dataset(self):
         """
@@ -80,27 +88,30 @@ class Session(object):
         A code fragment can be used to filter search results. For each feature,
         prints feature score and feature code.
         """
-        query = self._filter_features(code_fragment)
-        query = query.filter(Feature.user != self.__user)
+        with self.__orm.session_scope() as session:
+            query = self._filter_features(session, code_fragment)
+            query = query.join(Feature.user).filter(User.name != self.__username)
+            features = query.all()
 
-        features = query.all()
-
-        if features:
-            for feature in features:
-                self._print_one_feature(feature)
-        else:
-            print("No features found.")
+            if features:
+                for feature in features:
+                    self._print_one_feature(feature.score, feature.code)
+            else:
+                print("No features found.")
 
     def print_my_features(self):
         """Print all features written by this user."""
-        query = self._filter_features(None)
-        features = query.all()
+        with self.__orm.session_scope() as session:
+            query = self._filter_features(session, None)
+            query = query.join(Feature.user)\
+                         .filter(User.name == self.__username)
+            features = query.all()
 
-        if features:
-            for feature in features:
-                self._print_one_feature(feature)
-        else:
-            print("No features found.")
+            if features:
+                for feature in features:
+                    self._print_one_feature(feature.score, feature.code)
+            else:
+                print("No features found.")
 
     def evaluate(self, feature):
         """
@@ -117,8 +128,6 @@ class Session(object):
         """
         Creates a new feature entry in database.
         """
-
-        assert self.__user, "User not initialized properly."
 
         is_registered = self._check_if_registered(feature, description)
         if is_registered:
@@ -147,17 +156,15 @@ class Session(object):
         self.__dataset = []
         return self._load_dataset()
 
-    def _filter_features(self, code_fragment):
+    def _filter_features(self, session, code_fragment):
         """
         Return a query object that filters features written for the appropriate
         problem by code snippets.
 
         This query object can be added to by the caller.
         """
-        assert self.__user, "user not initialized properly"
-
         filter_ = (
-            Feature.problem == self.__problem,
+            Feature.problem_id == self.__problemid,
         )
 
         if code_fragment:
@@ -165,23 +172,23 @@ class Session(object):
                 Feature.code.contains(code_fragment),
             )
 
-        return (
-            self.__orm.session.query(Feature)
-                .filter(*filter_)
-                .order_by(Feature.score)
-        )
+        return session.query(Feature).filter(*filter_).order_by(Feature.score)
 
     def _check_if_registered(self, feature, description, verbose=True):
         code    = get_source(feature)
-        problem = self.__problem
         md5     = hashlib.md5(code).hexdigest()
 
-        query = (
-            Feature.problem == self.__problem,
-            Feature.user    == self.__user,
-            Feature.md5     == md5,
-        )
-        score = self.__orm.session.query(Feature.score).filter(*query).scalar()
+        with self.__orm.session_scope() as session:
+            filters_= (
+                Feature.problem_id == self.__problemid,
+                Feature.md5        == md5,
+                User.name          == self.__username,
+            )
+            query = session.query(Feature.score)\
+                        .join(Feature.user)\
+                        .filter(*filters_)
+            score = query.scalar()
+
         if score:
             if verbose:
                 print("Feature already registered with score {}".format(score))
@@ -204,12 +211,13 @@ class Session(object):
         return description
 
     @staticmethod
-    def _print_one_feature(feature):
-        print(dedent("""
+    def _print_one_feature(feature_score, feature_code):
+        print(dedent(
+        """
         ------------------
         Feature score: {0}
 
         Feature code:
         {1}
         \n
-        """.format(feature.score, feature.code)))
+        """.format(feature_score, feature_code)))

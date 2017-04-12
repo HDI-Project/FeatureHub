@@ -5,16 +5,16 @@ import requests
 import collections
 
 from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
-from featurefactory.admin.sqlalchemy_declarative import Feature
+from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.user.model                   import Model
 
 class EvaluationClient(object):
-    def __init__(self, problem, user, orm, dataset=[]):
-        self.problem = problem
-        self.user    = user
-        self.orm     = orm
-        self.dataset = dataset
+    def __init__(self, problem_id, username, orm, dataset=[]):
+        self.problem_id = problem_id
+        self.username  = username
+        self.orm       = orm
+        self.dataset   = dataset
 
         if self.dataset:
             self.__dataset_hash = compute_dataset_hash(self.dataset)
@@ -30,7 +30,7 @@ class EvaluationClient(object):
         code = get_source(feature)
         data = {
             "database"    : self.orm.database,
-            "problem_id"  : self.problem.id,
+            "problem_id"  : self.problem_id,
             "code"        : code,
             "description" : description,
         }
@@ -120,7 +120,11 @@ class EvaluationClient(object):
 
         # extract label
         vprint("Extracting label...", end='')
-        Y = self.dataset[self.problem.y_index][self.problem.y_column]
+        with self.orm.session_scope() as session:
+            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            y_index = problem.y_index
+            y_column = problem.y_column
+        Y = self.dataset[y_index][y_column]
         vprint("done")
 
         # compute metrics
@@ -135,7 +139,11 @@ class EvaluationClient(object):
             vprint = do_nothing
 
         vprint("Computing cross validated score...", end='')
-        model = Model(self.problem.problem_type)
+        with self.orm.session_scope() as session:
+            # TODO this may be a sub-transaction
+            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            problem_type = problem.problem_type
+        model = Model(problem_type)
         score_cv = model.cross_validate(X, Y)
         vprint("done")
 
@@ -156,7 +164,10 @@ class EvaluationClient(object):
         invalid.
         """
 
-        y_index = self.problem.y_index
+        with self.orm.session_scope() as session:
+            # TODO this may be a sub-transaction
+            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            y_index = problem.y_index
 
         result = []
 
@@ -185,8 +196,14 @@ class EvaluationClient(object):
         # TODO check for dtypes file, facilitating lower memory usage
 
         if not self.dataset:
-            for filename in self.problem.files.split(","):
-                abs_filename = os.path.join(self.problem.data_path, filename)
+            with self.orm.session_scope() as session:
+                # TODO this may be a sub-transaction
+                problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+                problem_files = problem.files
+                problem_data_path = problem.data_path
+
+            for filename in problem_files.split(","):
+                abs_filename = os.path.join(problem_data_path, filename)
                 self.dataset.append(pandas.read_csv(abs_filename, low_memory=False))
 
             # compute/recompute hash
@@ -206,8 +223,8 @@ class EvaluationClient(object):
         self._load_dataset()
 
 class Evaluator(EvaluationClient):
-    def __init__(self, problem, user, orm, dataset=[]):
-        super().__init__(problem, user, orm, dataset)
+    def __init__(self, problem_id, username, orm, dataset=[]):
+        super().__init__(problem_id, username, orm, dataset)
 
     def evaluate(self, feature):
         """
