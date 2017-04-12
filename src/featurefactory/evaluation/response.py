@@ -78,6 +78,18 @@ class EvaluationResponse(Response):
         else:
             return ""
 
+    @staticmethod
+    def _get_metrics_str(metrics):
+        metrics_str = "Feature evaluation metrics: "
+        line_prefix = "\n    "
+        if metrics:
+            for key in metrics:
+                metrics_str += line_prefix + "{}: {}".format(key, metrics[key])
+        else:
+            metrics_str += line_prefix + "<no metrics returned>"
+
+        return metrics_str
+
     def __str__(self):
         """
         Return a descriptive representation of the response suitable for showing
@@ -85,13 +97,5 @@ class EvaluationResponse(Response):
         """
 
         explanation = self._get_explanation()
-
-        metrics_str = "Feature evaluation metrics: "
-        line_prefix = "\n    "
-        if self.metrics:
-            for key in self.metrics:
-                metrics_str += line_prefix + "{}: {}".format(key, self.metrics[key])
-        else:
-            metrics_str += line_prefix + "<no metrics returned>"
-
+        metrics_str = self._get_metrics_str(self.metrics)
         return explanation + "\n\n" + metrics_str

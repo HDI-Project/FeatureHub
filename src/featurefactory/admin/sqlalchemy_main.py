@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from featurefactory.admin.sqlalchemy_declarative import Base
 from configparser import ConfigParser, NoSectionError
 import os
+from contextlib import contextmanager
 
 class ORMManager(object):
     """
@@ -41,19 +42,30 @@ class ORMManager(object):
 
 
         conn_string = "mysql+mysqlconnector://{}:{}@{}/{}".format(user,
-                password, host, self.database)
-        self.engine = create_engine(conn_string)
+                '{}', host, self.database)
+        self.engine = create_engine(conn_string.format(password))
 
         # Validate cxn
         try:
-            create_engine(conn_string).connect()
+            create_engine(conn_string.format(password)).connect()
         except Exception:
             # couldn't connect
             raise ValueError("Couldn't connect to database.")
 
         Base.metadata.bind = self.engine
         Session = sessionmaker(bind=self.engine)
-        Session.bind = self.engine
-        self.session = Session()
+        self.Session = Session
 
-        # TODO expose factory Session only, rather than instance session
+    @contextmanager
+    def session_scope(self):
+        """
+        """
+        session = self.Session()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
