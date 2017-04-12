@@ -3,9 +3,10 @@ import dill
 from multiprocessing import Pool
 import inspect
 from textwrap import dedent
+import xxhash
 
-def _loads_and_execute(f_dill, *args):
-    f = dill.loads(f_dill)
+def _get_function_and_execute(source, *args):
+    f = get_function(source)
     return f(*args)
 
 def run_isolated(f, *args):
@@ -16,9 +17,9 @@ def run_isolated(f, *args):
     to serialize some functions, so we must serialize and deserialize the
     function ourselves.
     """
-    f_dill = dill.dumps(f)
+    source = get_source(f)
     with Pool(1) as pool:
-        return pool.apply(_loads_and_execute, (f_dill, *args))
+        return pool.apply(_get_function_and_execute, (source, *args))
 
 def get_source(function):
     """
@@ -124,10 +125,15 @@ def get_function(source):
     return namespace[names[0]]
 
 def compute_dataset_hash(dataset):
-    """Return array of hash values of dataset contents (one per DataFrame)."""
+    """
+    Return hash value of dataset contents.
 
-    result = []
+    Args
+    ----
+        dataset : list of DataFrame
+    """
+    h = xxhash.xxh64()
     for d in dataset:
-        result.append(hash(d.values.tobytes()))
+        h.update(d.values)
 
-    return hash(tuple(result))
+    return h.intdigest()

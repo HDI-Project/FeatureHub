@@ -37,5 +37,6 @@ setup(
         'scipy',
         'sqlalchemy',
         'sqlalchemy_utils',
+        'xxhash',
     ],
  )

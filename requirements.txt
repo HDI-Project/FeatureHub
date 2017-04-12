@@ -13,3 +13,4 @@ scikit-learn
 scipy
 sqlalchemy
 sqlalchemy_utils
+xxhash>=1.0.1
