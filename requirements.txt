@@ -1,3 +1,4 @@
+dill
 docker>=2.0.0
 flask>=0.12
 jupyter
@@ -8,7 +9,6 @@ numpy
 mysqlclient
 mysql-connector-python-rf
 pandas
-pathos
 scikit-learn
 scipy
 sqlalchemy

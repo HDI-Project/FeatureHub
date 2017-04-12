@@ -1,18 +1,24 @@
 import sys
-#from multiprocessing import Pool
-from pathos.multiprocessing import ProcessPool as Pool
+import dill
+from multiprocessing import Pool
 import inspect
-import hashlib
 from textwrap import dedent
 
-def run_isolated(f, *args):
-    """Apply `f` to arguments in an isolated environment."""
+def _loads_and_execute(f_dill, *args):
+    f = dill.loads(f_dill)
+    return f(*args)
 
+def run_isolated(f, *args):
+    """
+    Execute `f(args)` in an isolated environment.
+    
+    First, uses dill to serialize the function. Unfortunately, pickle is unable
+    to serialize some functions, so we must serialize and deserialize the
+    function ourselves.
+    """
+    f_dill = dill.dumps(f)
     with Pool(1) as pool:
-        # hack, as pool is somehow not open on further invocations
-        pool.close()
-        pool.restart()
-        return pool.map(f, args)[0]
+        return pool.apply(_loads_and_execute, (f_dill, *args))
 
 def get_source(function):
     """
@@ -120,4 +126,8 @@ def get_function(source):
 def compute_dataset_hash(dataset):
     """Return array of hash values of dataset contents (one per DataFrame)."""
 
-    return [hashlib.md5(d.to_msgpack()).hexdigest() for d in dataset]
+    result = []
+    for d in dataset:
+        result.append(hash(d.values.tobytes()))
+
+    return hash(tuple(result))

@@ -74,7 +74,7 @@ def test_run_isolated():
 # Test compute_dataset_hash
 
 def test_compute_dataset_hash():
-    def create_dummy_dataset(n=5, m=10):
+    def create_dummy_dataset(n=10, m=30):
         import pandas as pd
         import numpy as np
         return [pd.DataFrame(np.random.randn(m,m)) for i in range(n)]
@@ -85,7 +85,18 @@ def test_compute_dataset_hash():
 
     # should get the same hash if we recompute with no changes
     assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
+    assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
+    assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
 
     # change the data, recompute, should get different hash
+    dataset = create_dummy_dataset()
+    dataset_hash = featurefactory.util.compute_dataset_hash(dataset)
     dataset[0].iloc[0,0] += 1
     assert dataset_hash != featurefactory.util.compute_dataset_hash(dataset)
+
+    # try some basic operations on the DataFrame
+    dataset = create_dummy_dataset()
+    dataset_hash = featurefactory.util.compute_dataset_hash(dataset)
+    [d.head() for d in dataset]
+    [d.describe() for d in dataset]
+    assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
