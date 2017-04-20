@@ -16,7 +16,8 @@ mysql_container_name       = os.environ["MYSQL_CONTAINER_NAME"]
 
 jupyterhub_config_dir      = os.path.join(ff_data_dir, "config", "jupyterhub")
 
-cull_idle_filename = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
+logo_file             = os.path.join(ff_data_dir, "config", "jupyterhub", "featurefactory.png")
+cull_idle_filename    = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
 if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
     cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
 else:
@@ -29,6 +30,9 @@ eval_server_url       = "http://{}:{}".format(eval_container_name,
 eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
 api_client_api_token = os.environ["API_CLIENT_API_TOKEN"]
+
+# General Hub config
+c.JupyterHub.logo_file               = logo_file
 
 # Spawned containers
 c.JupyterHub.spawner_class          = "dockerspawner.SystemUserSpawner"
