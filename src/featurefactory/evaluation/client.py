@@ -4,7 +4,7 @@ import pandas
 import requests
 import collections
 
-from featurefactory.util                         import compute_dataset_hash, run_isolated, run_isolated2, get_source
+from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.user.model                   import Model
@@ -98,7 +98,7 @@ class EvaluationClient(object):
 
 
         vprint("Extracting features...", end='')
-        X = run_isolated2(feature, self.dataset)
+        X = run_isolated(feature, self.dataset)
         vprint("done")
 
         # confirm dataset has not been changed

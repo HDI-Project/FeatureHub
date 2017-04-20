@@ -117,7 +117,7 @@ def test_run_isolated():
     source = b'def f(a):\n    return a+1\n'
     f1 = featurefactory.util.get_function(source)
     for arg in args:
-        assert f1(arg) == featurefactory.util.run_isolated2(f1, arg)
+        assert f1(arg) == featurefactory.util.run_isolated(f1, arg)
 
 # ------------------------------------------------------------------------------ 
 # Test compute_dataset_hash

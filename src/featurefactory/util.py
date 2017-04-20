@@ -9,8 +9,8 @@ import tempfile
 import importlib.util
 from types import ModuleType
 
-def _get_function_and_execute(source, *args):
-    f = get_function(source)
+def _get_function_and_execute(f_dill, *args):
+    f = dill.loads(f_dill)
     return f(*args)
 
 def run_isolated(f, *args):
@@ -21,18 +21,9 @@ def run_isolated(f, *args):
     to serialize some functions, so we must serialize and deserialize the
     function ourselves.
     """
-    source = get_source(f)
-    with Pool(1) as pool:
-        return pool.apply(_get_function_and_execute, (source, *args))
-
-def _get_function_and_execute2(f_dill, *args):
-    f = dill.loads(f_dill)
-    return f(*args)
-
-def run_isolated2(f, *args):
     f_dill = dill.dumps(f)
     with Pool(1) as pool:
-        return pool.apply(_get_function_and_execute2, (f_dill, *args))
+        return pool.apply(_get_function_and_execute, (f_dill, *args))
 
 def get_source(function):
     """
@@ -165,6 +156,9 @@ def get_function2(source):
     Note that the source code produced by get_source includes the source for the
     top-level function as well as any other local functions it calls. Here, we
     return the top-level function directly.
+
+    Caveat: This does not solve the problem of being able to re-extract source
+    from the returned function. (Or, at least, as currently implemented.)
 
     Args
     ----

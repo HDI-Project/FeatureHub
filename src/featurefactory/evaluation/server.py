@@ -12,6 +12,7 @@ from urllib.parse import quote
 from flask import Flask, redirect, request, Response
 import logging
 # from jupyterhub.services.auth import HubAuth
+from featurefactory.evaluation.future import HubAuth
 
 # feature factory imports
 import hashlib
@@ -21,7 +22,6 @@ from featurefactory.evaluation                   import EvaluationResponse, Eval
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
 from featurefactory.util                         import get_function
-from featurefactory.evaluation.future            import HubAuth
 
 # setup
 prefix = "/services/eval-server"
