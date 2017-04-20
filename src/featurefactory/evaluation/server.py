@@ -112,6 +112,13 @@ def evaluate(user):
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
             )
+        except Exception:
+            app.logger.exception("Unexpected issue accessing problem (id '{}') from db"
+                    .format(problem_id))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
+
         app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
 
         user_name = user["name"]
@@ -137,6 +144,9 @@ def evaluate(user):
         except Exception:
             app.logger.exception("Couldn't extract function (code '{}')"
                     .format(code))
+            return EvaluationResponse(
+                    status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
+            )
         app.logger.debug("Extracted function.")
 
         # processing
@@ -154,20 +164,32 @@ def evaluate(user):
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
             )
+        except Exception:
+            app.logger.exception("Unexpected error evaluating feature (code '{}')"
+                    .format(code))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
         app.logger.debug("Evaluated feature.")
 
-        # write to db
-        # TODO error handling
-        feature_obj = Feature(
-            description = description,
-            score       = score_cv,
-            code        = code,
-            md5         = md5,
-            user        = user_obj,
-            problem     = problem_obj
-        )
-        session.add(feature_obj)
-        app.logger.debug("Inserted into database.")
+        try:
+            # write to db
+            # TODO error handling
+            feature_obj = Feature(
+                description = description,
+                score       = score_cv,
+                code        = code,
+                md5         = md5,
+                user        = user_obj,
+                problem     = problem_obj
+            )
+            session.add(feature_obj)
+        except Exception:
+            app.logger.exception("Unexpected error inserting into db")
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_DB_ERROR
+            )
+        app.logger.debug("Inserted into db.")
 
     # return
     # - status code
@@ -175,14 +197,6 @@ def evaluate(user):
     return EvaluationResponse(
         status_code=EvaluationResponse.STATUS_CODE_OKAY,
         metrics=metrics
-    )
-
-@app.route(prefix + '/', methods=["GET"])
-@authenticated
-def test(user):
-    return Response(
-        json.dumps(user, indent=1, sort_keys=True),
-        mimetype='application/json',
     )
 
 if __name__ == "__main__":
