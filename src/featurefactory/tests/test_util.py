@@ -58,6 +58,50 @@ def test_get_function():
         code = featurefactory.util.get_source(fn)
         function = featurefactory.util.get_function(code)
 
+# Test get_function2
+def test_get_function2():
+    n = 10
+    def f():
+        return 0
+
+    def g(a):
+        return a + f()
+
+    def h(a,b,c):
+        x = g(a) + b + c
+
+    def w(h,g):
+        return h+g()
+
+    def x():
+        pass
+
+    def y(a):
+        if a:
+            y(not a)
+
+    def z(a,b,c):
+        import pandas
+        import numpy
+        return pandas.DataFrame(numpy.random.randn(a,b)) * h(a,b,c)
+
+    for fn in [f, g, h, w, x, y, z]:
+        code = featurefactory.util.get_source(fn)
+        function = featurefactory.util.get_function2(code)
+
+        code_orig = code[:]
+
+        # iterate inverses
+        # this doesn't work :(
+        try:
+            for i in range(n):
+                code = featurefactory.util.get_source(function)
+                function = featurefactory.util.get_function2(code)
+        except Exception:
+            pass
+
+        assert code == code_orig
+
 # ------------------------------------------------------------------------------ 
 # Test run_isolated
 
@@ -69,6 +113,11 @@ def test_run_isolated():
     args = [1,3,7]
     for arg in args:
         assert f(arg) == featurefactory.util.run_isolated(f, arg)
+
+    source = b'def f(a):\n    return a+1\n'
+    f1 = featurefactory.util.get_function(source)
+    for arg in args:
+        assert f1(arg) == featurefactory.util.run_isolated2(f1, arg)
 
 # ------------------------------------------------------------------------------ 
 # Test compute_dataset_hash
