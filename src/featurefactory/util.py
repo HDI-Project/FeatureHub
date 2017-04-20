@@ -134,6 +134,6 @@ def compute_dataset_hash(dataset):
     """
     h = xxhash.xxh64()
     for d in dataset:
-        h.update(d.values)
+        h.update(d.to_msgpack())
 
     return h.intdigest()
