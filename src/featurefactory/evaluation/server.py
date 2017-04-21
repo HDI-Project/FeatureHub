@@ -20,7 +20,7 @@ from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, Evaluator
 from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
+from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
 from featurefactory.util                         import get_function
 
 # setup
@@ -155,7 +155,6 @@ def evaluate(user):
         evaluator = Evaluator(problem_id, user_name, orm)
         try:
             metrics = evaluator.evaluate(feature)
-            score_cv = metrics["score_cv"]
             # TODO expand schema
         except ValueError:
             app.logger.exception("Couldn't evaluate feature (code '{}')"
@@ -177,13 +176,22 @@ def evaluate(user):
             # TODO error handling
             feature_obj = Feature(
                 description = description,
-                score       = score_cv,
                 code        = code,
                 md5         = md5,
                 user        = user_obj,
                 problem     = problem_obj
             )
             session.add(feature_obj)
+            for metric in metrics:
+                metric_db = metric.to_db_entry()
+                metric_obj = Metric(
+                    feature = feature_obj,
+                    name    = metric_db["name"],
+                    scoring = metric_db["scoring"],
+                    value   = metric_db["value"]
+                )
+                session.add(metric_obj)
+
         except Exception:
             app.logger.exception("Unexpected error inserting into db")
             return EvaluationResponse(

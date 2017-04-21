@@ -9,9 +9,9 @@ class EvaluationResponse(Response):
     ----
         status_code : string
             Possible values are EvaluationResponse static members.
-        metrics : dict
-            Dictionary mapping names of different metrics to floating point
-            values.
+        metrics : list of Metric
+            List of Metric objects, which each encode metric name, metric scoring
+            method, and value.
     """
 
     STATUS_CODE_OKAY         = "okay"
@@ -24,9 +24,13 @@ class EvaluationResponse(Response):
     try_again = "Please try again later or contact administrator."
 
     def __init__(self, status_code=STATUS_CODE_OKAY, metrics={}):
+        metrics1 = {}
+        for m in metrics:
+            metrics1.update(m.to_user_display())
+
         d = {
             "status_code" : status_code,
-            "metrics"     : metrics,
+            "metrics"     : metrics1,
         }
         response = json.dumps(d, indent=1, sort_keys=True)
         mimetype = "application/json"
@@ -34,7 +38,11 @@ class EvaluationResponse(Response):
         super().__init__(response=response, mimetype=mimetype)
 
         self.status_code1 = status_code
-        self.metrics = metrics
+        self.metrics = metrics1
+
+        # convert metrics
+        # - from: list of Metric
+        # - to: dict mapping name to value
 
     @classmethod
     def from_string(cls, string):
@@ -80,11 +88,15 @@ class EvaluationResponse(Response):
 
     @staticmethod
     def _get_metrics_str(metrics):
+        """
+        Get user-readable output from metrics, a list of Metric objects.
+        """
         metrics_str = "Feature evaluation metrics: "
         line_prefix = "\n    "
         if metrics:
-            for key in metrics:
-                metrics_str += line_prefix + "{}: {}".format(key, metrics[key])
+            for metric in metrics:
+                metrics_str += line_prefix + "{}: {}".format(metric.name,
+                        metric.value)
         else:
             metrics_str += line_prefix + "<no metrics returned>"
 
