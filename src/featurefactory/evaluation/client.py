@@ -11,7 +11,7 @@ from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.modeling                     import Model
 
 class EvaluationClient(object):
-    def __init__(self, problem_id, username, orm, dataset=[]):
+    def __init__(self, problem_id, username, orm, dataset={}):
         self.problem_id = problem_id
         self.username  = username
         self.orm       = orm
@@ -151,9 +151,9 @@ class EvaluationClient(object):
     def _extract_label(self):
         with self.orm.session_scope() as session:
             problem  = session.query(Problem).filter(Problem.id == self.problem_id).one()
-            y_index  = problem.y_index
-            y_column = problem.y_column
-        return self.dataset[y_index][y_column]
+            target_table_name = problem.target_table_name
+            y_column          = problem.y_column
+        return self.dataset[target_table_name][y_column]
 
     def _load_dataset(self):
         """
@@ -168,11 +168,13 @@ class EvaluationClient(object):
                 # TODO this may be a sub-transaction
                 problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
                 problem_files = problem.files
+                problem_table_names = problem.table_names
                 problem_data_path = problem.data_path
 
-            for filename in problem_files.split(","):
+            for (filename, table_name) in zip(problem_files.split(","),
+                    problem_table_names.split(",")):
                 abs_filename = os.path.join(problem_data_path, filename)
-                self.dataset.append(pandas.read_csv(abs_filename, low_memory=False))
+                self.dataset[table_name] = pandas.read_csv(abs_filename, low_memory=False)
 
             # compute/recompute hash
             self.__dataset_hash = compute_dataset_hash(self.dataset)
@@ -187,7 +189,7 @@ class EvaluationClient(object):
         """
         Force reload of dataset.
         """
-        self.dataset = []
+        self.dataset = {}
         self._load_dataset()
 
     def _validate_feature_values(self, feature_values):
@@ -203,7 +205,7 @@ class EvaluationClient(object):
         with self.orm.session_scope() as session:
             # TODO this may be a sub-transaction
             problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
-            y_index = problem.y_index
+            target_table_name = problem.target_table_name
 
         result = []
 
@@ -213,7 +215,7 @@ class EvaluationClient(object):
             return "; ".join(result)
 
         # must have the right shape
-        expected_shape = (self.dataset[y_index].shape[0], 1)
+        expected_shape = (self.dataset[target_table_name].shape[0], 1)
         if feature_values.shape != expected_shape:
             result.append(
                 "returns DataFrame of invalid shape "
@@ -239,7 +241,7 @@ class EvaluationClient(object):
             self._reload_dataset()
 
 class Evaluator(EvaluationClient):
-    def __init__(self, problem_id, username, orm, dataset=[]):
+    def __init__(self, problem_id, username, orm, dataset={}):
         super().__init__(problem_id, username, orm, dataset)
 
     def evaluate(self, feature):

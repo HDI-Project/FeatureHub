@@ -18,14 +18,15 @@ class User(Base):
 class Problem(Base):
     __tablename__ = 'problems'
 
-    id           = Column(Integer, primary_key=True, autoincrement=True)
-    name         = Column(String(100), nullable=False)
-    problem_type = Column(String(100), nullable=False)
-    data_path    = Column(String(100), nullable=False)
-    files        = Column(String(100), nullable=False)
-    y_index      = Column(Integer, nullable=False)
-    y_column     = Column(String(100), nullable=False)
-    created_at   = Column(DateTime, default=datetime.now)
+    id                = Column(Integer, primary_key=True, autoincrement=True)
+    name              = Column(String(100), nullable=False)
+    problem_type      = Column(String(100), nullable=False)
+    data_path         = Column(String(200), nullable=False)
+    files             = Column(String(500), nullable=False)
+    table_names       = Column(String(500), nullable=False)
+    target_table_name = Column(String(100), nullable=False)
+    y_column          = Column(String(100), nullable=False)
+    created_at        = Column(DateTime, default=datetime.now)
 
     @hybrid_method
     def urlencode(self):

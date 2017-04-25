@@ -200,7 +200,7 @@ def compute_dataset_hash(dataset):
         dataset : list of DataFrame
     """
     h = xxhash.xxh64()
-    for d in dataset:
-        h.update(d.to_msgpack())
+    for d in sorted(dataset.keys()):
+        h.update(dataset[d].to_msgpack())
 
-    return h.intdigest()
+    return h.hexdigest()

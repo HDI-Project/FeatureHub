@@ -25,19 +25,20 @@ class Session(object):
         self.__database = database
         self.__orm      = ORMManager(database)
         self.__username = None
-        self.__dataset  = []
+        self.__dataset  = {}
 
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem)\
                                  .filter(Problem.name == problem)\
                                  .one()
-                self.__problemid = problem.id
-                self.__files     = problem.files.split(",")
-                self.__y_index   = problem.y_index
-                self.__y_column  = problem.y_column
-                self.__data_path = problem.data_path
-                self.__model     = Model(problem.problem_type)
+                self.__problemid         = problem.id
+                self.__files             = problem.files.split(",")
+                self.__table_names       = problem.table_names.split(",")
+                self.__target_table_name = problem.target_table_name
+                self.__y_column          = problem.y_column
+                self.__data_path         = problem.data_path
+                self.__model             = Model(problem.problem_type)
             except NoResultFound:
                 raise ValueError("Invalid problem name: {}".format(problem))
 
@@ -75,8 +76,10 @@ class Session(object):
         if not self.__dataset:
             self._load_dataset()
 
-        gc.collect()    # make sure that we have enough space for this.
-        return [df.copy() for df in self.__dataset]
+        # Return a *copy* of the dataset, ensuring we have enough memory.
+        gc.collect()    
+        return {table_name : self.__dataset[table_name].copy() for table_name in
+                self.__dataset}
 
     def discover_features(self, code_fragment=None, metric_name=None):
         """
@@ -172,14 +175,14 @@ class Session(object):
         # TODO check for dtypes file, assisting in low memory usage
 
         if not self.__dataset:
-            for filename in self.__files:
+            for (filename, table_name) in zip(self.__files, self.__table_names):
                 abs_filename = os.path.join(self.__data_path, filename)
-                self.__dataset.append( pd.read_csv(abs_filename, low_memory=False))
+                self.__dataset[table_name] = pd.read_csv(abs_filename, low_memory=False)
 
         return self.__dataset
 
     def _reload_dataset(self):
-        self.__dataset = []
+        self.__dataset = {}
         return self._load_dataset()
 
     def _filter_features(self, session, code_fragment):

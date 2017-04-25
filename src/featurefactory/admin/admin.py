@@ -58,7 +58,7 @@ class Commands(object):
 
         print("Database {} created successfully".format(url))
 
-    def create_problem(self, name, problem_type, data_path, files, y_index, y_column):
+    def create_problem(self, name, problem_type, data_path, files, table_names, target_table_name, y_column):
         """Creates a new problem entry in database."""
 
         with self.__orm.session_scope() as session:
@@ -71,12 +71,13 @@ class Commands(object):
                 pass    # we will create it
 
             problem = Problem(
-                name         = name,
-                problem_type = problem_type,
-                data_path    = data_path,
-                files        = ",".join(files),
-                y_index      = y_index,
-                y_column     = y_column
+                name              = name,
+                problem_type      = problem_type,
+                data_path         = data_path,
+                files             = ",".join(files),
+                table_names       = ",".join(table_names),
+                target_table_name = target_table_name,
+                y_column          = y_column
             )
             session.add(problem)
             self.__problemid = problem.id

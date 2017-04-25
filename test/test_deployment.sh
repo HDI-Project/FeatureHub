@@ -41,11 +41,11 @@ docker exec -u ${ADMIN_USERNAME} -i ${FF_CONTAINER_NAME}-${ADMIN_USERNAME} \
     /opt/conda/bin/python3 /tmp/test_admin.py
 
 # user1 test
-#USER1_USERNAME=user1 FF_CONTAINER_NAME=featurefactoryuser 
-docker cp ./test_user1.py ${FF_CONTAINER_NAME}-${USER1_USERNAME}:/tmp/test_user1.py
-docker exec -u ${USER1_USERNAME} -i ${FF_CONTAINER_NAME}-${USER1_USERNAME} /opt/conda/bin/python3 /tmp/test_user.py
-
-# user2 test
-#USER2_USERNAME=user2 FF_CONTAINER_NAME=featurefactoryuser 
-docker cp ./test_user2.py ${FF_CONTAINER_NAME}-${USER2_USERNAME}:/tmp/test_user2.py
-docker exec -u ${USER2_USERNAME} -i ${FF_CONTAINER_NAME}-${USER2_USERNAME} /opt/conda/bin/python3 /tmp/test_user.py
+USER1_USERNAME=user1 USER2_USERNAME=user2 FF_CONTAINER_NAME=featurefactoryuser 
+for USER_ in $USER1_USERNAME $USER2_USERNAME;
+do
+    docker cp ./test_${USER_}.py \
+        ${FF_CONTAINER_NAME}-${USER_}:/tmp/test_${USER_}.py
+    docker exec -u ${USER_} -i ${FF_CONTAINER_NAME}-${USER_} \
+        /opt/conda/bin/python3 /tmp/test_${USER_}.py
+done
