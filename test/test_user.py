@@ -22,6 +22,11 @@ else:
     from example_feature import example_feature
     sys.path.pop(0)
 
+# test evaluation
 commands.evaluate(example_feature)
 description="Age"
 commands.register_feature(example_feature, description=description)
+
+# test feature discovery
+commands.discover_features()
+commands.print_my_features()

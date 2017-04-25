@@ -127,18 +127,18 @@ class Session(object):
 
             # Filter only users that are not me
             query = query.join(Feature.user).filter(predicate)
-
-            # Join with metrics table
-            query = query.join(Metric)\
-                         .filter(Metric.name == metric_name)\
-                         .add_columns(Metric.name, Metric.value)
             features = query.all()
 
             if features:
                 for feature in features:
-                    # each feature is a tuple (<feature>, metric_name, metric_value)
-                    self._print_one_feature(feature[0].description, feature[1],
-                            feature[2], feature[0].code)
+                    # Join with metrics table
+                    query = session.query(Metric.name, Metric.value)\
+                                .filter(Metric.feature_id == feature.id)
+                    metrics = query.all()
+                    metric_list = [(metric.name, metric.value) for metric in
+                            metrics]
+                    self._print_one_feature(feature.description, feature.id,
+                            feature.code, metric_list)
             else:
                 print("No features found.")
 
@@ -231,14 +231,14 @@ class Session(object):
         return description
 
     @staticmethod
-    def _print_one_feature(feature_description, metric_names, metric_values,
-            feature_code):
+    def _print_one_feature(feature_description, feature_id, feature_code,
+            metric_list):
         result = "------------------\n" + \
-                 "*{}*\n".format(feature_description) + \
+                 "*{}* (id: {})\n".format(feature_description, feature_id) + \
                  "\n" + \
                  "Feature metrics:\n"
 
-        for metric_name, metric_value in zip(metric_names, metric_values):
+        for metric_name, metric_value in metric_list:
             result += "    {}: {}\n".format(metric_name, metric_value)
 
         result += "\n"

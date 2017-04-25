@@ -92,6 +92,31 @@ class Commands(object):
             except NoResultFound:
                 return []
 
+    def get_features(self, user_name=None):
+        """Get a DataFrame with the details about all registered features."""
+        with self.__orm.session_scope() as session:
+            features = self._get_features(session, user_name).all()
+            feature_dicts = []
+            for feature in features:
+                d = {
+                    "user"        : feature.user.name,
+                    "description" : feature.description,
+                    "md5"         : feature.md5,
+                    "created_at"  : feature.created_at,
+                }
+                feature_metrics = session.query(Metric.name,
+                        Metric.value).filter(Metric.feature_id ==
+                                feature.id).all()
+                for metric in feature_metrics:
+                    d[metric.name] = metric.value
+
+                feature_dicts.append(d)
+
+            if not feature_dicts:
+                print("No features found")
+            else:
+                return pd.DataFrame(feature_dicts)
+
     def _get_features(self, session, user_name=None):
         """Get an SQLAlchemy cursor pointing at the requested features."""
 
@@ -101,49 +126,6 @@ class Commands(object):
         if user_name:
             query = query.filter(User.name == user_name)
 
-        query = query.filter(Feature.problem.id == self.__problemid)
+        query = query.filter(Feature.problem_id == self.__problemid)
 
         return query
-
-    def get_features(self, user_name=None):
-        """Get a DataFrame with the details about all registered features."""
-        with self.__orm.session_scope() as session:
-            features = self._get_features(session, user_name).all()
-            feature_dicts = [{
-                "user"        : feature.user.name,
-                "description" : feature.description,
-                "md5"         : feature.md5,
-                "created_at"  : feature.created_at,
-                metric.name   : metric.value,
-            } for feature, metric in features]
-
-            if not feature_dicts:
-                print("No features found")
-            else:
-                return pd.DataFrame(feature_dicts)
-
-    def print_feature(self, user_name, md5=None):
-        """
-        Print the code of the requested feature.
-
-        If there is more than one feature with the same name, only the
-        latest version is printed.
-        Alternatively, the feature md5 can be passed to select a particular feature.
-        """
-        with self.__orm.session_scope() as session:
-            query = self._get_features(session, user_name)
-
-            if md5:
-                query = query.filter(Feature.md5 == md5)
-
-            query = query.order_by(Feature.created_at.desc())
-
-            feature = query.first()
-            if feature:
-                print("Description: {}".format(feature.description))
-                print("md5: {}".format(feature.md5))
-                print("created_at: {}".format(feature.created_at))
-                print("\n")
-                print(feature.code)
-            else:
-                print("No matching features found.")
