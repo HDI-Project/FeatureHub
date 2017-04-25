@@ -8,7 +8,7 @@ import traceback
 from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
 from featurefactory.admin.sqlalchemy_declarative import Problem
 from featurefactory.evaluation                   import EvaluationResponse
-from featurefactory.user.model                   import Model
+from featurefactory.modeling                     import Model
 
 class EvaluationClient(object):
     def __init__(self, problem_id, username, orm, dataset=[]):

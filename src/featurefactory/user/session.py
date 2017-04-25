@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User, Metric
-from featurefactory.user.model                   import Model
+from featurefactory.modeling                     import Model
 from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
 from featurefactory.evaluation                   import EvaluationClient
 
