@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import database_exists, create_database, drop_database
 
-from featurefactory.admin.sqlalchemy_declarative import Base, Feature, Problem, User
+from featurefactory.admin.sqlalchemy_declarative import Base, Feature, Problem, User, Metric
 from featurefactory.admin.sqlalchemy_main import ORMManager
 
 
@@ -95,9 +95,10 @@ class Commands(object):
     def _get_features(self, session, user_name=None):
         """Get an SQLAlchemy cursor pointing at the requested features."""
 
+        #TODO pivot metrics tables
+        query = session.query(Feature, User.name, Metric)
 
         if user_name:
-            query = session.query(Feature, User.name)
             query = query.filter(User.name == user_name)
 
         query = query.filter(Feature.problem.id == self.__problemid)
@@ -112,9 +113,9 @@ class Commands(object):
                 "user"        : feature.user.name,
                 "description" : feature.description,
                 "md5"         : feature.md5,
-                "score"       : feature.score,
                 "created_at"  : feature.created_at,
-            } for feature in features]
+                metric.name   : metric.value,
+            } for feature, metric in features]
 
             if not feature_dicts:
                 print("No features found")
@@ -140,7 +141,6 @@ class Commands(object):
             feature = query.first()
             if feature:
                 print("Description: {}".format(feature.description))
-                print("Score: {}".format(feature.score))
                 print("md5: {}".format(feature.md5))
                 print("created_at: {}".format(feature.created_at))
                 print("\n")

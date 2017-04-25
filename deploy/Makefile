@@ -124,3 +124,11 @@ monitor_delete:
 .PHONY: monitor_stop
 monitor_stop:
 	sudo ./monitor.py stop
+
+# Driver for rebuild_eval
+.PHONY: remove_eval
+remove_eval:
+	docker rm -f $(EVAL_CONTAINER_NAME)
+
+.PHONY: rebuild_eval
+rebuild_eval: build remove_eval up

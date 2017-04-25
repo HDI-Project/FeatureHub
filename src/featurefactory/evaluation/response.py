@@ -1,5 +1,6 @@
-from flask import Response
 import json
+from flask import Response
+from featurefactory.user.model import MetricList
 
 class EvaluationResponse(Response):
     """
@@ -23,14 +24,13 @@ class EvaluationResponse(Response):
 
     try_again = "Please try again later or contact administrator."
 
-    def __init__(self, status_code=STATUS_CODE_OKAY, metrics={}):
-        metrics1 = {}
-        for m in metrics:
-            metrics1.update(m.to_user_display())
+    def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None):
+        if metrics is not None:
+            metrics = MetricList.from_object(metrics).convert(kind="user")
 
         d = {
             "status_code" : status_code,
-            "metrics"     : metrics1,
+            "metrics"     : metrics,
         }
         response = json.dumps(d, indent=1, sort_keys=True)
         mimetype = "application/json"
@@ -38,11 +38,7 @@ class EvaluationResponse(Response):
         super().__init__(response=response, mimetype=mimetype)
 
         self.status_code1 = status_code
-        self.metrics = metrics1
-
-        # convert metrics
-        # - from: list of Metric
-        # - to: dict mapping name to value
+        self.metrics = metrics
 
     @classmethod
     def from_string(cls, string):
@@ -86,21 +82,8 @@ class EvaluationResponse(Response):
         else:
             return ""
 
-    @staticmethod
-    def _get_metrics_str(metrics):
-        """
-        Get user-readable output from metrics, a list of Metric objects.
-        """
-        metrics_str = "Feature evaluation metrics: "
-        line_prefix = "\n    "
-        if metrics:
-            for metric in metrics:
-                metrics_str += line_prefix + "{}: {}".format(metric.name,
-                        metric.value)
-        else:
-            metrics_str += line_prefix + "<no metrics returned>"
-
-        return metrics_str
+    def _get_metrics_str(self):
+        return MetricList.from_object(self.metrics).to_string(kind="user")
 
     def __str__(self):
         """
@@ -109,5 +92,5 @@ class EvaluationResponse(Response):
         """
 
         explanation = self._get_explanation()
-        metrics_str = self._get_metrics_str(self.metrics)
+        metrics_str = self._get_metrics_str()
         return explanation + "\n\n" + metrics_str

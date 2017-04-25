@@ -3,9 +3,10 @@ import os
 import pandas
 import requests
 import collections
+import traceback
 
 from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
-from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
+from featurefactory.admin.sqlalchemy_declarative import Problem
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.user.model                   import Model
 
@@ -45,17 +46,20 @@ class EvaluationClient(object):
             try:
                 eval_response = EvaluationResponse.from_string(response.text)
                 print(eval_response)
-            except Exception:
+            except Exception as e:
                 # TODO
-                print("response failed")
+                print("response failed with exception")
+                print(traceback.format_exc(), file=sys.stderr)
                 try:
+                    print(response, file=sys.stderr)
                     print(response.text, file=sys.stderr)
                 except Exception:
                     pass
         else:
             # TODO
-            print("response failed")
+            print("response failed with bad status code")
             try:
+                print(response, file=sys.stderr)
                 print(response.text, file=sys.stderr)
             except Exception:
                 pass
@@ -74,9 +78,10 @@ class EvaluationClient(object):
         """
         try:
             metrics = self._evaluate(feature, verbose=True)
-            metrics_str = EvaluationResponse._get_metrics_str(metrics)
+            metrics_str = metrics.to_string(kind="user")
+            metrics_user = metrics.convert(kind="user")
             print(metrics_str)
-            return metrics
+            return metrics_user
         except ValueError as e:
             print("Feature is not valid: {}".format(str(e)), file=sys.stderr)
             return {}
@@ -245,7 +250,8 @@ class Evaluator(EvaluationClient):
         invalid, re-raises the ValueError.
         """
         try:
-            return self._evaluate(feature, verbose=False)
+            metrics = self._evaluate(feature, verbose=False)
+            return metrics
         except ValueError as e:
             raise
 
@@ -255,5 +261,10 @@ class Evaluator(EvaluationClient):
 
     def _compute_metrics(self, X, Y, verbose=False):
         # doesn't do anything different
-        metrics = super()._compute_metrics(X, Y, verbose=verbose)
+        metrics = super()._compute_metrics(X, Y)
         return metrics
+
+    def _verify_dataset_integrity(self):
+        # Don't need to verify dataset integrity on server because we re-load
+        # the dataset for every new feature.
+        pass

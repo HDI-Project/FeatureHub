@@ -11,8 +11,9 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    id   = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(200), unique=True, nullable=False)
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    name       = Column(String(200), unique=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
 
 class Problem(Base):
     __tablename__ = 'problems'
@@ -29,7 +30,7 @@ class Problem(Base):
     @hybrid_method
     def urlencode(self):
         d = {
-            'problem_id': self.id,
+            'problem_id' : self.id,
         }
         return urlencode(d)
 
@@ -43,7 +44,6 @@ class Feature(Base):
     problem     = relationship('Problem')
     code        = Column(Text, nullable=False)
     md5         = Column(String(32), nullable=True)
-    score       = Column(Float)
     description = Column(Text, nullable=True)
     created_at  = Column(DateTime, default=datetime.now)
 
@@ -56,3 +56,4 @@ class Metric(Base):
     name       = Column(String(100), nullable=False)
     scoring    = Column(String(100), nullable=False)
     value      = Column(Float, nullable=True)
+    created_at = Column(DateTime, default=datetime.now)

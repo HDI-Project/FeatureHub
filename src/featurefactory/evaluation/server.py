@@ -49,7 +49,8 @@ def authenticated(f):
     def decorated(*args, **kwargs):
         # try to authenticate via token
         token_header = request.headers.get('Authorization')
-        app.logger.debug("Authenticating via  token '{}' ...".format(token_header))
+        app.logger.debug("Authenticating via  token '{}' ..."
+                .format(token_header))
         if token_header:
             try:
                 token_str = token_header[:len("token ")]
@@ -61,7 +62,8 @@ def authenticated(f):
         else:
             # try to authenticate via cookie
             cookie = request.cookies.get(auth.cookie_name)
-            app.logger.debug("Authenticating via cookie '{}' ...".format(cookie))
+            app.logger.debug("Authenticating via cookie '{}' ..."
+                    .format(cookie))
             if cookie:
                 user = auth.user_for_cookie(cookie)
             else:
@@ -105,7 +107,8 @@ def evaluate(user):
     orm = ORMManager(database, admin=True)
     with orm.session_scope() as session:
         try:
-            problem_obj = session.query(Problem).filter(Problem.id == problem_id).one()
+            problem_obj = session.query(Problem)\
+                    .filter(Problem.id == problem_id).one()
         except (NoResultFound, MultipleResultsFound) as e:
             app.logger.exception("Couldn't access problem (id '{}') from db"
                     .format(problem_id))
@@ -113,13 +116,15 @@ def evaluate(user):
                 status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
             )
         except Exception:
-            app.logger.exception("Unexpected issue accessing problem (id '{}') from db"
+            app.logger.exception(
+                    "Unexpected issue accessing problem (id '{}') from db"
                     .format(problem_id))
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
             )
 
-        app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
+        app.logger.debug("Accessed problem (id '{}') from db"
+                .format(problem_id))
 
         user_name = user["name"]
         try:
@@ -164,7 +169,8 @@ def evaluate(user):
                 status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
             )
         except Exception:
-            app.logger.exception("Unexpected error evaluating feature (code '{}')"
+            app.logger.exception(
+                    "Unexpected error evaluating feature (code '{}')"
                     .format(code))
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
@@ -173,7 +179,6 @@ def evaluate(user):
 
         try:
             # write to db
-            # TODO error handling
             feature_obj = Feature(
                 description = description,
                 code        = code,
