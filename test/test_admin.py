@@ -1,6 +1,6 @@
 from featurefactory.admin.admin import Commands
-admin_commands = Commands()
-admin_commands.set_up(drop=True)
+commands = Commands()
+commands.set_up(drop=True)
 
 name = 'airbnb'
 problem_type = 'classification'
@@ -9,4 +9,8 @@ files = ['train_users_2.csv', 'sessions.csv', 'countries.csv', 'age_gender_bkts.
 y_index = 0
 y_column = 'country_destination'
 
-admin_commands.create_problem(name, problem_type, data_path, files, y_index, y_column)
+commands.create_problem(name, problem_type, data_path, files, y_index, y_column)
+
+# more testing :)
+commands.get_problems()
+commands.get_features()

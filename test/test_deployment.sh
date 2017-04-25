@@ -33,6 +33,7 @@ sleep 5
 cd ../test
 
 # admin initialization
+#ADMIN_USERNAME=admin FF_CONTAINER_NAME=featurefactoryuser 
 docker cp ./test_admin.py ${FF_CONTAINER_NAME}-${ADMIN_USERNAME}:/tmp/test_admin.py
 docker exec -u ${ADMIN_USERNAME} -i ${FF_CONTAINER_NAME}-${ADMIN_USERNAME} \
     /opt/conda/bin/python3 /tmp/test_admin.py

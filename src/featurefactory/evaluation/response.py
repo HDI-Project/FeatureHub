@@ -1,6 +1,6 @@
 import json
 from flask import Response
-from featurefactory.user.model import MetricList
+from featurefactory.modeling import MetricList
 
 class EvaluationResponse(Response):
     """

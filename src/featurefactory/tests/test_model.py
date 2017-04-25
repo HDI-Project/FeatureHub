@@ -1,11 +1,7 @@
-from os.path import abspath, realpath, dirname, join
-import sys
-sys.path.insert(0, join(dirname(abspath(realpath(__file__))),'..','..'))
-
 import featurefactory.util
 import numpy as np
 
-from featurefactory.user.model import Model
+from featurefactory.modeling import Model
 
 # ------------------------------------------------------------------------------ 
 # Create fake data
