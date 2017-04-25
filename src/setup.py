@@ -24,6 +24,7 @@ setup(
     url              = 'https://github.com/HDI-Project/FeatureFactory',
     packages         = find_packages(exclude=["tests", "__pycache__"]),
     install_requires = [
+        'dill',
         'flask',
         'jupyter',
         'jupyterhub',
@@ -32,10 +33,10 @@ setup(
         'mysqlclient',
         'mysql-connector-python-rf',
         'pandas',
-        'pathos',
         'scikit-learn',
         'scipy',
         'sqlalchemy',
         'sqlalchemy_utils',
+        'xxhash',
     ],
  )

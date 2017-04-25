@@ -12,6 +12,7 @@ from urllib.parse import quote
 from flask import Flask, redirect, request, Response
 import logging
 # from jupyterhub.services.auth import HubAuth
+from featurefactory.evaluation.future import HubAuth
 
 # feature factory imports
 import hashlib
@@ -19,9 +20,8 @@ from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, Evaluator
 from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User
+from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
 from featurefactory.util                         import get_function
-from featurefactory.evaluation.future            import HubAuth
 
 # setup
 prefix = "/services/eval-server"
@@ -49,7 +49,8 @@ def authenticated(f):
     def decorated(*args, **kwargs):
         # try to authenticate via token
         token_header = request.headers.get('Authorization')
-        app.logger.debug("Authenticating via  token '{}' ...".format(token_header))
+        app.logger.debug("Authenticating via  token '{}' ..."
+                .format(token_header))
         if token_header:
             try:
                 token_str = token_header[:len("token ")]
@@ -61,7 +62,8 @@ def authenticated(f):
         else:
             # try to authenticate via cookie
             cookie = request.cookies.get(auth.cookie_name)
-            app.logger.debug("Authenticating via cookie '{}' ...".format(cookie))
+            app.logger.debug("Authenticating via cookie '{}' ..."
+                    .format(cookie))
             if cookie:
                 user = auth.user_for_cookie(cookie)
             else:
@@ -105,14 +107,24 @@ def evaluate(user):
     orm = ORMManager(database, admin=True)
     with orm.session_scope() as session:
         try:
-            problem_obj = session.query(Problem).filter(Problem.id == problem_id).one()
+            problem_obj = session.query(Problem)\
+                    .filter(Problem.id == problem_id).one()
         except (NoResultFound, MultipleResultsFound) as e:
             app.logger.exception("Couldn't access problem (id '{}') from db"
                     .format(problem_id))
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_BAD_REQUEST
             )
-        app.logger.debug("Accessed problem (id '{}') from db".format(problem_id))
+        except Exception:
+            app.logger.exception(
+                    "Unexpected issue accessing problem (id '{}') from db"
+                    .format(problem_id))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
+
+        app.logger.debug("Accessed problem (id '{}') from db"
+                .format(problem_id))
 
         user_name = user["name"]
         try:
@@ -137,6 +149,9 @@ def evaluate(user):
         except Exception:
             app.logger.exception("Couldn't extract function (code '{}')"
                     .format(code))
+            return EvaluationResponse(
+                    status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
+            )
         app.logger.debug("Extracted function.")
 
         # processing
@@ -145,7 +160,6 @@ def evaluate(user):
         evaluator = Evaluator(problem_id, user_name, orm)
         try:
             metrics = evaluator.evaluate(feature)
-            score_cv = metrics["score_cv"]
             # TODO expand schema
         except ValueError:
             app.logger.exception("Couldn't evaluate feature (code '{}')"
@@ -154,20 +168,41 @@ def evaluate(user):
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_BAD_FEATURE
             )
+        except Exception:
+            app.logger.exception(
+                    "Unexpected error evaluating feature (code '{}')"
+                    .format(code))
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
         app.logger.debug("Evaluated feature.")
 
-        # write to db
-        # TODO error handling
-        feature_obj = Feature(
-            description = description,
-            score       = score_cv,
-            code        = code,
-            md5         = md5,
-            user        = user_obj,
-            problem     = problem_obj
-        )
-        session.add(feature_obj)
-        app.logger.debug("Inserted into database.")
+        try:
+            # write to db
+            feature_obj = Feature(
+                description = description,
+                code        = code,
+                md5         = md5,
+                user        = user_obj,
+                problem     = problem_obj
+            )
+            session.add(feature_obj)
+            for metric in metrics:
+                metric_db = metric.to_db_entry()
+                metric_obj = Metric(
+                    feature = feature_obj,
+                    name    = metric_db["name"],
+                    scoring = metric_db["scoring"],
+                    value   = metric_db["value"]
+                )
+                session.add(metric_obj)
+
+        except Exception:
+            app.logger.exception("Unexpected error inserting into db")
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_DB_ERROR
+            )
+        app.logger.debug("Inserted into db.")
 
     # return
     # - status code
@@ -175,14 +210,6 @@ def evaluate(user):
     return EvaluationResponse(
         status_code=EvaluationResponse.STATUS_CODE_OKAY,
         metrics=metrics
-    )
-
-@app.route(prefix + '/', methods=["GET"])
-@authenticated
-def test(user):
-    return Response(
-        json.dumps(user, indent=1, sort_keys=True),
-        mimetype='application/json',
     )
 
 if __name__ == "__main__":

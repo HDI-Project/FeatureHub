@@ -1,15 +1,13 @@
-from __future__ import print_function
-
-import gc
-import hashlib
 import os
 import sys
-from textwrap import dedent
+import gc
+import hashlib
 import pandas as pd
+from textwrap import dedent
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User
+from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User, Metric
 from featurefactory.user.model                   import Model
 from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
 from featurefactory.evaluation                   import EvaluationClient
@@ -80,46 +78,78 @@ class Session(object):
         gc.collect()    # make sure that we have enough space for this.
         return [df.copy() for df in self.__dataset]
 
-    def discover_features(self, code_fragment=None):
+    def discover_features(self, code_fragment=None, metric_name=None):
         """
-        Discover features written by other users.
+        Print features written by other users.
 
-        Print features written by other users, enabling collaboration.
         A code fragment can be used to filter search results. For each feature,
-        prints feature score and feature code.
+        prints feature description, metrics, and source code.
+
+        Args
+        ----
+            code_fragment : string
+                Source code fragment to filter for.
+            metric_name : string
+                Metric to report. One of "Accuracy", "Precision", "Recall", and
+                "ROC AUC" for classification problems, and "Mean Squared Error"
+                and "R-squared" for regression problems.
         """
+        self._print_some_features(code_fragment, metric_name, User.name != self.__username)
+
+    def print_my_features(self, code_fragment=None, metric_name=None):
+        """
+        Print features written by me.
+
+        A code fragment can be used to filter search results. For each feature,
+        prints feature description, metrics, and source code.
+
+        Args
+        ----
+            code_fragment : string
+                Source code fragment to filter for.
+            metric_name : string
+                Metric to report. One of "Accuracy", "Precision", "Recall", and
+                "ROC AUC" for classification problems, and "Mean Squared Error"
+                and "R-squared" for regression problems.
+        """
+        self._print_some_features(code_fragment, metric_name, User.name == self.__username)
+
+    def _print_some_features(self, code_fragment, metric_name, predicate):
+        """
+        Driver function for discover_features and print_my_features.
+        """
+        metric_name_default = "Accuracy"
+        if not metric_name:
+            metric_name = metric_name_default
+
         with self.__orm.session_scope() as session:
             query = self._filter_features(session, code_fragment)
-            query = query.join(Feature.user).filter(User.name != self.__username)
+
+            # Filter only users that are not me
+            query = query.join(Feature.user).filter(predicate)
+
+            # Join with metrics table
+            query = query.join(Metric)\
+                         .filter(Metric.name == metric_name)\
+                         .add_columns(Metric.name, Metric.value)
             features = query.all()
 
             if features:
                 for feature in features:
-                    self._print_one_feature(feature.score, feature.code)
+                    # each feature is a tuple (<feature>, metric_name, metric_value)
+                    self._print_one_feature(feature[0].description, feature[1],
+                            feature[2], feature[0].code)
             else:
                 print("No features found.")
 
-    def print_my_features(self):
-        """Print all features written by this user."""
-        with self.__orm.session_scope() as session:
-            query = self._filter_features(session, None)
-            query = query.join(Feature.user)\
-                         .filter(User.name == self.__username)
-            features = query.all()
-
-            if features:
-                for feature in features:
-                    self._print_one_feature(feature.score, feature.code)
-            else:
-                print("No features found.")
 
     def evaluate(self, feature):
         """
-        Return score of feature run on dataset sample.
+        Evaluate feature on training dataset, returning key performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
-        feature, performs cross validation, and returns the score.
+        feature, performs cross validation, and returns key performance metrics.
         """
 
         return self.__evaluation_client.evaluate(feature)
@@ -137,10 +167,6 @@ class Session(object):
             description = self._prompt_description()
 
         self.__evaluation_client.register_feature(feature, description)
-
-    def _abbrev_md5(self, md5):
-        """Return first MD5_ABBREV_LEN characters of md5"""
-        return md5[:MD5_ABBREV_LEN]
 
     def _load_dataset(self):
         # TODO check for dtypes file, assisting in low memory usage
@@ -172,26 +198,24 @@ class Session(object):
                 Feature.code.contains(code_fragment),
             )
 
-        return session.query(Feature).filter(*filter_).order_by(Feature.score)
+        return session.query(Feature).filter(*filter_)
 
     def _check_if_registered(self, feature, description, verbose=True):
         code    = get_source(feature)
         md5     = hashlib.md5(code).hexdigest()
 
         with self.__orm.session_scope() as session:
-            filters_= (
+            filters = (
                 Feature.problem_id == self.__problemid,
                 Feature.md5        == md5,
                 User.name          == self.__username,
             )
-            query = session.query(Feature.score)\
-                        .join(Feature.user)\
-                        .filter(*filters_)
-            score = query.scalar()
+            query = session.query(Feature, User).filter(*filters)
+            result = query.scalar()
 
-        if score:
+        if result:
             if verbose:
-                print("Feature already registered with score {}".format(score))
+                print("Feature already registered.")
             return True
 
         return False
@@ -202,22 +226,25 @@ class Session(object):
               " (If your feature fails to register, this description will be "
               "discarded.)")
 
-        try:
-            raw_input
-        except NameError:
-            raw_input = input
-
-        description = raw_input("Enter description: ")
+        description = input("Enter description: ")
+        print("")
         return description
 
     @staticmethod
-    def _print_one_feature(feature_score, feature_code):
-        print(dedent(
-        """
-        ------------------
-        Feature score: {0}
+    def _print_one_feature(feature_description, metric_names, metric_values,
+            feature_code):
+        result = "------------------\n" + \
+                 "*{}*\n".format(feature_description) + \
+                 "\n" + \
+                 "Feature metrics:\n"
 
-        Feature code:
-        {1}
-        \n
-        """.format(feature_score, feature_code)))
+        for metric_name, metric_value in zip(metric_names, metric_values):
+            result += "    {}: {}\n".format(metric_name, metric_value)
+
+        result += "\n"
+        result += "Feature code:\n"
+
+        for line in feature_code.split("\n"):
+            result += "    " + line + "\n"
+
+        print(result)

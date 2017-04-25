@@ -7,37 +7,37 @@ cd ../deploy
 source .env
 source .env.local >/dev/null 2>&1 || true
 
+# test parameters
+cd ../test
+source .env.test >/dev/null 2>&1 || true
+cd ../deploy
+
 # build
-make clean_all
+make clean
 make build
 make up
-sleep 20 # wait to complete
-./add_user.sh -a admin admin
-./add_user.sh user user
+sleep 15 # wait to complete
 
-# start admin container
-HUB_API_URL="http://$HUB_CONTAINER_NAME:8080/hub/api"
-ADMIN_USERNAME=admin
-docker exec -u root -i $HUB_CONTAINER_NAME \
-    bash <<EOF
-cd $FF_DATA_DIR/config/jupyterhub
-TOKEN=\$(jupyterhub token root)
-wget \
-    --quiet \
-    -O- \
-    --server-response \
-    --method=POST \
-    --header='Content-Type: application/json' \
-    --header='Accept: application/json' \
-    --header="Authorization: token \$TOKEN" \
-    '$HUB_API_URL/users/$ADMIN_USERNAME/server' 2>&1
-EOF
+# create users
+./add_user.sh -a ${ADMIN_USERNAME} ${ADMIN_PASSWORD}
+./add_user.sh ${USER_USERNAME} ${USER_PASSWORD}
+
+# start both containers
+./api_client.py start-server ${ADMIN_USERNAME}
+./api_client.py start-server ${USER_USERNAME}
 
 # wait for it to start
 sleep 5
 
-# execute some lines
+# run tests
+cd ../test
+
+# admin initialization
+docker cp ./test_admin.py ${FF_CONTAINER_NAME}-${ADMIN_USERNAME}:/tmp/test_admin.py
 docker exec -u ${ADMIN_USERNAME} -i ${FF_CONTAINER_NAME}-${ADMIN_USERNAME} \
-    bash <<EOF
-echo true;
-EOF
+    /opt/conda/bin/python3 /tmp/test_admin.py
+
+# user test
+#USER_USERNAME=user FF_CONTAINER_NAME=featurefactoryuser 
+docker cp ./test_user.py ${FF_CONTAINER_NAME}-${USER_USERNAME}:/tmp/test_user.py
+docker exec -u ${USER_USERNAME} -i ${FF_CONTAINER_NAME}-${USER_USERNAME} /opt/conda/bin/python3 /tmp/test_user.py

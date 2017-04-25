@@ -25,6 +25,7 @@ setup_files:
 	sudo cp ./jupyterhub_config.py $(FF_DATA_DIR)/config/jupyterhub/
 	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
 	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
+	sudo cp ../share/static/images/featurefactory.png $(FF_DATA_DIR)/config/jupyterhub
 
 .PHONY: teardown_files
 teardown_files:
@@ -123,3 +124,11 @@ monitor_delete:
 .PHONY: monitor_stop
 monitor_stop:
 	sudo ./monitor.py stop
+
+# Driver for rebuild_eval
+.PHONY: remove_eval
+remove_eval:
+	docker rm -f $(EVAL_CONTAINER_NAME)
+
+.PHONY: rebuild_eval
+rebuild_eval: build remove_eval up

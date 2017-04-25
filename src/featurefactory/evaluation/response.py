@@ -1,5 +1,6 @@
-from flask import Response
 import json
+from flask import Response
+from featurefactory.user.model import MetricList
 
 class EvaluationResponse(Response):
     """
@@ -9,9 +10,9 @@ class EvaluationResponse(Response):
     ----
         status_code : string
             Possible values are EvaluationResponse static members.
-        metrics : dict
-            Dictionary mapping names of different metrics to floating point
-            values.
+        metrics : list of Metric
+            List of Metric objects, which each encode metric name, metric scoring
+            method, and value.
     """
 
     STATUS_CODE_OKAY         = "okay"
@@ -23,7 +24,10 @@ class EvaluationResponse(Response):
 
     try_again = "Please try again later or contact administrator."
 
-    def __init__(self, status_code=STATUS_CODE_OKAY, metrics={}):
+    def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None):
+        if metrics is not None:
+            metrics = MetricList.from_object(metrics).convert(kind="user")
+
         d = {
             "status_code" : status_code,
             "metrics"     : metrics,
@@ -78,17 +82,8 @@ class EvaluationResponse(Response):
         else:
             return ""
 
-    @staticmethod
-    def _get_metrics_str(metrics):
-        metrics_str = "Feature evaluation metrics: "
-        line_prefix = "\n    "
-        if metrics:
-            for key in metrics:
-                metrics_str += line_prefix + "{}: {}".format(key, metrics[key])
-        else:
-            metrics_str += line_prefix + "<no metrics returned>"
-
-        return metrics_str
+    def _get_metrics_str(self):
+        return MetricList.from_object(self.metrics).to_string(kind="user")
 
     def __str__(self):
         """
@@ -97,5 +92,5 @@ class EvaluationResponse(Response):
         """
 
         explanation = self._get_explanation()
-        metrics_str = self._get_metrics_str(self.metrics)
+        metrics_str = self._get_metrics_str()
         return explanation + "\n\n" + metrics_str
