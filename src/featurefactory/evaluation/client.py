@@ -10,7 +10,7 @@ from featurefactory.admin.sqlalchemy_declarative import Problem
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.modeling                     import Model
 
-class EvaluationClient(object):
+class EvaluatorClient(object):
     def __init__(self, problem_id, username, orm, dataset={}):
         self.problem_id = problem_id
         self.username  = username
@@ -240,7 +240,7 @@ class EvaluationClient(object):
             #TODO exception handling
             self._reload_dataset()
 
-class Evaluator(EvaluationClient):
+class EvaluatorServer(EvaluatorClient):
     def __init__(self, problem_id, username, orm, dataset={}):
         super().__init__(problem_id, username, orm, dataset)
 

@@ -18,7 +18,7 @@ from featurefactory.evaluation.future import HubAuth
 import hashlib
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from featurefactory.evaluation                   import EvaluationResponse, Evaluator
+from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
 from featurefactory.util                         import get_function
@@ -157,7 +157,7 @@ def evaluate(user):
         # processing
         # - compute the CV score
         # - compute any other metrics
-        evaluator = Evaluator(problem_id, user_name, orm)
+        evaluator = EvaluatorServer(problem_id, user_name, orm)
         try:
             metrics = evaluator.evaluate(feature)
             # TODO expand schema

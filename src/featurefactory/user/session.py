@@ -10,7 +10,7 @@ from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User, Metric
 from featurefactory.modeling                     import Model
 from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation                   import EvaluationClient
+from featurefactory.evaluation                   import EvaluatorClient
 
 MD5_ABBREV_LEN = 8
 
@@ -47,7 +47,7 @@ class Session(object):
         self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluationClient(self.__problemid,
+        self.__evaluation_client = EvaluatorClient(self.__problemid,
                 self.__username, self.__orm, self.__dataset) 
 
     def _login(self):
