@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import sklearn.datasets
 
-from featurefactory.modeling import Model
+#from featurefactory.modeling.model_old import Model
+from featurefactory.modeling.model import Model
 from featurefactory.tests.util import EPSILON
 
 # ------------------------------------------------------------------------------ 
@@ -42,10 +43,10 @@ def test_classification():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Accuracy"]  - 0.9264705) < EPSILON
-    assert abs(metrics_user["Precision"] - 0.9264705) < EPSILON
-    assert abs(metrics_user["Recall"]    - 0.9199346) < EPSILON
-    assert abs(metrics_user["ROC AUC"]   - 0.9497549) < EPSILON
+    assert abs(metrics_user["Accuracy"]  - 0.9468954) < EPSILON
+    assert abs(metrics_user["Precision"] - 0.9468954) < EPSILON
+    assert abs(metrics_user["Recall"]    - 0.9468954) < EPSILON
+    assert abs(metrics_user["ROC AUC"]   - 0.9601715) < EPSILON
 
 def test_regression():
     metrics = _test_problem_type(Model.REGRESSION, data)
@@ -54,15 +55,12 @@ def test_regression():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Mean Squared Error"] - 24.8794703) < EPSILON
-    assert abs(metrics_user["R-squared"]          - 0.7714879)  < EPSILON
+    assert abs(metrics_user["Mean Squared Error"] - 20.7262935) < EPSILON
+    assert abs(metrics_user["R-squared"]          -  0.7393219) < EPSILON
 
 
 def _test_problem_type(problem_type, data):
-    random.seed(0)
-    np.random.seed(0)
     model = Model(problem_type)
     metrics = model.compute_metrics(data[problem_type]["X"],
                                     data[problem_type]["Y"])
-    print(metrics)
     return metrics

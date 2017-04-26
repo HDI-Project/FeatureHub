@@ -9,6 +9,8 @@ import tempfile
 import importlib.util
 from types import ModuleType
 
+RANDOM_STATE = 1754
+
 def _get_function_and_execute(f_dill, *args):
     f = dill.loads(f_dill)
     return f(*args)

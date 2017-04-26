@@ -7,6 +7,7 @@ from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurefactory.modeling.metrics import Metric, MetricList
+from featurefactory.util import RANDOM_STATE
 
 class Model(object):
     CLASSIFICATION = "classification"
@@ -30,9 +31,9 @@ class Model(object):
         self.problem_type = problem_type
 
         if self.problem_type == Model.CLASSIFICATION:
-            self.model = DecisionTreeClassifier()
+            self.model = DecisionTreeClassifier(random_state=RANDOM_STATE+1)
         elif self.problem_type == Model.REGRESSION:
-            self.model = DecisionTreeRegressor()
+            self.model = DecisionTreeRegressor(random_state=RANDOM_STATE+2)
         else:
             raise NotImplementedError
 
@@ -94,9 +95,9 @@ class Model(object):
         }
 
         if self._is_classification():
-            kf = StratifiedKFold(shuffle=True, random_state=1754)
+            kf = StratifiedKFold(shuffle=True, random_state=RANDOM_STATE+3)
         else:
-            kf = KFold(shuffle=True, random_state=1754)
+            kf = KFold(shuffle=True, random_state=RANDOM_STATE+4)
 
         # Split data, train model, and evaluate metric. We fit the model just
         # once per fold.
@@ -116,10 +117,8 @@ class Model(object):
                     score = params[scoring]["scorer"](Y_test, Y_test_pred)
                 except ValueError as e:
                     score = np.nan
-                    #print(traceback.format_exc(), file=sys.stderr)
                 scoring_outputs[scoring].append(score)
 
-        #print(scoring_outputs, file=sys.stderr)
         for scoring in scoring_outputs:
             score_mean = np.nanmean(scoring_outputs[scoring])
             if np.isnan(score_mean):
