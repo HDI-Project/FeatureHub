@@ -2,7 +2,7 @@ import traceback
 import sys
 import numpy as np
 import sklearn.metrics
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import KFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurefactory.modeling.metrics import Metric, MetricList
@@ -15,7 +15,7 @@ class Model(object):
         { "name" : "Accuracy"  , "scoring" : "accuracy" },
         { "name" : "Precision" , "scoring" : "precision" },
         { "name" : "Recall"    , "scoring" : "recall" },
-        #{ "name" : "ROC AUC"   , "scoring" : "roc_auc" },
+        { "name" : "ROC AUC"   , "scoring" : "roc_auc" },
     ]
     REGRESSION_SCORING = [
         { "name" : "Mean Squared Error" , "scoring" : "mean_squared_error" },
@@ -70,8 +70,8 @@ class Model(object):
             scorer = lambda y_true, y_pred: sklearn.metrics.roc_auc_score(
                     y_true, y_pred, average=metric_aggregation)
             predictor        = lambda model, X_test: model.predict_proba(X_test)
-            transform_Y_test = lambda Y_test: OneHotEncoder(n_values=n_classes,
-                    sparse=False).fit_transform(Y_test)
+            transform_Y_test = lambda Y_test: label_binarize(Y_test,
+                    classes=[x for x in range(n_classes)])
         elif scoring=="mean_squared_error":
             scorer           = sklearn.metrics.mean_squared_error
             predictor        = lambda model, X_test: model.predict(X_test)
@@ -103,6 +103,11 @@ class Model(object):
         that these values may be numpy floating points, and should be
         converted prior to insertion in a database.
         """
+
+        # just ensure that we np for everything
+        X = np.array(X)
+        Y = np.array(Y)
+
         # scoring_types maps user-readable name to `scoring`, as argument to
         # cross_val_score
         # See also http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter

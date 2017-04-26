@@ -1,9 +1,12 @@
 import sys
+import random
 import featurefactory.util
 import numpy as np
+import pandas as pd
 import sklearn.datasets
 
 from featurefactory.modeling import Model
+from featurefactory.tests.util import EPSILON
 
 # ------------------------------------------------------------------------------ 
 # Create fake data
@@ -21,13 +24,44 @@ data = {
     },
 }
 
+data_pd = {
+    Model.CLASSIFICATION : {
+        "X" : pd.DataFrame(X_classification),
+        "Y" : pd.DataFrame(Y_classification),
+    },
+    Model.REGRESSION : {
+        "X" : pd.DataFrame(X_regression),
+        "Y" : pd.DataFrame(Y_regression),
+    },
+}
+
 def test_classification():
-    _test_problem_type(Model.CLASSIFICATION)
+    metrics = _test_problem_type(Model.CLASSIFICATION, data)
+    metrics_pd = _test_problem_type(Model.CLASSIFICATION, data_pd)
+
+    assert metrics==metrics_pd
+
+    metrics_user = metrics.convert(kind="user")
+    assert abs(metrics_user["Accuracy"] - 0.9666666)  < EPSILON
+    assert abs(metrics_user["Precision"] - 0.9133333) < EPSILON
+    assert abs(metrics_user["Recall"] - 0.9466666)    < EPSILON
+    assert abs(metrics_user["ROC AUC"] - 0.9550000)   < EPSILON
 
 def test_regression():
-    _test_problem_type(Model.REGRESSION)
+    metrics = _test_problem_type(Model.REGRESSION, data)
+    metrics_pd = _test_problem_type(Model.REGRESSION, data_pd)
 
-def _test_problem_type(problem_type):
+    assert metrics==metrics_pd
+
+    metrics_user = metrics.convert(kind="user")
+    assert abs(metrics_user["Mean Squared Error"] - 24.4079908) < EPSILON
+    assert abs(metrics_user["R-squared"] - 0.7415685)           < EPSILON
+
+
+def _test_problem_type(problem_type, data):
+    random.seed(0)
+    np.random.seed(0)
     model = Model(problem_type)
     metrics = model.compute_metrics(data[problem_type]["X"],
                                     data[problem_type]["Y"])
+    return metrics
