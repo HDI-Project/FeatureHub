@@ -237,17 +237,19 @@ class Session(object):
     def _print_one_feature(feature_description, feature_id, feature_code,
             metric_list):
         result = "------------------\n" + \
-                 "*{}* (id: {})\n".format(feature_description, feature_id) + \
-                 "\n" + \
-                 "Feature metrics:\n"
+                 "Feature id: {}\n".format(feature_id) + \
+                 "Feature description: {}\n".format(feature_description)
 
-        for metric_name, metric_value in metric_list:
-            result += "    {}: {}\n".format(metric_name, metric_value)
-
-        result += "\n"
-        result += "Feature code:\n"
+        result += "\n" + \
+                  "Feature code:\n"
 
         for line in feature_code.split("\n"):
             result += "    " + line + "\n"
+
+        result += "\n" + \
+                  "Feature metrics:\n"
+
+        for metric_name, metric_value in metric_list:
+            result += "    {}: {}\n".format(metric_name, metric_value)
 
         print(result)
