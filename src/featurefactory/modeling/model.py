@@ -1,4 +1,9 @@
-from sklearn.model_selection import cross_val_score
+import traceback
+import sys
+import numpy as np
+import sklearn.metrics
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import KFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurefactory.modeling.metrics import Metric, MetricList
 
@@ -10,12 +15,15 @@ class Model(object):
         { "name" : "Accuracy"  , "scoring" : "accuracy" },
         { "name" : "Precision" , "scoring" : "precision" },
         { "name" : "Recall"    , "scoring" : "recall" },
-        { "name" : "ROC AUC"   , "scoring" : "roc_auc" },
+        #{ "name" : "ROC AUC"   , "scoring" : "roc_auc" },
     ]
     REGRESSION_SCORING = [
-        { "name" : "Mean Squared Error" , "scoring" : "neg_mean_squared_error" },
+        { "name" : "Mean Squared Error" , "scoring" : "mean_squared_error" },
         { "name" : "R-squared"          , "scoring" : "r2" }                     ,
     ]
+
+    BINARY_METRIC_AGGREGATION = "average"
+    MULTICLASS_METRIC_AGGREGATION = "micro"
 
     def __init__(self, problem_type):
         self.problem_type = problem_type
@@ -27,10 +35,64 @@ class Model(object):
         else:
             raise NotImplementedError
 
-    def cv_score_mean(self, X, Y, scoring="accuracy"):
-        if len(X.shape) == 1:    # 1d arrays are not supported anymore by
+    def cv_score_mean(self, X, Y, scoring):
+        # 1d arrays are deprecated by sklearn 0.17
+        if len(X.shape) == 1:
             X = X.reshape(-1, 1)
-        return cross_val_score(self.model, X, Y, scoring=scoring, n_jobs=-1).mean()
+
+        if len(Y.shape) == 1:
+            Y = Y.reshape(-1, 1)
+
+        # Determine binary/multiclass classification
+        n_classes = len(np.unique(Y))
+        if n_classes > 2:
+            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
+        else:
+            metric_aggregation = Model.BINARY_METRIC_AGGREGATION
+
+        # Determine predictor (labels, label probabilities, or values) and
+        # scoring function.
+        if scoring=="accuracy":
+            scorer           = sklearn.metrics.accuracy_score
+            predictor        = lambda model, X_test: model.predict(X_test)
+            transform_Y_test = lambda Y_test: Y_test
+        elif scoring=="precision":
+            scorer = lambda y_true, y_pred: sklearn.metrics.precision_score(
+                    y_true, y_pred, average=metric_aggregation)
+            predictor        = lambda model, X_test: model.predict(X_test)
+            transform_Y_test = lambda Y_test: Y_test
+        elif scoring=="recall":
+            scorer = lambda y_true, y_pred: sklearn.metrics.recall_score(
+                    y_true, y_pred, average=metric_aggregation)
+            predictor        = lambda model, X_test: model.predict(X_test)
+            transform_Y_test = lambda Y_test: Y_test
+        elif scoring=="roc_auc":
+            scorer = lambda y_true, y_pred: sklearn.metrics.roc_auc_score(
+                    y_true, y_pred, average=metric_aggregation)
+            predictor        = lambda model, X_test: model.predict_proba(X_test)
+            transform_Y_test = lambda Y_test: OneHotEncoder(n_values=n_classes,
+                    sparse=False).fit_transform(Y_test)
+        elif scoring=="mean_squared_error":
+            scorer           = sklearn.metrics.mean_squared_error
+            predictor        = lambda model, X_test: model.predict(X_test)
+            transform_Y_test = lambda Y_test: Y_test
+        elif scoring=="r2":
+            scorer           = sklearn.metrics.r2_score
+            predictor        = lambda model, X_test: model.predict(X_test)
+            transform_Y_test = lambda Y_test: Y_test
+
+        kf = KFold(shuffle=True)
+        scores = []
+        for train_inds, test_inds in kf.split(X, Y):
+            X_train, X_test = X[train_inds], X[test_inds]
+            Y_train, Y_test = Y[train_inds], Y[test_inds]
+            self.model.fit(X_train, Y_train)
+            Y_test_pred = predictor(self.model, X_test)
+            Y_test_tr = transform_Y_test(Y_test)
+            score = scorer(Y_test_tr, Y_test_pred)
+            scores.append(score)
+
+        return np.mean(scores)
 
     def compute_metrics(self, X, Y):
         """
@@ -55,11 +117,13 @@ class Model(object):
         for v in scoring_list:
             name    = v["name"]
             scoring = v["scoring"]
+
             try:
                 value = self.cv_score_mean(X, Y, scoring=scoring)
                 metric_list.append(Metric(name, scoring, value))
             except Exception:
                 metric_list.append(Metric(name, scoring, None))
+                raise
 
         return metric_list
 

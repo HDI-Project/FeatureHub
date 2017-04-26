@@ -1,20 +1,14 @@
+import sys
 import featurefactory.util
 import numpy as np
+import sklearn.datasets
 
 from featurefactory.modeling import Model
 
 # ------------------------------------------------------------------------------ 
 # Create fake data
-X_classification = np.array([
-    [6, 8, 6, 7],
-    [1, 1, 1, 4],
-    [0, 0.5, -1, 3],
-])
-X_regression = np.copy(X_classification)
-Y_regression = np.array(
-    [0.3, 0.7, 1.5]
-)
-Y_classification  = np.round(np.arctan(Y_regression))
+(X_classification, Y_classification) = sklearn.datasets.load_iris(return_X_y=True)
+(X_regression, Y_regression)         = sklearn.datasets.load_boston(return_X_y=True)
 
 data = {
     Model.CLASSIFICATION : {
