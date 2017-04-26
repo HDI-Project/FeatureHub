@@ -42,10 +42,10 @@ def test_classification():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Accuracy"] - 0.9666666)  < EPSILON
-    assert abs(metrics_user["Precision"] - 0.9133333) < EPSILON
-    assert abs(metrics_user["Recall"] - 0.9466666)    < EPSILON
-    assert abs(metrics_user["ROC AUC"] - 0.9550000)   < EPSILON
+    assert abs(metrics_user["Accuracy"] - 0.9264705)  < EPSILON
+    assert abs(metrics_user["Precision"] - 0.9264705) < EPSILON
+    assert abs(metrics_user["Recall"] - 0.9199346)    < EPSILON
+    assert abs(metrics_user["ROC AUC"] - 0.9497549)   < EPSILON
 
 def test_regression():
     metrics = _test_problem_type(Model.REGRESSION, data)
@@ -54,8 +54,8 @@ def test_regression():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Mean Squared Error"] - 24.4079908) < EPSILON
-    assert abs(metrics_user["R-squared"] - 0.7415685)           < EPSILON
+    assert abs(metrics_user["Mean Squared Error"] - 24.8794703) < EPSILON
+    assert abs(metrics_user["R-squared"] - 0.7714879)           < EPSILON
 
 
 def _test_problem_type(problem_type, data):
@@ -64,4 +64,5 @@ def _test_problem_type(problem_type, data):
     model = Model(problem_type)
     metrics = model.compute_metrics(data[problem_type]["X"],
                                     data[problem_type]["Y"])
+    print(metrics)
     return metrics

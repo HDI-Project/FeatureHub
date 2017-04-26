@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import sklearn.metrics
 from sklearn.preprocessing import label_binarize
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurefactory.modeling.metrics import Metric, MetricList
 
@@ -36,12 +36,11 @@ class Model(object):
             raise NotImplementedError
 
     def cv_score_mean(self, X, Y, scoring):
-        # 1d arrays are deprecated by sklearn 0.17
+        # 1d arrays are deprecated by sklearn 0.17 (?)
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
 
-        if len(Y.shape) == 1:
-            Y = Y.reshape(-1, 1)
+        Y = Y.ravel()
 
         # Determine binary/multiclass classification
         n_classes = len(np.unique(Y))
@@ -53,46 +52,54 @@ class Model(object):
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
         if scoring=="accuracy":
-            scorer           = sklearn.metrics.accuracy_score
-            predictor        = lambda model, X_test: model.predict(X_test)
-            transform_Y_test = lambda Y_test: Y_test
+            predictor = lambda model, X_test: model.predict(X_test)
+            scorer = sklearn.metrics.accuracy_score
         elif scoring=="precision":
+            predictor = lambda model, X_test: model.predict(X_test)
             scorer = lambda y_true, y_pred: sklearn.metrics.precision_score(
                     y_true, y_pred, average=metric_aggregation)
-            predictor        = lambda model, X_test: model.predict(X_test)
-            transform_Y_test = lambda Y_test: Y_test
         elif scoring=="recall":
+            predictor = lambda model, X_test: model.predict(X_test)
             scorer = lambda y_true, y_pred: sklearn.metrics.recall_score(
                     y_true, y_pred, average=metric_aggregation)
-            predictor        = lambda model, X_test: model.predict(X_test)
-            transform_Y_test = lambda Y_test: Y_test
         elif scoring=="roc_auc":
-            scorer = lambda y_true, y_pred: sklearn.metrics.roc_auc_score(
-                    y_true, y_pred, average=metric_aggregation)
-            predictor        = lambda model, X_test: model.predict_proba(X_test)
-            transform_Y_test = lambda Y_test: label_binarize(Y_test,
-                    classes=[x for x in range(n_classes)])
+            predictor = lambda model, X_test: model.predict_proba(X_test)
+            def scorer(y_true, y_pred):
+                y_true = label_binarize(y_true, classes=[x for x in
+                    range(n_classes)])
+                return sklearn.metrics.roc_auc_score( y_true, y_pred,
+                        average=metric_aggregation)
         elif scoring=="mean_squared_error":
-            scorer           = sklearn.metrics.mean_squared_error
-            predictor        = lambda model, X_test: model.predict(X_test)
-            transform_Y_test = lambda Y_test: Y_test
+            predictor = lambda model, X_test: model.predict(X_test)
+            scorer = sklearn.metrics.mean_squared_error
         elif scoring=="r2":
-            scorer           = sklearn.metrics.r2_score
-            predictor        = lambda model, X_test: model.predict(X_test)
-            transform_Y_test = lambda Y_test: Y_test
+            predictor = lambda model, X_test: model.predict(X_test)
+            scorer = sklearn.metrics.r2_score
 
-        kf = KFold(shuffle=True)
+        if self._is_classification():
+            kf = StratifiedKFold(shuffle=True, random_state=1754)
+        else:
+            kf = KFold(shuffle=True, random_state=1754)
+
+        # split data, train model, and evaluate metric
         scores = []
         for train_inds, test_inds in kf.split(X, Y):
             X_train, X_test = X[train_inds], X[test_inds]
             Y_train, Y_test = Y[train_inds], Y[test_inds]
+
             self.model.fit(X_train, Y_train)
+
+            # Make and evaluate predictions. Note that ROC AUC may raise
+            # exception if somehow we only have examples from one class in a
+            # given fold.
             Y_test_pred = predictor(self.model, X_test)
-            Y_test_tr = transform_Y_test(Y_test)
-            score = scorer(Y_test_tr, Y_test_pred)
+            try:
+                score = scorer(Y_test, Y_test_pred)
+            except ValueError:
+                score = np.nan
             scores.append(score)
 
-        return np.mean(scores)
+        return np.nanmean(scores)
 
     def compute_metrics(self, X, Y):
         """
