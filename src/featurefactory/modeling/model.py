@@ -2,6 +2,7 @@ import traceback
 import sys
 import numpy as np
 import sklearn.metrics
+from collections import defaultdict
 from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -19,7 +20,7 @@ class Model(object):
     ]
     REGRESSION_SCORING = [
         { "name" : "Mean Squared Error" , "scoring" : "mean_squared_error" },
-        { "name" : "R-squared"          , "scoring" : "r2" }                     ,
+        { "name" : "R-squared"          , "scoring" : "r2" },
     ]
 
     BINARY_METRIC_AGGREGATION = "average"
@@ -35,12 +36,14 @@ class Model(object):
         else:
             raise NotImplementedError
 
-    def cv_score_mean(self, X, Y, scoring):
+    def cv_score_mean(self, X, Y, scorings):
         # 1d arrays are deprecated by sklearn 0.17 (?)
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
 
         Y = Y.ravel()
+
+        scorings = list(scorings)
 
         # Determine binary/multiclass classification
         n_classes = len(np.unique(Y))
@@ -51,55 +54,79 @@ class Model(object):
 
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
-        if scoring=="accuracy":
-            predictor = lambda model, X_test: model.predict(X_test)
-            scorer = sklearn.metrics.accuracy_score
-        elif scoring=="precision":
-            predictor = lambda model, X_test: model.predict(X_test)
-            scorer = lambda y_true, y_pred: sklearn.metrics.precision_score(
-                    y_true, y_pred, average=metric_aggregation)
-        elif scoring=="recall":
-            predictor = lambda model, X_test: model.predict(X_test)
-            scorer = lambda y_true, y_pred: sklearn.metrics.recall_score(
-                    y_true, y_pred, average=metric_aggregation)
-        elif scoring=="roc_auc":
-            predictor = lambda model, X_test: model.predict_proba(X_test)
-            def scorer(y_true, y_pred):
-                y_true = label_binarize(y_true, classes=[x for x in
-                    range(n_classes)])
-                return sklearn.metrics.roc_auc_score( y_true, y_pred,
-                        average=metric_aggregation)
-        elif scoring=="mean_squared_error":
-            predictor = lambda model, X_test: model.predict(X_test)
-            scorer = sklearn.metrics.mean_squared_error
-        elif scoring=="r2":
-            predictor = lambda model, X_test: model.predict(X_test)
-            scorer = sklearn.metrics.r2_score
+        def predict_fn(model, X_test):
+            return model.predict(X_test)
+        def predict_prob_fn(model, X_test):
+            return model.predict_proba(X_test)
+        def roc_auc_scorer(y_true, y_pred):
+            y_true = label_binarize(y_true, classes=[x for x in
+                range(n_classes)])
+            return sklearn.metrics.roc_auc_score(y_true, y_pred,
+                    average=metric_aggregation)
+
+        params = {
+            "accuracy" : {
+                "predictor" : predict_fn,
+                "scorer" : sklearn.metrics.accuracy_score,
+            },
+            "precision" : {
+                "predictor" : predict_fn,
+                "scorer" : lambda y_true, y_pred: sklearn.metrics.precision_score(
+                        y_true, y_pred, average=metric_aggregation),
+            },
+            "recall" : {
+                "predictor" : predict_fn,
+                "scorer" : lambda y_true, y_pred: sklearn.metrics.recall_score(
+                        y_true, y_pred, average=metric_aggregation),
+            },
+            "roc_auc" : {
+                "predictor" : predict_prob_fn,
+                "scorer" : roc_auc_scorer,
+            },
+            "mean_squared_error" : {
+                "predictor" : predict_fn,
+                "scorer" : sklearn.metrics.mean_squared_error,
+            },
+            "r2" : {
+                "predictor" : predict_fn,
+                "scorer" : sklearn.metrics.r2_score
+            },
+        }
 
         if self._is_classification():
             kf = StratifiedKFold(shuffle=True, random_state=1754)
         else:
             kf = KFold(shuffle=True, random_state=1754)
 
-        # split data, train model, and evaluate metric
-        scores = []
+        # Split data, train model, and evaluate metric. We fit the model just
+        # once per fold.
+        scoring_outputs = defaultdict(lambda : [])
         for train_inds, test_inds in kf.split(X, Y):
             X_train, X_test = X[train_inds], X[test_inds]
             Y_train, Y_test = Y[train_inds], Y[test_inds]
 
             self.model.fit(X_train, Y_train)
 
-            # Make and evaluate predictions. Note that ROC AUC may raise
-            # exception if somehow we only have examples from one class in a
-            # given fold.
-            Y_test_pred = predictor(self.model, X_test)
-            try:
-                score = scorer(Y_test, Y_test_pred)
-            except ValueError:
-                score = np.nan
-            scores.append(score)
+            for scoring in scorings:
+                # Make and evaluate predictions. Note that ROC AUC may raise
+                # exception if somehow we only have examples from one class in
+                # a given fold.
+                Y_test_pred = params[scoring]["predictor"](self.model, X_test)
+                try:
+                    score = params[scoring]["scorer"](Y_test, Y_test_pred)
+                except ValueError as e:
+                    score = np.nan
+                    #print(traceback.format_exc(), file=sys.stderr)
+                scoring_outputs[scoring].append(score)
 
-        return np.nanmean(scores)
+        #print(scoring_outputs, file=sys.stderr)
+        for scoring in scoring_outputs:
+            score_mean = np.nanmean(scoring_outputs[scoring])
+            if np.isnan(score_mean):
+                score_mean = None
+            scoring_outputs[scoring] = score_mean
+
+        return scoring_outputs
 
     def compute_metrics(self, X, Y):
         """
@@ -125,17 +152,22 @@ class Model(object):
         else:
             raise NotImplementedError
 
+        # compute scores
+        scores = self.cv_score_mean(X, Y, scorings=[d["scoring"] for d in
+            scoring_list])
+
+        # unpack into MetricList
         metric_list = MetricList()
         for v in scoring_list:
             name    = v["name"]
             scoring = v["scoring"]
 
-            try:
-                value = self.cv_score_mean(X, Y, scoring=scoring)
-                metric_list.append(Metric(name, scoring, value))
-            except Exception:
-                metric_list.append(Metric(name, scoring, None))
-                raise
+            if scoring in scores:
+                value = scores[scoring]
+            else:
+                value = None
+
+            metric_list.append(Metric(name, scoring, value))
 
         return metric_list
 
