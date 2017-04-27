@@ -1,7 +1,6 @@
 featurefactory
 ==============
 
-.. toctree::
-   :maxdepth: 4
-
-   featurefactory
+.. automodule:: featurefactory
+   :members:
+   :undoc-members:

@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>featurefactory.evaluation.client &#8212; Feature Factory 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for featurefactory.evaluation.client</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">featurefactory.util</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">compute_dataset_hash</span><span class="p">,</span> <span class="n">run_isolated</span><span class="p">,</span> <span class="n">get_source</span><span class="p">,</span> <span class="n">possibly_talking_action</span><span class="p">,</span>
+    <span class="n">myhash</span>
+
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">featurefactory.admin.sqlalchemy_declarative</span> <span class="k">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">Feature</span>
+<span class="kn">from</span> <span class="nn">featurefactory.evaluation</span>                   <span class="k">import</span> <span class="n">EvaluationResponse</span>
+<span class="kn">from</span> <span class="nn">featurefactory.modeling</span>                     <span class="k">import</span> <span class="n">Model</span>
+
+<div class="viewcode-block" id="EvaluatorClient"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorClient">[docs]</a><span class="k">class</span> <span class="nc">EvaluatorClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">orm</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">=</span> <span class="n">problem_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span>  <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orm</span>       <span class="o">=</span> <span class="n">orm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>   <span class="o">=</span> <span class="n">dataset</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span> <span class="o">=</span> <span class="n">compute_dataset_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="EvaluatorClient.check_if_registered"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorClient.check_if_registered">[docs]</a>    <span class="k">def</span> <span class="nf">check_if_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if feature is registered.</span>
+
+<span class="sd">        Extracts source code, then looks for the identical source code in the</span>
+<span class="sd">        feature database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature : function</span>
+<span class="sd">        verbose : bool</span>
+<span class="sd">            Whether to print output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">code</span>    <span class="o">=</span> <span class="n">get_source</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_if_registered</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_if_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">md5</span> <span class="o">=</span> <span class="n">myhash</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">filters</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Feature</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">,</span>
+                <span class="n">Feature</span><span class="o">.</span><span class="n">md5</span>        <span class="o">==</span> <span class="n">md5</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Feature</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">scalar</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature already registered.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="EvaluatorClient.register_feature"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorClient.register_feature">[docs]</a>    <span class="k">def</span> <span class="nf">register_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Submit feature to server for evaluation on test data.</span>
+<span class="sd">        </span>
+<span class="sd">        If successful, registers feature in feature database and returns key</span>
+<span class="sd">        performance metrics.</span>
+
+<span class="sd">        Runs the feature in an isolated environment to extract the feature</span>
+<span class="sd">        values. Validates the feature values. Then, builds a model on that one</span>
+<span class="sd">        feature, performs cross validation, and returns key performance</span>
+<span class="sd">        metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature : function</span>
+<span class="sd">            Feature to evaluate</span>
+<span class="sd">        description : str</span>
+<span class="sd">            Feature description</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># request from eval-server directly</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">/services/eval-server/evaluate&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;EVAL_CONTAINER_NAME&quot;</span><span class="p">],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;EVAL_CONTAINER_PORT&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">get_source</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;database&quot;</span>    <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">database</span><span class="p">,</span>
+            <span class="s2">&quot;problem_id&quot;</span>  <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">,</span>
+            <span class="s2">&quot;code&quot;</span>        <span class="p">:</span> <span class="n">code</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span> <span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Authorization&quot;</span> <span class="p">:</span> <span class="s2">&quot;token </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JUPYTERHUB_API_TOKEN&quot;</span><span class="p">]),</span>
+        <span class="p">}</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">eval_response</span> <span class="o">=</span> <span class="n">EvaluationResponse</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">eval_response</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># TODO</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;response failed with exception&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;response failed with bad status code&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="EvaluatorClient.evaluate"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorClient.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate feature on training dataset and return key performance metrics.</span>
+
+<span class="sd">        Runs the feature in an isolated environment to extract the feature</span>
+<span class="sd">        values. Validates the feature values. Then, builds a model on that one</span>
+<span class="sd">        feature and computes key cross-validated metrics. Prints results and</span>
+<span class="sd">        returns a dictionary with (metric =&gt; value) entries. If the feature is</span>
+<span class="sd">        invalid, prints reason and returns empty dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature : function</span>
+<span class="sd">            Feature to evaluate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">metrics_str</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+            <span class="n">metrics_user</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">metrics_str</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">metrics_user</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature is not valid: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Obtaining dataset...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_dataset</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Extracting features...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_features</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+        <span class="c1"># confirm dataset has not been changed</span>
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Verifying dataset integrity...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_verify_dataset_integrity</span><span class="p">()</span>
+
+        <span class="c1"># validate</span>
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Validating feature values...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_feature_values</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># extract label</span>
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Extracting label...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_label</span><span class="p">()</span>
+
+        <span class="c1"># compute metrics</span>
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Computing metrics...&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_metrics</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metrics</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># The rest of these methods are subroutines within _evaluate, or utility</span>
+    <span class="c1"># functions of those subroutines.</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="nf">_compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="c1"># TODO this may be a sub-transaction</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>\
+                    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="n">problem_type</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">problem_type</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">problem_type</span><span class="p">)</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metrics</span>
+
+    <span class="k">def</span> <span class="nf">_extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Callable</span><span class="p">),</span> \
+                <span class="s2">&quot;feature must be a function!&quot;</span>
+
+        <span class="k">return</span> <span class="n">run_isolated</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_extract_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>\
+                    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="n">target_table_name</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">target_table_name</span>
+            <span class="n">y_column</span>          <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">y_column</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">target_table_name</span><span class="p">][</span><span class="n">y_column</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load dataset if not present.</span>
+<span class="sd">        </span>
+<span class="sd">        Also computes/re-computes dataset hash.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO check for dtypes file, facilitating lower memory usage</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                <span class="c1"># TODO this may be a sub-transaction</span>
+                <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>\
+                        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="n">problem_files</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">files</span>
+                <span class="n">problem_table_names</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">table_names</span>
+                <span class="n">problem_data_path</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">data_path</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">problem_files</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
+                    <span class="n">problem_table_names</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)):</span>
+                <span class="n">abs_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">problem_data_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_filename</span><span class="p">,</span>
+                        <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># compute/recompute hash</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span> <span class="o">=</span> <span class="n">compute_dataset_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span> <span class="o">=</span> <span class="n">compute_dataset_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
+
+    <span class="k">def</span> <span class="nf">_reload_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Force reload of dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_dataset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate_feature_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether feature values are valid.</span>
+
+<span class="sd">        Currently checks if the feature is a DataFrame of the correct</span>
+<span class="sd">        dimensions. If the feature is valid, returns an empty string. Otherwise,</span>
+<span class="sd">        returns a semicolon-delimited list of reasons that the feature is</span>
+<span class="sd">        invalid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature_values : np array-like</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="c1"># TODO this may be a sub-transaction</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="n">target_table_name</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">target_table_name</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># must be a data frame</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_values</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;does not return DataFrame&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># must have the right shape</span>
+        <span class="n">expected_shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">target_table_name</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feature_values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;returns DataFrame of invalid shape &quot;</span>
+                <span class="s2">&quot;(actual </span><span class="si">{}</span><span class="s2">, expected </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">feature_values</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">expected_shape</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_verify_dataset_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_hash</span> <span class="o">=</span> <span class="n">compute_dataset_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span> <span class="o">!=</span> <span class="n">new_hash</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Old hash: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dataset_hash</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New hash: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new_hash</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="c1">#TODO exception handling</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reload_dataset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EvaluatorServer"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorServer">[docs]</a><span class="k">class</span> <span class="nc">EvaluatorServer</span><span class="p">(</span><span class="n">EvaluatorClient</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">orm</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">problem_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">orm</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EvaluatorServer.check_if_registered"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorServer.check_if_registered">[docs]</a>    <span class="k">def</span> <span class="nf">check_if_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if feature is registered.</span>
+
+<span class="sd">        Overwrites client method by expecting code to be passed directly. This</span>
+<span class="sd">        is because on the server, we are limited to be unable to do code -&gt;</span>
+<span class="sd">        function -&gt; code.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        code : str</span>
+<span class="sd">        verbose : bool, optional (default=False)</span>
+<span class="sd">            Whether to print output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_if_registered</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvaluatorServer.evaluate"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorServer.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate feature.</span>
+
+<span class="sd">        Returns a dictionary with (metric =&gt; value) entries. If the feature is</span>
+<span class="sd">        invalid, re-raises the ValueError.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature : function</span>
+<span class="sd">            Feature to evaluate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">metrics</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="EvaluatorServer.register_feature"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.client.EvaluatorServer.register_feature">[docs]</a>    <span class="k">def</span> <span class="nf">register_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Does nothing.</span>
+
+<span class="sd">        This class is instantiated at the server, thus we are already</span>
+<span class="sd">        registering the feature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># doesn&#39;t do anything different</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_compute_metrics</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metrics</span>
+
+    <span class="k">def</span> <span class="nf">_verify_dataset_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Does nothing.</span>
+
+<span class="sd">        Don&#39;t need to verify dataset integrity on server because we re-load</span>
+<span class="sd">        the dataset for every new feature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Micah Smith.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

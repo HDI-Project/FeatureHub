@@ -62,8 +62,25 @@
 features.</p>
 <dl class="method">
 <dt id="featurefactory.admin.admin.Commands.create_problem">
-<code class="descname">create_problem</code><span class="sig-paren">(</span><em>name</em>, <em>problem_type</em>, <em>data_path</em>, <em>files</em>, <em>y_index</em>, <em>y_column</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.create_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.create_problem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_problem</code><span class="sig-paren">(</span><em>name</em>, <em>problem_type</em>, <em>data_path</em>, <em>files</em>, <em>table_names</em>, <em>target_table_name</em>, <em>y_column</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.create_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.create_problem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new problem entry in database.</p>
+<p>name : str
+problem_type : str
+data_path : str</p>
+<blockquote>
+<div>Absolute path of containing directory of data files.</div></blockquote>
+<dl class="docutils">
+<dt>files <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
+<dd>List of file paths relative to data_path</dd>
+<dt>table_names <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
+<dd>List of table names, corresponding exactly to files</dd>
+<dt>target_table_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Name of table that contains the target variable (label). Must be
+found in table_names.</dd>
+<dt>y_column <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Name of column in target_table_name that identifies the target
+variable.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -79,19 +96,13 @@ features.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="featurefactory.admin.admin.Commands.print_feature">
-<code class="descname">print_feature</code><span class="sig-paren">(</span><em>user_name</em>, <em>md5=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.print_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.print_feature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print the code of the requested feature.</p>
-<p>If there is more than one feature with the same name, only the
-latest version is printed.
-Alternatively, the feature md5 can be passed to select a particular feature.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="featurefactory.admin.admin.Commands.set_up">
 <code class="descname">set_up</code><span class="sig-paren">(</span><em>drop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.set_up" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new DB and create the initial scheme.</p>
-<p>If the DB already exists, it will be dropped if the drop argument is True.</p>
+<dl class="docutils">
+<dt>drop <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
+<dd>Drop database if it already exists.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -139,11 +150,6 @@ Alternatively, the feature md5 can be passed to select a particular feature.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.score">
-<code class="descname">score</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.score" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Feature.user">
 <code class="descname">user</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.user" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -151,6 +157,47 @@ Alternatively, the feature md5 can be passed to select a particular feature.</p>
 <dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Feature.user_id">
 <code class="descname">user_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">Metric</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.created_at">
+<code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.feature">
+<code class="descname">feature</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.feature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.feature_id">
+<code class="descname">feature_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.feature_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.id">
+<code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.name">
+<code class="descname">name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.scoring">
+<code class="descname">scoring</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.scoring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Metric.value">
+<code class="descname">value</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Metric.value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -190,13 +237,23 @@ Alternatively, the feature md5 can be passed to select a particular feature.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_column">
-<code class="descname">y_column</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_column" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.table_names">
+<code class="descname">table_names</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.table_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_index">
-<code class="descname">y_index</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_index" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.target_table_name">
+<code class="descname">target_table_name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.target_table_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.urlencode">
+<code class="descname">urlencode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Problem.urlencode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.urlencode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_column">
+<code class="descname">y_column</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_column" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -205,6 +262,11 @@ Alternatively, the feature md5 can be passed to select a particular feature.</p>
 <dt id="featurefactory.admin.sqlalchemy_declarative.User">
 <em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">User</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User.created_at">
+<code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.User.id">
 <code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.id" title="Permalink to this definition">¶</a></dt>
@@ -222,9 +284,27 @@ Alternatively, the feature md5 can be passed to select a particular feature.</p>
 <span id="featurefactory-admin-sqlalchemy-main-module"></span><h2>featurefactory.admin.sqlalchemy_main module<a class="headerlink" href="#module-featurefactory.admin.sqlalchemy_main" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="featurefactory.admin.sqlalchemy_main.ORMManager">
-<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_main.</code><code class="descname">ORMManager</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_main.html#ORMManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_main.ORMManager" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_main.</code><code class="descname">ORMManager</code><span class="sig-paren">(</span><em>database</em>, <em>admin=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_main.html#ORMManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_main.ORMManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Initialize the sqlalchemy ORM engine and starts a database session.</p>
+<dl class="docutils">
+<dt>database <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Name of database to connect to</dd>
+<dt>admin <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
+<dd>Whether to look up credentials in environment variables
+<cite>MYSQL_ROOT_USERNAME</cite> and <cite>MYSQL_ROOT_PASSWORD</cite>. If so, logs in as root
+user with admin permissions.</dd>
+</dl>
+<dl class="method">
+<dt id="featurefactory.admin.sqlalchemy_main.ORMManager.session_scope">
+<code class="descname">session_scope</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_main.html#ORMManager.session_scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_main.ORMManager.session_scope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager to wrap a transaction.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+<span class="go">        session.query(User.name).all()</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </div>

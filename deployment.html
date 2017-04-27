@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Intro" href="intro.html" /> 
+    <link rel="prev" title="FAQ" href="faq.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +39,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="Intro"
+          <a href="faq.html" title="FAQ"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
       </ul>
@@ -74,6 +74,11 @@
 </pre></div>
 </div>
 </li>
+<li><p class="first">Install Python requirements for the host.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">deploy</span><span class="o">/</span><span class="n">requirements</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</li>
 </ol>
 </div>
 <div class="section" id="configuration">
@@ -88,20 +93,27 @@
 <li><code class="docutils literal"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let&#8217;s Encrypt.</li>
 <li><code class="docutils literal"><span class="pre">FF_DOMAIN_EMAIL</span></code>: email associated with domain name registration</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
+<li><code class="docutils literal"><span class="pre">EVAL_API_TOKEN</span></code>: API token for eval server. You should generate a valid API token by
+executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">API_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You generate a valid API
+token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
 </ul>
 <p>You can usually leave these variables at their default values:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">DOCKER_NETWORK_NAME</span></code>: name for docker network used for networking containers</li>
 <li><code class="docutils literal"><span class="pre">HUB_IMAGE_NAME</span></code>: name for docker Hub image</li>
 <li><code class="docutils literal"><span class="pre">HUB_CONTAINER_NAME</span></code>: name for docker Hub container</li>
+<li><code class="docutils literal"><span class="pre">HUB_API_PROT</span></code> : port for Hub REST API to list on</li>
 <li><code class="docutils literal"><span class="pre">FF_IMAGE_NAME</span></code>: name for docker User notebook server image</li>
 <li><code class="docutils literal"><span class="pre">FF_CONTAINER_NAME</span></code>: prefix for docker User containers. Actual containers will have
 <code class="docutils literal"><span class="pre">-username</span></code> appended.</li>
 <li><code class="docutils literal"><span class="pre">FF_DATA_DIR</span></code>: path to data directory on <em>host machine</em> (deployment machine)</li>
 <li><code class="docutils literal"><span class="pre">FF_PROJECT_NAME</span></code>: name for docker-compose app</li>
-<li><code class="docutils literal"><span class="pre">FF_IDLE_SERVER_TIMEOUT</span></code>: timeout interval for idle servers. If a server is idle for this
-amount of time, then it will be automatically stopped. Due to some JupyterHub defaults,
-this value should be set to at least 5m 30s (<code class="docutils literal"><span class="pre">330</span></code>).</li>
+<li><code class="docutils literal"><span class="pre">FF_IDLE_SERVER_TIMEOUT</span></code>: timeout interval for idle servers (i.e., user containers). If a
+server is idle for this amount of time, then it will be automatically stopped. Due to some
+JupyterHub defaults, this value should be set to at least 5m 30s (<code class="docutils literal"><span class="pre">330</span></code>).</li>
+<li><code class="docutils literal"><span class="pre">FF_CONTAINER_MEMLIMIT</span></code>: memory limit for user containers. The value can either be an
+integer (bytes) or a string with a &#8216;K&#8217;, &#8216;M&#8217;, &#8216;G&#8217; or &#8216;T&#8217; prefix.</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_CONTAINER_NAME</span></code>: name for docker DB container</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_ROOT_USERNAME</span></code>: username for DB root user</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_DATABASE</span></code>: competition database name in DB</li>
@@ -109,13 +121,17 @@ this value should be set to at least 5m 30s (<code class="docutils literal"><spa
 <li><code class="docutils literal"><span class="pre">SECRETS_VOLUME_NAME</span></code>: name for Hub secrets volume</li>
 <li><code class="docutils literal"><span class="pre">USE_LETSENCRYPT_CERT</span></code>: flag to use Lets Encrypt certificate (<code class="docutils literal"><span class="pre">&quot;yes&quot;</span></code>). For testing
 purposes, can use <code class="docutils literal"><span class="pre">openssl</span></code> to issue a self-signed certificate (<code class="docutils literal"><span class="pre">&quot;no&quot;</span></code>).</li>
+<li><code class="docutils literal"><span class="pre">EVAL_IMAGE_NAME</span></code> : name for docker eval server image</li>
+<li><code class="docutils literal"><span class="pre">EVAL_CONTAINER_NAME</span></code> : name for docker eval server container. Since there is one eval
+container, this will be the exact name.</li>
+<li><code class="docutils literal"><span class="pre">EVAL_CONTAINER_PORT</span></code> : port for eval server to listen on</li>
+<li><code class="docutils literal"><span class="pre">EVAL_FLASK_DEBUG</span></code> : whether eval server Flask app should be started with DEBUG flag</li>
 </ul>
 </div>
 <div class="section" id="userlist">
 <span id="userlist"></span><h3>Userlist<a class="headerlink" href="#userlist" title="Permalink to this headline">¶</a></h3>
 <p><em>Currently, this method does not allow setup of template notebooks and DB credentials. Thus,
-it should be avoided entirely in favor of <a class="reference external" href="#user-and-data-management">User and data
-management</a>.</em></p>
+it should be avoided entirely in favor of <a class="reference external" href="#user-and-data-management">User and data management</a>.</em></p>
 <p>Optionally, you can provide a userlist in <code class="docutils literal"><span class="pre">deploy/userlist</span></code>. Include one user per row.</p>
 <ul class="simple">
 <li>Specify normal users by their username only: <code class="docutils literal"><span class="pre">testuser</span></code></li>
@@ -153,6 +169,7 @@ containers:</p>
 <li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data</span></code></li>
 <li>Notebooks and other user-created files: <code class="docutils literal"><span class="pre">FF_DATA_DIR/users</span></code></li>
 <li>Configuration files for FeatureFactory and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
+<li>Log files for Hub and eval server: <code class="docutils literal"><span class="pre">FF_DATA_DIR/log</span></code></li>
 </ul>
 <p>The MySQL database is mounted on a docker data volume:</p>
 <ul class="simple">
@@ -181,6 +198,24 @@ experiments, restart experiments, and view features created.</li>
 Python commands to initialize the experiment and database, provide paths to the
 experiment data, and configure experiment parameters.</li>
 </ul>
+<div class="section" id="hub-api-client">
+<span id="hub-api-client"></span><h3>Hub API client<a class="headerlink" href="#hub-api-client" title="Permalink to this headline">¶</a></h3>
+<p>Admins can also use a command line API client to interact with the Hub&#8217;s REST API. To use
+this, you must set an API key for the client to use in the <code class="docutils literal"><span class="pre">API_CLIENT_API_TOKEN</span></code>
+environment variable. See <a class="reference external" href="#app-deployment">App Deployment</a> above.</p>
+<p>See the available commands:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>List all users:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="nb">list</span><span class="o">-</span><span class="n">users</span>
+</pre></div>
+</div>
+<p>Start the server of a user that already exists:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="n">start</span><span class="o">-</span><span class="n">server</span> <span class="n">username</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="manage-app-lifecycle">
 <span id="manage-app-lifecycle"></span><h2>Manage app lifecycle<a class="headerlink" href="#manage-app-lifecycle" title="Permalink to this headline">¶</a></h2>
@@ -209,15 +244,14 @@ state files persist, user notebooks, and the database dump persist on the filesy
 </div>
 <p><em>Optional</em>: Clean filesystem and containers. This stops and removes all Feature Factory
 containers, if not been already done. Additionally, user notebooks and config files are
-removed. Note that this <em>does not clear the database</em>, which may then retain information
-relating to non-existent users and expect user credentials that have been deleted.</p>
+removed and data volumes are deleted.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
 </pre></div>
 </div>
-<p><em>Optional</em>: Clean images, network, and volumes, in addition to filesystem and containers.
-This removes all trace of Feature Factory beside the source repository and the experiment
-data directory. Built images are removed, the docker internal network is shut down, and the
-database volume is removed.</p>
+<p><em>Optional</em>: In addition to the steps taken by <code class="docutils literal"><span class="pre">make</span> <span class="pre">clean</span></code>, cleans images, network, in
+addition to filesystem and containers.  This removes all trace of Feature Factory beside the
+source repository and the experiment data directory. Built images are removed and the docker
+internal network is shut down.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean_all</span>
 </pre></div>
 </div>
@@ -244,7 +278,10 @@ database volume is removed.</p>
 <li><a class="reference internal" href="#build-the-app">Build the app</a></li>
 <li><a class="reference internal" href="#launch-the-app">Launch the app</a></li>
 <li><a class="reference internal" href="#user-and-data-management">User and data management</a></li>
-<li><a class="reference internal" href="#app-administration">App administration</a></li>
+<li><a class="reference internal" href="#app-administration">App administration</a><ul>
+<li><a class="reference internal" href="#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li><a class="reference internal" href="#restarting-the-server">Restarting the server</a></li>
 </ul>
@@ -254,8 +291,8 @@ database volume is removed.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="intro.html"
-                        title="previous chapter">Intro</a></p>
+  <p class="topless"><a href="faq.html"
+                        title="previous chapter">FAQ</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -287,7 +324,7 @@ database volume is removed.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="Intro"
+          <a href="faq.html" title="FAQ"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
       </ul>

@@ -4,34 +4,10 @@ featurefactory.user package
 Submodules
 ----------
 
-featurefactory.user.model module
---------------------------------
-
-.. automodule:: featurefactory.user.model
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 featurefactory.user.session module
 ----------------------------------
 
 .. automodule:: featurefactory.user.session
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-featurefactory.user.test module
--------------------------------
-
-.. automodule:: featurefactory.user.test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-featurefactory.user.util module
--------------------------------
-
-.. automodule:: featurefactory.user.util
     :members:
     :undoc-members:
     :show-inheritance:

@@ -51,124 +51,91 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-featurefactory.user.model">
-<span id="featurefactory-user-model-module"></span><h2>featurefactory.user.model module<a class="headerlink" href="#module-featurefactory.user.model" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="featurefactory.user.model.Model">
-<em class="property">class </em><code class="descclassname">featurefactory.user.model.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>problem_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.model.Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="featurefactory.user.model.Model.cross_validate">
-<code class="descname">cross_validate</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/model.html#Model.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.model.Model.cross_validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-featurefactory.user.session">
 <span id="featurefactory-user-session-module"></span><h2>featurefactory.user.session module<a class="headerlink" href="#module-featurefactory.user.session" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="featurefactory.user.session.Session">
 <em class="property">class </em><code class="descclassname">featurefactory.user.session.</code><code class="descname">Session</code><span class="sig-paren">(</span><em>problem</em>, <em>database='featurefactory'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>created per user connected, hidden/inaccessible to user.</p>
-<p>Note: use &#8220;__&#8221; prefix to make variables private so that users cannot read
-them directly.</p>
-<p>WARNING: The statement above is not completely true.
-Variables prefixed by &#8220;__&#8221; are &#8220;harder&#8221; to access, but still accessible!
-For example, __db attribute is still accessible as <cite>session._Session__db</cite></p>
+<p>Represents a user&#8217;s session within Feature Factory.</p>
+<p>Includes commands for discovering, testing, and registering new features.</p>
 <dl class="method">
-<dt id="featurefactory.user.session.Session.cross_validate">
-<code class="descname">cross_validate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.cross_validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return score of feature run on dataset sample.</p>
-<p>Runs the feature in an isolated environment to extract the feature
-values. Validates the feature values. Then, builds a model on that one
-feature, performs cross validation, and returns the score.</p>
+<dt id="featurefactory.user.session.Session.discover_features">
+<code class="descname">discover_features</code><span class="sig-paren">(</span><em>code_fragment=None</em>, <em>metric_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.discover_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.discover_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print features written by other users.</p>
+<p>A code fragment can be used to filter search results. For each feature,
+prints feature id, feature description, metrics, and source code.</p>
+<dl class="docutils">
+<dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Source code fragment to filter for.</dd>
+<dt>metric_name <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Metric to report. One of &#8220;Accuracy&#8221;, &#8220;Precision&#8221;, &#8220;Recall&#8221;, and
+&#8220;ROC AUC&#8221; for classification problems, and &#8220;Mean Squared Error&#8221;
+and &#8220;R-squared&#8221; for regression problems.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="featurefactory.user.session.Session.discover_features">
-<code class="descname">discover_features</code><span class="sig-paren">(</span><em>code_fragment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.discover_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.discover_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Discover features written by other users.</p>
-<p>Print features written by other users, enabling collaboration.
-A code fragment can be used to filter search results. For each feature,
-prints feature score and feature code.</p>
+<dt id="featurefactory.user.session.Session.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature on training dataset and return key performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature and computes key cross-validated metrics. Prints results and
+returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, prints reason and returns empty dictionary.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="featurefactory.user.session.Session.get_sample_dataset">
 <code class="descname">get_sample_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.get_sample_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.get_sample_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads sample of problem dataset into memory.</p>
-<p>Returns a list of DataFrames, each of which is a <em>copy</em> of the class&#8217;
-field. May require a substantial amount of memory.</p>
+<dd><p>Loads sample of problem training dataset.</p>
+<p>Returns a dict mapping table names to pandas DataFrames.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">get_sample_dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;stores&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="featurefactory.user.session.Session.print_my_features">
-<code class="descname">print_my_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.print_my_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.print_my_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print all features written by this user.</p>
+<code class="descname">print_my_features</code><span class="sig-paren">(</span><em>code_fragment=None</em>, <em>metric_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.print_my_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.print_my_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print features written by me.</p>
+<p>A code fragment can be used to filter search results. For each feature,
+prints feature id, feature description, metrics, and source code.</p>
+<dl class="docutils">
+<dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Source code fragment to filter for.</dd>
+<dt>metric_name <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Metric to report. One of &#8220;Accuracy&#8221;, &#8220;Precision&#8221;, &#8220;Recall&#8221;, and
+&#8220;ROC AUC&#8221; for classification problems, and &#8220;Mean Squared Error&#8221;
+and &#8220;R-squared&#8221; for regression problems.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="featurefactory.user.session.Session.register_feature">
-<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.register_feature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new feature entry in database.</p>
+<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.register_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submit feature to server for evaluation on test data.</p>
+<p>If successful, registers feature in feature database and returns key
+performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature, performs cross validation, and returns key performance
+metrics.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Feature description. If left empty, will prompt for user imput.</dd>
+</dl>
 </dd></dl>
 
-</dd></dl>
-
-</div>
-<div class="section" id="module-featurefactory.user.test">
-<span id="featurefactory-user-test-module"></span><h2>featurefactory.user.test module<a class="headerlink" href="#module-featurefactory.user.test" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="featurefactory.user.test.Test">
-<em class="property">class </em><code class="descclassname">featurefactory.user.test.</code><code class="descname">Test</code><a class="reference internal" href="_modules/featurefactory/user/test.html#Test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.test.Test" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="featurefactory.user.test.Test.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/test.html#Test.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.test.Test.delete" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.user.test.Test.print">
-<code class="descname">print</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/test.html#Test.print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.test.Test.print" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-featurefactory.user.util">
-<span id="featurefactory-user-util-module"></span><h2>featurefactory.user.util module<a class="headerlink" href="#module-featurefactory.user.util" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="featurefactory.user.util.DescriptionStore">
-<em class="property">class </em><code class="descclassname">featurefactory.user.util.</code><code class="descname">DescriptionStore</code><a class="reference internal" href="_modules/featurefactory/user/util.html#DescriptionStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.util.DescriptionStore" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="featurefactory.user.util.DescriptionStore.MAX_ATTEMPTS">
-<code class="descname">MAX_ATTEMPTS</code><em class="property"> = 10</em><a class="headerlink" href="#featurefactory.user.util.DescriptionStore.MAX_ATTEMPTS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="featurefactory.user.util.DescriptionStore.TIMEOUT">
-<code class="descname">TIMEOUT</code><em class="property"> = 5</em><a class="headerlink" href="#featurefactory.user.util.DescriptionStore.TIMEOUT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.user.util.DescriptionStore.get_description">
-<code class="descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/util.html#DescriptionStore.get_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.util.DescriptionStore.get_description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.user.util.DescriptionStore.set_description">
-<code class="descname">set_description</code><span class="sig-paren">(</span><em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/util.html#DescriptionStore.set_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.util.DescriptionStore.set_description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="featurefactory.user.util.run_isolated">
-<code class="descclassname">featurefactory.user.util.</code><code class="descname">run_isolated</code><span class="sig-paren">(</span><em>f</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/util.html#run_isolated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.util.run_isolated" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply <cite>f</cite> to arguments in an isolated environment.</p>
 </dd></dl>
 
 </div>
@@ -187,10 +154,7 @@ field. May require a substantial amount of memory.</p>
   <ul>
 <li><a class="reference internal" href="#">featurefactory.user package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-featurefactory.user.model">featurefactory.user.model module</a></li>
 <li><a class="reference internal" href="#module-featurefactory.user.session">featurefactory.user.session module</a></li>
-<li><a class="reference internal" href="#module-featurefactory.user.test">featurefactory.user.test module</a></li>
-<li><a class="reference internal" href="#module-featurefactory.user.util">featurefactory.user.util module</a></li>
 <li><a class="reference internal" href="#module-featurefactory.user">Module contents</a></li>
 </ul>
 </li>

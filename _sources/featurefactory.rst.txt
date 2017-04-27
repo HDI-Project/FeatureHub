@@ -7,9 +7,22 @@ Subpackages
 .. toctree::
 
     featurefactory.admin
+    featurefactory.evaluation
+    featurefactory.modeling
     featurefactory.problems
-    featurefactory.tests
     featurefactory.user
+
+Submodules
+----------
+
+featurefactory.util module
+--------------------------
+
+.. automodule:: featurefactory.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

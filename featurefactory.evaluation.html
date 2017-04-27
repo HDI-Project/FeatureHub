@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>featurefactory.evaluation package &#8212; Feature Factory 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="featurefactory-evaluation-package">
+<h1>featurefactory.evaluation package<a class="headerlink" href="#featurefactory-evaluation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurefactory.evaluation.client">
+<span id="featurefactory-evaluation-client-module"></span><h2>featurefactory.evaluation.client module<a class="headerlink" href="#module-featurefactory.evaluation.client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.evaluation.client.EvaluatorClient">
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorClient</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorClient.check_if_registered">
+<code class="descname">check_if_registered</code><span class="sig-paren">(</span><em>feature</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient.check_if_registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient.check_if_registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if feature is registered.</p>
+<p>Extracts source code, then looks for the identical source code in the
+feature database.</p>
+<p>feature : function
+verbose : bool</p>
+<blockquote>
+<div>Whether to print output.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorClient.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature on training dataset and return key performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature and computes key cross-validated metrics. Prints results and
+returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, prints reason and returns empty dictionary.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorClient.register_feature">
+<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient.register_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submit feature to server for evaluation on test data.</p>
+<p>If successful, registers feature in feature database and returns key
+performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature, performs cross validation, and returns key performance
+metrics.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Feature description</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurefactory.evaluation.client.EvaluatorServer">
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorServer</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#featurefactory.evaluation.client.EvaluatorClient" title="featurefactory.evaluation.client.EvaluatorClient"><code class="xref py py-class docutils literal"><span class="pre">featurefactory.evaluation.client.EvaluatorClient</span></code></a></p>
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorServer.check_if_registered">
+<code class="descname">check_if_registered</code><span class="sig-paren">(</span><em>code</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer.check_if_registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer.check_if_registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if feature is registered.</p>
+<p>Overwrites client method by expecting code to be passed directly. This
+is because on the server, we are limited to be unable to do code -&gt;
+function -&gt; code.</p>
+<p>code : str
+verbose : bool, optional (default=False)</p>
+<blockquote>
+<div>Whether to print output.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorServer.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature.</p>
+<p>Returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, re-raises the ValueError.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.evaluation.client.EvaluatorServer.register_feature">
+<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer.register_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing.</p>
+<p>This class is instantiated at the server, thus we are already
+registering the feature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurefactory.evaluation.future">
+<span id="featurefactory-evaluation-future-module"></span><h2>featurefactory.evaluation.future module<a class="headerlink" href="#module-featurefactory.evaluation.future" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.evaluation.future.HubAuth">
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.future.</code><code class="descname">HubAuth</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/future.html#HubAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.future.HubAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">jupyterhub.services.auth.HubAuth</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.evaluation.future.HubAuth.cache">
+<code class="descname">cache</code><a class="headerlink" href="#featurefactory.evaluation.future.HubAuth.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>A trait whose value must be an instance of a specified class.</p>
+<p>The value can also be an instance of a subclass of the specified class.</p>
+<p>Subclasses can declare default classes by overriding the klass attribute</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.future.HubAuth.cache_max_age">
+<code class="descname">cache_max_age</code><a class="headerlink" href="#featurefactory.evaluation.future.HubAuth.cache_max_age" title="Permalink to this definition">¶</a></dt>
+<dd><p>An int trait.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.evaluation.future.HubAuth.user_for_token">
+<code class="descname">user_for_token</code><span class="sig-paren">(</span><em>token</em>, <em>use_cache=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/future.html#HubAuth.user_for_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.future.HubAuth.user_for_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask the Hub to identify the user for a given token.
+Args:</p>
+<blockquote>
+<div>token (str): the token
+use_cache (bool): Specify use_cache=False to skip cached cookie values (default: True)</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>user_model (dict): The user model, if a user is identified, None if authentication fails.
+The &#8216;name&#8217; field contains the user&#8217;s name.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurefactory.evaluation.response">
+<span id="featurefactory-evaluation-response-module"></span><h2>featurefactory.evaluation.response module<a class="headerlink" href="#module-featurefactory.evaluation.response" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.evaluation.response.EvaluationResponse">
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.response.</code><code class="descname">EvaluationResponse</code><span class="sig-paren">(</span><em>status_code='okay'</em>, <em>metrics=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/response.html#EvaluationResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">flask.wrappers.Response</span></code></p>
+<p>Wrapper class for response from evaluation server.</p>
+<dl class="docutils">
+<dt>status_code <span class="classifier-delimiter">:</span> <span class="classifier">string, optional (default=EvaluationResponse.STATUS_CODE_OKAY)</span></dt>
+<dd>Possible values are EvaluationResponse static members.</dd>
+<dt>metrics <span class="classifier-delimiter">:</span> <span class="classifier">list of Metric, optional (default=None)</span></dt>
+<dd>List of Metric objects, which each encode metric name, metric scoring
+method, and value.</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EvaluationResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">EvaluationResponse</span><span class="o">.</span><span class="n">STATUS_CODE_SERVER_ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_AUTH">
+<code class="descname">STATUS_CODE_BAD_AUTH</code><em class="property"> = 'bad_auth'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_FEATURE">
+<code class="descname">STATUS_CODE_BAD_FEATURE</code><em class="property"> = 'bad_feature'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_FEATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_REQUEST">
+<code class="descname">STATUS_CODE_BAD_REQUEST</code><em class="property"> = 'bad_request'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_DB_ERROR">
+<code class="descname">STATUS_CODE_DB_ERROR</code><em class="property"> = 'db_error'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_DB_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE">
+<code class="descname">STATUS_CODE_DUPLICATE_FEATURE</code><em class="property"> = 'duplicate_feature'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_OKAY">
+<code class="descname">STATUS_CODE_OKAY</code><em class="property"> = 'okay'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_OKAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_SERVER_ERROR">
+<code class="descname">STATUS_CODE_SERVER_ERROR</code><em class="property"> = 'server_error'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.STATUS_CODE_SERVER_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.from_string">
+<em class="property">classmethod </em><code class="descname">from_string</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/response.html#EvaluationResponse.from_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate EvaluationResponse from a json-dumped string.</p>
+<p>This is useful for recreating the instance on the receiving end of the
+web connection.</p>
+<dl class="docutils">
+<dt>string <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Json-dumped string encoding the response.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.evaluation.response.EvaluationResponse.try_again">
+<code class="descname">try_again</code><em class="property"> = 'Please try again later or contact administrator.'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.try_again" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="featurefactory-evaluation-server-module">
+<h2>featurefactory.evaluation.server module<a class="headerlink" href="#featurefactory-evaluation-server-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurefactory.evaluation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurefactory.evaluation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">featurefactory.evaluation package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-featurefactory.evaluation.client">featurefactory.evaluation.client module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.evaluation.future">featurefactory.evaluation.future module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.evaluation.response">featurefactory.evaluation.response module</a></li>
+<li><a class="reference internal" href="#featurefactory-evaluation-server-module">featurefactory.evaluation.server module</a></li>
+<li><a class="reference internal" href="#module-featurefactory.evaluation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/featurefactory.evaluation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Micah Smith.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

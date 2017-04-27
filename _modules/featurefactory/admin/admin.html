@@ -55,13 +55,12 @@
 <span class="kn">from</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="k">import</span> <span class="n">NoResultFound</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy_utils</span> <span class="k">import</span> <span class="n">database_exists</span><span class="p">,</span> <span class="n">create_database</span><span class="p">,</span> <span class="n">drop_database</span>
 
-<span class="kn">from</span> <span class="nn">featurefactory.admin.sqlalchemy_declarative</span> <span class="k">import</span> <span class="n">Base</span><span class="p">,</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">featurefactory.admin.sqlalchemy_declarative</span> <span class="k">import</span> <span class="n">Base</span><span class="p">,</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">Metric</span>
 <span class="kn">from</span> <span class="nn">featurefactory.admin.sqlalchemy_main</span> <span class="k">import</span> <span class="n">ORMManager</span>
 
 
 <div class="viewcode-block" id="Commands"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands">[docs]</a><span class="k">class</span> <span class="nc">Commands</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Admin interface for the database.</span>
+    <span class="sd">&quot;&quot;&quot;Admin interface for the database.</span>
 
 <span class="sd">    Create the schema, add or remove problems, and view problems, users, and</span>
 <span class="sd">    features.</span>
@@ -70,7 +69,14 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s2">&quot;featurefactory&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the ORMManager and connect to DB.</span>
 
-<span class="sd">        if problem name is given, load it.</span>
+<span class="sd">        If problem name is given, load it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        problem : str, optional (default=None)</span>
+<span class="sd">            Name of problem</span>
+<span class="sd">        database : str, optional (default=&quot;featurefactory&quot;)</span>
+<span class="sd">            Name of database within DBMS.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span> <span class="o">=</span> <span class="n">ORMManager</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
@@ -80,8 +86,9 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You might want to create it by calling set_up method&quot;</span><span class="p">)</span>
         <span class="k">elif</span>  <span class="n">problem</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">problems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__problem</span> <span class="o">=</span> <span class="n">problems</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                    <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
             <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Problem </span><span class="si">{}</span><span class="s2"> does not exist!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You might want to create it by calling create_problem method&quot;</span><span class="p">)</span>
@@ -89,7 +96,10 @@
 <div class="viewcode-block" id="Commands.set_up"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a new DB and create the initial scheme.</span>
 
-<span class="sd">        If the DB already exists, it will be dropped if the drop argument is True.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        drop : bool, optional (default=False)</span>
+<span class="sd">            Drop database if it already exists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span>
         <span class="k">if</span> <span class="n">database_exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -107,98 +117,103 @@
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database </span><span class="si">{}</span><span class="s2"> created successfully&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Commands.create_problem"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.create_problem">[docs]</a>    <span class="k">def</span> <span class="nf">create_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">problem_type</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">y_index</span><span class="p">,</span> <span class="n">y_column</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a new problem entry in database.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Commands.create_problem"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.create_problem">[docs]</a>    <span class="k">def</span> <span class="nf">create_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">problem_type</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">table_names</span><span class="p">,</span>
+            <span class="n">target_table_name</span><span class="p">,</span> <span class="n">y_column</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new problem entry in database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">        problem_type : str</span>
+<span class="sd">        data_path : str</span>
+<span class="sd">            Absolute path of containing directory of data files.</span>
+<span class="sd">        files : list of str</span>
+<span class="sd">            List of file paths relative to data_path</span>
+<span class="sd">        table_names : list of str</span>
+<span class="sd">            List of table names, corresponding exactly to files</span>
+<span class="sd">        target_table_name : str</span>
+<span class="sd">            Name of table that contains the target variable (label). Must be</span>
+<span class="sd">            found in table_names.</span>
+<span class="sd">        y_column : str</span>
+<span class="sd">            Name of column in target_table_name that identifies the target</span>
+<span class="sd">            variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>    <span class="c1"># forces a refresh # TODO sketchy</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__problem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> already exists&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
-            <span class="k">pass</span>    <span class="c1"># we will create it</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> already exists&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
+                <span class="k">pass</span>    <span class="c1"># we will create it</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">problem_type</span><span class="o">=</span><span class="n">problem_type</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-                                 <span class="n">files</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="n">y_index</span><span class="o">=</span><span class="n">y_index</span><span class="p">,</span> <span class="n">y_column</span><span class="o">=</span><span class="n">y_column</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__problem</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> successfully created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+                <span class="n">name</span>              <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
+                <span class="n">problem_type</span>      <span class="o">=</span> <span class="n">problem_type</span><span class="p">,</span>
+                <span class="n">data_path</span>         <span class="o">=</span> <span class="n">data_path</span><span class="p">,</span>
+                <span class="n">files</span>             <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+                <span class="n">table_names</span>       <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_names</span><span class="p">),</span>
+                <span class="n">target_table_name</span> <span class="o">=</span> <span class="n">target_table_name</span><span class="p">,</span>
+                <span class="n">y_column</span>          <span class="o">=</span> <span class="n">y_column</span>
+            <span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> successfully created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Commands.get_problems"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.get_problems">[docs]</a>    <span class="k">def</span> <span class="nf">get_problems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of problems in the database.&quot;&quot;&quot;</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>    <span class="c1"># forces a refresh # TODO sketchy</span>
-            <span class="n">problems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">]</span>
-        <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get an SQLAlchemy cursor pointing at the requested features.&quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>    <span class="c1"># forces a refresh # TODO sketchy</span>
-
-        <span class="n">filter_</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">Feature</span><span class="o">.</span><span class="n">problem</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__problem</span><span class="p">,</span>
-        <span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">user_name</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># TODO shouldn&#39;t need a separate query here</span>
-                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>\
-                           <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">user_name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
-                <span class="n">filter_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Feature</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">user</span><span class="p">)</span>
+                <span class="n">problems</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">]</span>
             <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No features found from user </span><span class="si">{}</span><span class="s2">. All users shown.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">user_name</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Feature</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">filter_</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Commands.get_features"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.get_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a DataFrame with the details about all registered features.&quot;&quot;&quot;</span>
-        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_features</span><span class="p">(</span><span class="n">user_name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-        <span class="n">feature_dicts</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-            <span class="s2">&quot;md5&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">md5</span><span class="p">,</span>
-            <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
-            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
-        <span class="p">}</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_features</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">user_name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">feature_dicts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;user&quot;</span>        <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span> <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;md5&quot;</span>         <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">md5</span><span class="p">,</span>
+                    <span class="s2">&quot;created_at&quot;</span>  <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">feature_metrics</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Metric</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">Metric</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Metric</span><span class="o">.</span><span class="n">feature_id</span> <span class="o">==</span>
+                                <span class="n">feature</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">feature_metrics</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">feature_dicts</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No features found&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">feature_dicts</span><span class="p">)</span></div>
+                <span class="n">feature_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Commands.print_feature"><a class="viewcode-back" href="../../../featurefactory.admin.html#featurefactory.admin.admin.Commands.print_feature">[docs]</a>    <span class="k">def</span> <span class="nf">print_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_name</span><span class="p">,</span> <span class="n">md5</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Print the code of the requested feature.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">feature_dicts</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No features found&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">feature_dicts</span><span class="p">)</span></div>
 
-<span class="sd">        If there is more than one feature with the same name, only the</span>
-<span class="sd">        latest version is printed.</span>
-<span class="sd">        Alternatively, the feature md5 can be passed to select a particular feature.</span>
+    <span class="k">def</span> <span class="nf">_get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a query filtering a given user for the current problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        user_name : str, optional(default=None)</span>
+<span class="sd">            If no user name provided, returns features for all users.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_features</span><span class="p">(</span><span class="n">user_name</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">features</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No matching features found.&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
+        <span class="c1">#TODO pivot metrics tables</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Feature</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">Metric</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">md5</span><span class="p">:</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Feature</span><span class="o">.</span><span class="n">md5</span> <span class="o">==</span> <span class="n">md5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user_name</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">user_name</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">features</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No matching features found.&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Feature</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span><span class="p">)</span>
 
-        <span class="n">feature</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Feature</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Description: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">score</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;md5: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">md5</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;created_at: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">created_at</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">code</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">query</span></div>
 </pre></div>
 
           </div>
