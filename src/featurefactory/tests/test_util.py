@@ -126,7 +126,7 @@ def test_compute_dataset_hash():
     def create_dummy_dataset(n=10, m=30):
         import pandas as pd
         import numpy as np
-        return [pd.DataFrame(np.random.randn(m,m)) for i in range(n)]
+        return {i:pd.DataFrame(np.random.randn(m,m)) for i in range(n)}
 
     # create dummy
     dataset = create_dummy_dataset()
@@ -146,6 +146,12 @@ def test_compute_dataset_hash():
     # try some basic operations on the DataFrame
     dataset = create_dummy_dataset()
     dataset_hash = featurefactory.util.compute_dataset_hash(dataset)
-    [d.head() for d in dataset]
-    [d.describe() for d in dataset]
+    [d.head() for d in dataset.values()]
+    [d.describe() for d in dataset.values()]
     assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
+
+def test_myhash():
+    a = "hello world"
+    b = "hello world".encode("utf-8")
+
+    assert featurefactory.util.myhash(a) == featurefactory.util.myhash(b)

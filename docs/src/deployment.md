@@ -19,6 +19,11 @@ A variety of resources facilitate easy deployment of Feature Factory:
     git clone https://github.com/HDI-Project/FeatureFactory.git
     ```
 
+3. Install Python requirements for the host.
+    ```
+    pip install -r deploy/requirements-host.txt
+    ```
+
 ## Configuration
 
 Feature Factory allows configuration in several places.
@@ -35,12 +40,17 @@ Definitely override values for these variables:
 - `FF_DOMAIN_NAME`: fully-qualified domain name of this server, used for Let's Encrypt.
 - `FF_DOMAIN_EMAIL`: email associated with domain name registration
 - `MYSQL_ROOT_PASSWORD`: password for DB root user
+- `EVAL_API_TOKEN`: API token for eval server. You should generate a valid API token by
+    executing `openssl rand -hex 32`.
+- `API_CLIENT_API_TOKEN` : API token for Hub API client script. You generate a valid API
+    token by executing `openssl rand -hex 32`.
 
 You can usually leave these variables at their default values:
 
 - `DOCKER_NETWORK_NAME`: name for docker network used for networking containers
 - `HUB_IMAGE_NAME`: name for docker Hub image
 - `HUB_CONTAINER_NAME`: name for docker Hub container
+- `HUB_API_PROT` : port for Hub REST API to list on
 - `FF_IMAGE_NAME`: name for docker User notebook server image
 - `FF_CONTAINER_NAME`: prefix for docker User containers. Actual containers will have
     `-username` appended.
@@ -58,12 +68,16 @@ You can usually leave these variables at their default values:
 - `SECRETS_VOLUME_NAME`: name for Hub secrets volume
 - `USE_LETSENCRYPT_CERT`: flag to use Lets Encrypt certificate (`"yes"`). For testing
     purposes, can use `openssl` to issue a self-signed certificate (`"no"`).
+- `EVAL_IMAGE_NAME` : name for docker eval server image
+- `EVAL_CONTAINER_NAME` : name for docker eval server container. Since there is one eval
+    container, this will be the exact name.
+- `EVAL_CONTAINER_PORT` : port for eval server to listen on
+- `EVAL_FLASK_DEBUG` : whether eval server Flask app should be started with DEBUG flag
 
 ### Userlist
 
 *Currently, this method does not allow setup of template notebooks and DB credentials. Thus,
-it should be avoided entirely in favor of [User and data
-management](#user-and-data-management).*
+it should be avoided entirely in favor of [User and data management](#user-and-data-management).*
 
 Optionally, you can provide a userlist in `deploy/userlist`. Include one user per row.
 
@@ -101,6 +115,7 @@ containers:
 - Experiment data: `FF_DATA_DIR/data`
 - Notebooks and other user-created files: `FF_DATA_DIR/users`
 - Configuration files for FeatureFactory and JupyterHub: `FF_DATA_DIR/config`
+- Log files for Hub and eval server: `FF_DATA_DIR/log`
 
 The MySQL database is mounted on a docker data volume:
 
@@ -129,6 +144,27 @@ Experiment admin
 - To create an experiment, the admin user must store data on the server, then execute
     Python commands to initialize the experiment and database, provide paths to the
     experiment data, and configure experiment parameters.
+
+### Hub API client
+
+Admins can also use a command line API client to interact with the Hub's REST API. To use
+this, you must set an API key for the client to use in the `API_CLIENT_API_TOKEN`
+environment variable. See [App Deployment](#app-deployment) above.
+
+See the available commands:
+```
+api_client.py -- --help
+```
+
+List all users:
+```
+api_client.py list-users
+```
+
+Start the server of a user that already exists:
+```
+api_client.py start-server username
+```
 
 ## Manage app lifecycle
 

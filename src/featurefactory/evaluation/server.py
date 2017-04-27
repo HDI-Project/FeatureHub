@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-"""
-Evaluation server for Feature Factory user notebooks
-"""
+"""Evaluation server for Feature Factory user notebooks."""
 
 # flask imports
 from functools import wraps
@@ -14,31 +11,27 @@ import logging
 # from jupyterhub.services.auth import HubAuth
 from featurefactory.evaluation.future import HubAuth
 
-# feature factory imports
+# Feature Factory imports
 import hashlib
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from featurefactory.evaluation                   import EvaluationResponse, Evaluator
+from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
-from featurefactory.util                         import get_function
+from featurefactory.util                         import get_function, myhash
 
 # setup
 prefix = "/services/eval-server"
-hub_api_token = os.environ["EVAL_API_TOKEN"]
+hub_api_token = os.environ.get("EVAL_API_TOKEN")
 hub_api_url = "http://{}:{}/hub/api".format(
-    os.environ["HUB_CONTAINER_NAME"],
-    os.environ["HUB_API_PORT"]
+    os.environ.get("HUB_CONTAINER_NAME"),
+    os.environ.get("HUB_API_PORT")
 )
 auth = HubAuth(
     api_token            = hub_api_token,
     api_url              = hub_api_url,
     cookie_cache_max_age = 60,
 )
-log_filename = os.path.join(os.environ["FF_DATA_DIR"], "log", "eval-server",
-        "eval-server.log")
-if not os.path.exists(os.path.dirname(log_filename)):
-    os.makedirs(os.path.dirname(log_filename))
 
 # app
 app = Flask("eval-server")
@@ -82,11 +75,12 @@ def authenticated(f):
 @app.route(prefix + "/evaluate", methods=["POST"])
 @authenticated
 def evaluate(user):
-    # required inputs include
-    # - the database
-    # - the problem id, for lookup in database
-    # - the feature code
-    # - the user-provided feature description
+    """Process user request to evaluate and register feature.
+
+    Extracts 'database', 'problem_id', 'code', and 'description' from POST
+    body.
+    """
+
     try:
         database    = request.form["database"]
         problem_id  = request.form["problem_id"]
@@ -137,12 +131,24 @@ def evaluate(user):
             )
         app.logger.debug("Accessed user (name '{}') from db".format(user_name))
 
-        if not isinstance(code, bytes):
-            code_enc = code.encode("utf-8")
-        else:
-            code_enc = code
-        md5 = hashlib.md5(code_enc).hexdigest()
+        md5 = myhash(code)
         app.logger.debug("Computed feature hash.")
+
+        evaluator = EvaluatorServer(problem_id, user_name, orm)
+        try:
+            is_registered = evaluator.check_if_registered(code)
+            if is_registered:
+                app.logger.debug("feature already registered.")
+                return EvaluationResponse(
+                    status_code = EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE
+                )
+        except Exception:
+            app.logger.exception("Unexpected error checking if feature is "
+                                 "registered")
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
+        app.logger.debug("Confirmed that feature is not already registered")
 
         try:
             feature = get_function(code)
@@ -157,7 +163,6 @@ def evaluate(user):
         # processing
         # - compute the CV score
         # - compute any other metrics
-        evaluator = Evaluator(problem_id, user_name, orm)
         try:
             metrics = evaluator.evaluate(feature)
             # TODO expand schema
@@ -188,7 +193,7 @@ def evaluate(user):
             )
             session.add(feature_obj)
             for metric in metrics:
-                metric_db = metric.to_db_entry()
+                metric_db = metric.convert(kind="db")
                 metric_obj = Metric(
                     feature = feature_obj,
                     name    = metric_db["name"],
@@ -213,6 +218,11 @@ def evaluate(user):
     )
 
 if __name__ == "__main__":
+    # set up logging
+    log_filename = os.path.join(os.environ.get("FF_DATA_DIR"), "log", "eval-server",
+            "eval-server.log")
+    if not os.path.exists(os.path.dirname(log_filename)):
+        os.makedirs(os.path.dirname(log_filename))
     handler = RotatingFileHandler(log_filename, maxBytes=1024 * 1024 * 5,
             backupCount=5)
     formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} "
@@ -222,6 +232,7 @@ if __name__ == "__main__":
     app.logger.addHandler(handler)
     app.logger.setLevel(logging.DEBUG)
 
+    # run app
     host  = "0.0.0.0"
     port  = int(os.environ.get("EVAL_CONTAINER_PORT", 5000))
     debug = bool(os.environ.get("EVAL_FLASK_DEBUG", False))

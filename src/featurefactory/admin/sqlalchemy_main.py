@@ -6,14 +6,13 @@ import os
 from contextlib import contextmanager
 
 class ORMManager(object):
-    """
-    Initialize the sqlalchemy ORM engine and starts a database session.
+    """Initialize the sqlalchemy ORM engine and starts a database session.
 
     Parameters
     ----------
     database : string
         Name of database to connect to
-    admin : bool, default False
+    admin : bool, optional (default=False)
         Whether to look up credentials in environment variables
         `MYSQL_ROOT_USERNAME` and `MYSQL_ROOT_PASSWORD`. If so, logs in as root
         user with admin permissions.
@@ -58,7 +57,12 @@ class ORMManager(object):
 
     @contextmanager
     def session_scope(self):
-        """
+        """Context manager to wrap a transaction.
+        
+        Examples
+        --------
+        >>> with orm.session_scope() as session:
+                session.query(User.name).all()
         """
         session = self.Session()
         try:

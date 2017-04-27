@@ -5,13 +5,17 @@ import requests
 import collections
 import traceback
 
-from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
-from featurefactory.admin.sqlalchemy_declarative import Problem
+from featurefactory.util import (
+    compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
+    myhash
+
+)
+from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.modeling                     import Model
 
-class EvaluationClient(object):
-    def __init__(self, problem_id, username, orm, dataset=[]):
+class EvaluatorClient(object):
+    def __init__(self, problem_id, username, orm, dataset={}):
         self.problem_id = problem_id
         self.username  = username
         self.orm       = orm
@@ -22,7 +26,57 @@ class EvaluationClient(object):
         else:
             self.__dataset_hash = None
 
+    def check_if_registered(self, feature, verbose=False):
+        """Check if feature is registered.
+
+        Extracts source code, then looks for the identical source code in the
+        feature database.
+
+        Parameters
+        ----------
+        feature : function
+        verbose : bool
+            Whether to print output.
+        """
+        code    = get_source(feature)
+        return self._check_if_registered(code, verbose=verbose)
+
+    def _check_if_registered(self, code, verbose=False):
+        md5 = myhash(code)
+
+        with self.orm.session_scope() as session:
+            filters = (
+                Feature.problem_id == self.problem_id,
+                Feature.md5        == md5,
+            )
+            query = session.query(Feature).filter(*filters)
+            result = query.scalar()
+
+        if result:
+            if verbose:
+                print("Feature already registered.")
+            return True
+
+        return False
+
     def register_feature(self, feature, description):
+        """Submit feature to server for evaluation on test data.
+        
+        If successful, registers feature in feature database and returns key
+        performance metrics.
+
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature, performs cross validation, and returns key performance
+        metrics.
+
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
+        description : str
+            Feature description
+        """
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
             os.environ["EVAL_CONTAINER_NAME"],
@@ -65,16 +119,18 @@ class EvaluationClient(object):
                 pass
 
     def evaluate(self, feature):
-        """
-        Evaluate feature.
+        """Evaluate feature on training dataset and return key performance metrics.
 
-        Prints results and returns a dictionary with (metric => value) entries.
-        If the feature is invalid, prints reason and returns empty dictionary.
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature and computes key cross-validated metrics. Prints results and
+        returns a dictionary with (metric => value) entries. If the feature is
+        invalid, prints reason and returns empty dictionary.
 
-        Args
-        ----
-            feature : function
-                Feature to evaluate
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
         try:
             metrics = self._evaluate(feature, verbose=True)
@@ -88,40 +144,27 @@ class EvaluationClient(object):
 
     def _evaluate(self, feature, verbose=False):
 
-        if verbose:
-            vprint = print
-        else:
-            def do_nothing(*args, **kwargs): pass
-            vprint = do_nothing
+        with possibly_talking_action("Obtaining dataset...", verbose):
+            self._load_dataset()
 
-        vprint("Obtaining dataset...", end='')
-        self._load_dataset()
-        vprint("done")
-
-
-        vprint("Extracting features...", end='')
-        X = self._extract_features(feature)
-        vprint("done")
+        with possibly_talking_action("Extracting features...", verbose):
+            X = self._extract_features(feature)
 
         # confirm dataset has not been changed
-        vprint("Verifying dataset integrity...", end='')
-        self._verify_dataset_integrity()
-        vprint("done")
+        with possibly_talking_action("Verifying dataset integrity...", verbose):
+            self._verify_dataset_integrity()
 
         # validate
-        vprint("Validating feature values...", end='')
-        result = self._validate_feature_values(X)
-        vprint("done")
+        with possibly_talking_action("Validating feature values...", verbose):
+            result = self._validate_feature_values(X)
 
         # extract label
-        vprint("Extracting label...", end='')
-        Y = self._extract_label()
-        vprint("done")
+        with possibly_talking_action("Extracting label...", verbose):
+            Y = self._extract_label()
 
         # compute metrics
-        vprint("Computing metrics...", end='')
-        metrics = self._compute_metrics(X, Y)
-        vprint("done")
+        with possibly_talking_action("Computing metrics...", verbose):
+            metrics = self._compute_metrics(X, Y)
 
         return metrics
 
@@ -133,7 +176,8 @@ class EvaluationClient(object):
     def _compute_metrics(self, X, Y):
         with self.orm.session_scope() as session:
             # TODO this may be a sub-transaction
-            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            problem = session.query(Problem)\
+                    .filter(Problem.id == self.problem_id).one()
             problem_type = problem.problem_type
         model = Model(problem_type)
         metrics = model.compute_metrics(X, Y)
@@ -141,8 +185,6 @@ class EvaluationClient(object):
         return metrics
 
     def _extract_features(self, feature):
-        """
-        """
         assert isinstance(feature, collections.Callable), \
                 "feature must be a function!"
 
@@ -150,15 +192,16 @@ class EvaluationClient(object):
 
     def _extract_label(self):
         with self.orm.session_scope() as session:
-            problem  = session.query(Problem).filter(Problem.id == self.problem_id).one()
-            y_index  = problem.y_index
-            y_column = problem.y_column
-        return self.dataset[y_index][y_column]
+            problem = session.query(Problem)\
+                    .filter(Problem.id == self.problem_id).one()
+            target_table_name = problem.target_table_name
+            y_column          = problem.y_column
+        return self.dataset[target_table_name][y_column]
 
     def _load_dataset(self):
-        """
-        Load dataset if dataset is not present, and compute/re-compute dataset
-        hash.
+        """Load dataset if not present.
+        
+        Also computes/re-computes dataset hash.
         """
 
         # TODO check for dtypes file, facilitating lower memory usage
@@ -166,13 +209,17 @@ class EvaluationClient(object):
         if not self.dataset:
             with self.orm.session_scope() as session:
                 # TODO this may be a sub-transaction
-                problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+                problem = session.query(Problem)\
+                        .filter(Problem.id == self.problem_id).one()
                 problem_files = problem.files
+                problem_table_names = problem.table_names
                 problem_data_path = problem.data_path
 
-            for filename in problem_files.split(","):
+            for (filename, table_name) in zip(problem_files.split(","),
+                    problem_table_names.split(",")):
                 abs_filename = os.path.join(problem_data_path, filename)
-                self.dataset.append(pandas.read_csv(abs_filename, low_memory=False))
+                self.dataset[table_name] = pandas.read_csv(abs_filename,
+                        low_memory=False)
 
             # compute/recompute hash
             self.__dataset_hash = compute_dataset_hash(self.dataset)
@@ -187,23 +234,26 @@ class EvaluationClient(object):
         """
         Force reload of dataset.
         """
-        self.dataset = []
+        self.dataset = {}
         self._load_dataset()
 
     def _validate_feature_values(self, feature_values):
-        """
-        Return validity of feature values.
+        """Check whether feature values are valid.
 
         Currently checks if the feature is a DataFrame of the correct
         dimensions. If the feature is valid, returns an empty string. Otherwise,
         returns a semicolon-delimited list of reasons that the feature is
         invalid.
+
+        Parameters
+        ----------
+        feature_values : np array-like
         """
 
         with self.orm.session_scope() as session:
             # TODO this may be a sub-transaction
             problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
-            y_index = problem.y_index
+            target_table_name = problem.target_table_name
 
         result = []
 
@@ -213,7 +263,7 @@ class EvaluationClient(object):
             return "; ".join(result)
 
         # must have the right shape
-        expected_shape = (self.dataset[y_index].shape[0], 1)
+        expected_shape = (self.dataset[target_table_name].shape[0], 1)
         if feature_values.shape != expected_shape:
             result.append(
                 "returns DataFrame of invalid shape "
@@ -229,8 +279,6 @@ class EvaluationClient(object):
         return result
 
     def _verify_dataset_integrity(self):
-        """
-        """
         new_hash = compute_dataset_hash(self.dataset)
         if self.__dataset_hash != new_hash:
             print("Old hash: {}".format(self.__dataset_hash), file=sys.stderr)
@@ -238,16 +286,35 @@ class EvaluationClient(object):
             #TODO exception handling
             self._reload_dataset()
 
-class Evaluator(EvaluationClient):
-    def __init__(self, problem_id, username, orm, dataset=[]):
+class EvaluatorServer(EvaluatorClient):
+    def __init__(self, problem_id, username, orm, dataset={}):
         super().__init__(problem_id, username, orm, dataset)
 
-    def evaluate(self, feature):
+    def check_if_registered(self, code, verbose=False):
+        """Check if feature is registered.
+
+        Overwrites client method by expecting code to be passed directly. This
+        is because on the server, we are limited to be unable to do code ->
+        function -> code.
+
+        Parameters
+        ----------
+        code : str
+        verbose : bool, optional (default=False)
+            Whether to print output.
         """
-        Evaluate feature.
+        return self._check_if_registered(code, verbose=verbose)
+
+    def evaluate(self, feature):
+        """Evaluate feature.
 
         Returns a dictionary with (metric => value) entries. If the feature is
         invalid, re-raises the ValueError.
+
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
         try:
             metrics = self._evaluate(feature, verbose=False)
@@ -256,7 +323,11 @@ class Evaluator(EvaluationClient):
             raise
 
     def register_feature(self, feature, description):
-        """Register_feature is a no-op in this subclass."""
+        """Does nothing.
+
+        This class is instantiated at the server, thus we are already
+        registering the feature.
+        """
         pass
 
     def _compute_metrics(self, X, Y, verbose=False):
@@ -265,6 +336,9 @@ class Evaluator(EvaluationClient):
         return metrics
 
     def _verify_dataset_integrity(self):
-        # Don't need to verify dataset integrity on server because we re-load
-        # the dataset for every new feature.
+        """Does nothing.
+
+        Don't need to verify dataset integrity on server because we re-load
+        the dataset for every new feature.
+        """
         pass

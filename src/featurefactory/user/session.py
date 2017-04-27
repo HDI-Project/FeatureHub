@@ -6,17 +6,16 @@ import pandas as pd
 from textwrap import dedent
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User, Metric
-from featurefactory.modeling                     import Model
-from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation                   import EvaluationClient
-
-MD5_ABBREV_LEN = 8
+from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import (
+    Problem, Feature, User, Metric
+)
+from featurefactory.modeling import Model
+from featurefactory.util import run_isolated, get_source, compute_dataset_hash
+from featurefactory.evaluation import EvaluatorClient
 
 class Session(object):
-    """
-    Represents a user's session within Feature Factory.
+    """Represents a user's session within Feature Factory.
 
     Includes commands for discovering, testing, and registering new features.
     """
@@ -25,19 +24,20 @@ class Session(object):
         self.__database = database
         self.__orm      = ORMManager(database)
         self.__username = None
-        self.__dataset  = []
+        self.__dataset  = {}
 
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem)\
                                  .filter(Problem.name == problem)\
                                  .one()
-                self.__problemid = problem.id
-                self.__files     = problem.files.split(",")
-                self.__y_index   = problem.y_index
-                self.__y_column  = problem.y_column
-                self.__data_path = problem.data_path
-                self.__model     = Model(problem.problem_type)
+                self.__problemid         = problem.id
+                self.__files             = problem.files.split(",")
+                self.__table_names       = problem.table_names.split(",")
+                self.__target_table_name = problem.target_table_name
+                self.__y_column          = problem.y_column
+                self.__data_path         = problem.data_path
+                self.__model             = Model(problem.problem_type)
             except NoResultFound:
                 raise ValueError("Invalid problem name: {}".format(problem))
 
@@ -46,7 +46,7 @@ class Session(object):
         self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluationClient(self.__problemid,
+        self.__evaluation_client = EvaluatorClient(self.__problemid,
                 self.__username, self.__orm, self.__dataset) 
 
     def _login(self):
@@ -68,56 +68,60 @@ class Session(object):
                 raise e
 
     def get_sample_dataset(self):
-        """
-        Loads sample of problem dataset, returning a list of
-        DataFrames.
+        """Loads sample of problem training dataset.
+
+        Returns a dict mapping table names to pandas DataFrames.
+
+        Examples
+        --------
+        >>> dataset = commands.get_sample_dataset()
+        >>> dataset["users"] # -> returns DataFrame
+        >>> dataset["stores"] # -> returns DataFrame
         """
         if not self.__dataset:
             self._load_dataset()
 
-        gc.collect()    # make sure that we have enough space for this.
-        return [df.copy() for df in self.__dataset]
+        # Return a *copy* of the dataset, ensuring we have enough memory.
+        gc.collect()    
+        return { table_name : self.__dataset[table_name].copy() for table_name
+                in self.__dataset }
 
     def discover_features(self, code_fragment=None, metric_name=None):
-        """
-        Print features written by other users.
+        """Print features written by other users.
 
         A code fragment can be used to filter search results. For each feature,
-        prints feature description, metrics, and source code.
+        prints feature id, feature description, metrics, and source code.
 
-        Args
-        ----
-            code_fragment : string
-                Source code fragment to filter for.
-            metric_name : string
-                Metric to report. One of "Accuracy", "Precision", "Recall", and
-                "ROC AUC" for classification problems, and "Mean Squared Error"
-                and "R-squared" for regression problems.
+        Parameters
+        ----------
+        code_fragment : string, default=None
+            Source code fragment to filter for.
+        metric_name : string, default=None
+            Metric to report. One of "Accuracy", "Precision", "Recall", and
+            "ROC AUC" for classification problems, and "Mean Squared Error"
+            and "R-squared" for regression problems.
         """
         self._print_some_features(code_fragment, metric_name, User.name != self.__username)
 
     def print_my_features(self, code_fragment=None, metric_name=None):
-        """
-        Print features written by me.
+        """Print features written by me.
 
         A code fragment can be used to filter search results. For each feature,
-        prints feature description, metrics, and source code.
+        prints feature id, feature description, metrics, and source code.
 
-        Args
-        ----
-            code_fragment : string
-                Source code fragment to filter for.
-            metric_name : string
-                Metric to report. One of "Accuracy", "Precision", "Recall", and
-                "ROC AUC" for classification problems, and "Mean Squared Error"
-                and "R-squared" for regression problems.
+        Parameters
+        ----------
+        code_fragment : string, default=None
+            Source code fragment to filter for.
+        metric_name : string, default=None
+            Metric to report. One of "Accuracy", "Precision", "Recall", and
+            "ROC AUC" for classification problems, and "Mean Squared Error"
+            and "R-squared" for regression problems.
         """
         self._print_some_features(code_fragment, metric_name, User.name == self.__username)
 
     def _print_some_features(self, code_fragment, metric_name, predicate):
-        """
-        Driver function for discover_features and print_my_features.
-        """
+        """Driver function for discover_features and print_my_features."""
         metric_name_default = "Accuracy"
         if not metric_name:
             metric_name = metric_name_default
@@ -144,24 +148,43 @@ class Session(object):
 
 
     def evaluate(self, feature):
-        """
-        Evaluate feature on training dataset, returning key performance metrics.
+        """Evaluate feature on training dataset and return key performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
-        feature, performs cross validation, and returns key performance metrics.
+        feature and computes key cross-validated metrics. Prints results and
+        returns a dictionary with (metric => value) entries. If the feature is
+        invalid, prints reason and returns empty dictionary.
+
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
+
+        if self.__evaluation_client.check_if_registered(feature, verbose=True):
+            return
 
         return self.__evaluation_client.evaluate(feature)
 
     def register_feature(self, feature, description=""):
-        """
-        Creates a new feature entry in database.
-        """
+        """Submit feature to server for evaluation on test data.
+        
+        If successful, registers feature in feature database and returns key
+        performance metrics.
 
-        is_registered = self._check_if_registered(feature, description)
-        if is_registered:
-            return
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature, performs cross validation, and returns key performance
+        metrics.
+
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
+        description : str
+            Feature description. If left empty, will prompt for user imput.
+        """
 
         if not description:
             description = self._prompt_description()
@@ -172,22 +195,22 @@ class Session(object):
         # TODO check for dtypes file, assisting in low memory usage
 
         if not self.__dataset:
-            for filename in self.__files:
+            for (filename, table_name) in zip(self.__files, self.__table_names):
                 abs_filename = os.path.join(self.__data_path, filename)
-                self.__dataset.append( pd.read_csv(abs_filename, low_memory=False))
+                self.__dataset[table_name] = pd.read_csv(abs_filename, low_memory=False)
 
         return self.__dataset
 
     def _reload_dataset(self):
-        self.__dataset = []
+        self.__dataset = {}
         return self._load_dataset()
 
     def _filter_features(self, session, code_fragment):
-        """
+        """Return query that filters this problem and given code fragment.
+        
         Return a query object that filters features written for the appropriate
-        problem by code snippets.
-
-        This query object can be added to by the caller.
+        problem by code snippets. This query object can be added to by the
+        caller.
         """
         filter_ = (
             Feature.problem_id == self.__problemid,
@@ -200,27 +223,8 @@ class Session(object):
 
         return session.query(Feature).filter(*filter_)
 
-    def _check_if_registered(self, feature, description, verbose=True):
-        code    = get_source(feature)
-        md5     = hashlib.md5(code).hexdigest()
-
-        with self.__orm.session_scope() as session:
-            filters = (
-                Feature.problem_id == self.__problemid,
-                Feature.md5        == md5,
-                User.name          == self.__username,
-            )
-            query = session.query(Feature, User).filter(*filters)
-            result = query.scalar()
-
-        if result:
-            if verbose:
-                print("Feature already registered.")
-            return True
-
-        return False
-
     def _prompt_description(self):
+        """Prompt user for description of feature"""
         print("First, enter feature description. Your feature description "
               "should be clear, concise, and meaningful to non-data scientists."
               " (If your feature fails to register, this description will be "
@@ -233,18 +237,44 @@ class Session(object):
     @staticmethod
     def _print_one_feature(feature_description, feature_id, feature_code,
             metric_list):
+        """Print one feature in user-readable format.
+        
+        Parameters
+        ----------
+        feature_description : str
+        feature_id : int
+        feature_code : str
+        metric_list : MetricList
+
+        Examples
+        --------
+        >>> Session._print_one_feature("Age", 1, "def age(dataset):    pass\n",
+                metric_list_)
+        -------------------
+        Feature id: 1
+        Feature description: Age
+
+        Feature code:
+            def age(dataset):    pass
+
+        Feature metrics:
+            Accuracy: 0.5
+            ROC AUC: 0.35
+        """
         result = "------------------\n" + \
-                 "*{}* (id: {})\n".format(feature_description, feature_id) + \
-                 "\n" + \
-                 "Feature metrics:\n"
+                 "Feature id: {}\n".format(feature_id) + \
+                 "Feature description: {}\n".format(feature_description)
 
-        for metric_name, metric_value in metric_list:
-            result += "    {}: {}\n".format(metric_name, metric_value)
-
-        result += "\n"
-        result += "Feature code:\n"
+        result += "\n" + \
+                  "Feature code:\n"
 
         for line in feature_code.split("\n"):
             result += "    " + line + "\n"
+
+        result += "\n" + \
+                  "Feature metrics:\n"
+
+        for metric_name, metric_value in metric_list:
+            result += "    {}: {}\n".format(metric_name, metric_value)
 
         print(result)

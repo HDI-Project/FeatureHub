@@ -32,7 +32,7 @@ clean:
 
 .PHONY: apidoc
 apidoc:
-	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" "$(PROJDIR)"
+	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" "$(PROJDIR)" "$(PROJDIR)/tests"
 
 .PHONY: publish
 publish: html

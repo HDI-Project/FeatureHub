@@ -10,8 +10,7 @@ from featurefactory.admin.sqlalchemy_main import ORMManager
 
 
 class Commands(object):
-    """
-    Admin interface for the database.
+    """Admin interface for the database.
 
     Create the schema, add or remove problems, and view problems, users, and
     features.
@@ -20,7 +19,14 @@ class Commands(object):
     def __init__(self, problem=None, database="featurefactory"):
         """Create the ORMManager and connect to DB.
 
-        if problem name is given, load it.
+        If problem name is given, load it.
+
+        Parameters
+        ----------
+        problem : str, optional (default=None)
+            Name of problem
+        database : str, optional (default="featurefactory")
+            Name of database within DBMS.
         """
 
         self.__orm = ORMManager(database)
@@ -40,7 +46,10 @@ class Commands(object):
     def set_up(self, drop=False):
         """Create a new DB and create the initial scheme.
 
-        If the DB already exists, it will be dropped if the drop argument is True.
+        Parameters
+        ----------
+        drop : bool, optional (default=False)
+            Drop database if it already exists.
         """
         url = self.__orm.engine.url
         if database_exists(url):
@@ -58,8 +67,27 @@ class Commands(object):
 
         print("Database {} created successfully".format(url))
 
-    def create_problem(self, name, problem_type, data_path, files, y_index, y_column):
-        """Creates a new problem entry in database."""
+    def create_problem(self, name, problem_type, data_path, files, table_names,
+            target_table_name, y_column):
+        """Creates a new problem entry in database.
+        
+        Parameters
+        ----------
+        name : str
+        problem_type : str
+        data_path : str
+            Absolute path of containing directory of data files.
+        files : list of str
+            List of file paths relative to data_path
+        table_names : list of str
+            List of table names, corresponding exactly to files
+        target_table_name : str
+            Name of table that contains the target variable (label). Must be
+            found in table_names.
+        y_column : str
+            Name of column in target_table_name that identifies the target
+            variable.
+        """
 
         with self.__orm.session_scope() as session:
             try:
@@ -71,12 +99,13 @@ class Commands(object):
                 pass    # we will create it
 
             problem = Problem(
-                name         = name,
-                problem_type = problem_type,
-                data_path    = data_path,
-                files        = ",".join(files),
-                y_index      = y_index,
-                y_column     = y_column
+                name              = name,
+                problem_type      = problem_type,
+                data_path         = data_path,
+                files             = ",".join(files),
+                table_names       = ",".join(table_names),
+                target_table_name = target_table_name,
+                y_column          = y_column
             )
             session.add(problem)
             self.__problemid = problem.id
@@ -118,7 +147,13 @@ class Commands(object):
                 return pd.DataFrame(feature_dicts)
 
     def _get_features(self, session, user_name=None):
-        """Get an SQLAlchemy cursor pointing at the requested features."""
+        """Return a query filtering a given user for the current problem.
+
+        Parameters
+        ----------
+        user_name : str, optional(default=None)
+            If no user name provided, returns features for all users.
+        """
 
         #TODO pivot metrics tables
         query = session.query(Feature, User.name, Metric)

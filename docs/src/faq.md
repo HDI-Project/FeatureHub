@@ -2,9 +2,9 @@
 
 ## Restarting your server
 
-You may want or be asked to restart your notebook server, possibly in order to access bug
-fixes. If you follow these instructions, you should be able to do this without loss of any
-data or work.
+You may want or be asked to restart your notebook server, possibly in order to access
+software udpates. If you follow these instructions, you will be able to do this without
+loss of any data or work.
 
 1. *Save all of your notebooks.* Your notebooks should autosave on any changes, but you can
    save them manually to be sure. Press *File -> Save and Checkpoint*.
