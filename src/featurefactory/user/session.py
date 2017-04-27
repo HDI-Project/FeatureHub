@@ -15,8 +15,7 @@ from featurefactory.util import run_isolated, get_source, compute_dataset_hash
 from featurefactory.evaluation import EvaluatorClient
 
 class Session(object):
-    """
-    Represents a user's session within Feature Factory.
+    """Represents a user's session within Feature Factory.
 
     Includes commands for discovering, testing, and registering new features.
     """
@@ -69,16 +68,15 @@ class Session(object):
                 raise e
 
     def get_sample_dataset(self):
-        """
-        Loads sample of problem training dataset.
+        """Loads sample of problem training dataset.
 
         Returns a dict mapping table names to pandas DataFrames.
 
-        Example usage:
-        
-            dataset = commands.get_sample_dataset()
-            dataset["users"] # -> returns DataFrame
-            dataset["stores"] # -> returns DataFrame
+        Examples
+        --------
+        >>> dataset = commands.get_sample_dataset()
+        >>> dataset["users"] # -> returns DataFrame
+        >>> dataset["stores"] # -> returns DataFrame
         """
         if not self.__dataset:
             self._load_dataset()
@@ -89,45 +87,41 @@ class Session(object):
                 in self.__dataset }
 
     def discover_features(self, code_fragment=None, metric_name=None):
-        """
-        Print features written by other users.
+        """Print features written by other users.
 
         A code fragment can be used to filter search results. For each feature,
         prints feature id, feature description, metrics, and source code.
 
-        Args
-        ----
-            code_fragment : string
-                Source code fragment to filter for.
-            metric_name : string
-                Metric to report. One of "Accuracy", "Precision", "Recall", and
-                "ROC AUC" for classification problems, and "Mean Squared Error"
-                and "R-squared" for regression problems.
+        Parameters
+        ----------
+        code_fragment : string, default=None
+            Source code fragment to filter for.
+        metric_name : string, default=None
+            Metric to report. One of "Accuracy", "Precision", "Recall", and
+            "ROC AUC" for classification problems, and "Mean Squared Error"
+            and "R-squared" for regression problems.
         """
         self._print_some_features(code_fragment, metric_name, User.name != self.__username)
 
     def print_my_features(self, code_fragment=None, metric_name=None):
-        """
-        Print features written by me.
+        """Print features written by me.
 
         A code fragment can be used to filter search results. For each feature,
         prints feature id, feature description, metrics, and source code.
 
-        Args
-        ----
-            code_fragment : string
-                Source code fragment to filter for.
-            metric_name : string
-                Metric to report. One of "Accuracy", "Precision", "Recall", and
-                "ROC AUC" for classification problems, and "Mean Squared Error"
-                and "R-squared" for regression problems.
+        Parameters
+        ----------
+        code_fragment : string, default=None
+            Source code fragment to filter for.
+        metric_name : string, default=None
+            Metric to report. One of "Accuracy", "Precision", "Recall", and
+            "ROC AUC" for classification problems, and "Mean Squared Error"
+            and "R-squared" for regression problems.
         """
         self._print_some_features(code_fragment, metric_name, User.name == self.__username)
 
     def _print_some_features(self, code_fragment, metric_name, predicate):
-        """
-        Driver function for discover_features and print_my_features.
-        """
+        """Driver function for discover_features and print_my_features."""
         metric_name_default = "Accuracy"
         if not metric_name:
             metric_name = metric_name_default
@@ -154,9 +148,7 @@ class Session(object):
 
 
     def evaluate(self, feature):
-        """
-        Evaluate feature on training dataset, returning key performance
-        metrics.
+        """Evaluate feature on training dataset and return key performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
@@ -164,10 +156,10 @@ class Session(object):
         returns a dictionary with (metric => value) entries. If the feature is
         invalid, prints reason and returns empty dictionary.
 
-        Args
-        ----
-            feature : function
-                Feature to evaluate
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
 
         if self.__evaluation_client.check_if_registered(feature, verbose=True):
@@ -176,22 +168,22 @@ class Session(object):
         return self.__evaluation_client.evaluate(feature)
 
     def register_feature(self, feature, description=""):
-        """
-        Submit feature to server for evaluation on test data. If successful,
-        registers feature in feature database and returns key performance
-        metrics.
+        """Submit feature to server for evaluation on test data.
+        
+        If successful, registers feature in feature database and returns key
+        performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
         feature, performs cross validation, and returns key performance
         metrics.
 
-        Args
-        ----
-            feature : function
-                Feature to evaluate
-            description : str
-                Feature description. If left empty, will prompt for user imput.
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
+        description : str
+            Feature description. If left empty, will prompt for user imput.
         """
 
         if not description:
@@ -214,11 +206,11 @@ class Session(object):
         return self._load_dataset()
 
     def _filter_features(self, session, code_fragment):
-        """
+        """Return query that filters this problem and given code fragment.
+        
         Return a query object that filters features written for the appropriate
-        problem by code snippets.
-
-        This query object can be added to by the caller.
+        problem by code snippets. This query object can be added to by the
+        caller.
         """
         filter_ = (
             Feature.problem_id == self.__problemid,
@@ -232,6 +224,7 @@ class Session(object):
         return session.query(Feature).filter(*filter_)
 
     def _prompt_description(self):
+        """Prompt user for description of feature"""
         print("First, enter feature description. Your feature description "
               "should be clear, concise, and meaningful to non-data scientists."
               " (If your feature fails to register, this description will be "
@@ -244,6 +237,30 @@ class Session(object):
     @staticmethod
     def _print_one_feature(feature_description, feature_id, feature_code,
             metric_list):
+        """Print one feature in user-readable format.
+        
+        Parameters
+        ----------
+        feature_description : str
+        feature_id : int
+        feature_code : str
+        metric_list : MetricList
+
+        Examples
+        --------
+        >>> Session._print_one_feature("Age", 1, "def age(dataset):    pass\n",
+                metric_list_)
+        -------------------
+        Feature id: 1
+        Feature description: Age
+
+        Feature code:
+            def age(dataset):    pass
+
+        Feature metrics:
+            Accuracy: 0.5
+            ROC AUC: 0.35
+        """
         result = "------------------\n" + \
                  "Feature id: {}\n".format(feature_id) + \
                  "Feature description: {}\n".format(feature_description)

@@ -8,10 +8,20 @@ the site's domain name as well as your username and password.
 
 ## Using Jupyter Notebook
 
-Jupyter Notebook is a widely-used platform for interactive computing. Rather than describing
-it here, we recommend you check out these quick tutorials
-- http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/What%20is%20the%20Jupyter%20Notebook.ipynb#
-- http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb
+Jupyter Notebook is a widely-used platform for interactive computing. Here, we provide
+resources to learn to use Notebook within your web browser.
 
-You can also reference the full documentation
-- http://jupyter-notebook.readthedocs.io/en/latest/notebook.html
+First, we recommend you check out these quick video tutorials:
+
+<table> <tbody> <tr> <td style="padding: 20px;">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/T4WXs6niloU" frameborder="0" allowfullscreen></iframe>
+</td> <td style="padding: 20px;">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tz4UwhQs0Z8" frameborder="0" allowfullscreen></iframe>
+</td> </tr> </tbody> </table>
+
+You can also look through these tutorials, which are rendered Notebooks themselves:
+- [What is the Jupyter Notebook?](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/What%20is%20the%20Jupyter%20Notebook.ipynb#)
+- [Notebook Basics](http://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/Notebook%20Basics.ipynb)
+
+You can also reference the official Jupyter Notebook documentation:
+- [http://jupyter-notebook.readthedocs.io/en/latest/notebook.html]

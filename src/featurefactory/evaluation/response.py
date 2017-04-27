@@ -3,16 +3,19 @@ from flask import Response
 from featurefactory.modeling import MetricList
 
 class EvaluationResponse(Response):
-    """
-    Wrapper class for response from evaluation server.
+    """Wrapper class for response from evaluation server.
 
-    Args
+    Parameters
     ----
-        status_code : string
-            Possible values are EvaluationResponse static members.
-        metrics : list of Metric
-            List of Metric objects, which each encode metric name, metric scoring
-            method, and value.
+    status_code : string, optional (default=EvaluationResponse.STATUS_CODE_OKAY)
+        Possible values are EvaluationResponse static members.
+    metrics : list of Metric, optional (default=None)
+        List of Metric objects, which each encode metric name, metric scoring
+        method, and value.
+
+    Examples
+    --------
+    >>> EvaluationResponse(status_code=EvaluationResponse.STATUS_CODE_SERVER_ERROR)
     """
 
     STATUS_CODE_OKAY              = "okay"
@@ -43,14 +46,15 @@ class EvaluationResponse(Response):
 
     @classmethod
     def from_string(cls, string):
-        """
-        Create a new instance from a json-dumped string. This is useful for
-        recreating the instance on the receiving end of the web connection.
+        """Instantiate EvaluationResponse from a json-dumped string.
+        
+        This is useful for recreating the instance on the receiving end of the
+        web connection.
 
-        Args
-        ----
-            string : str
-                Json-dumped string encoding the response.
+        Parameters
+        ----------
+        string : str
+            Json-dumped string encoding the response.
         """
 
         d = json.loads(string)
@@ -61,9 +65,7 @@ class EvaluationResponse(Response):
         return cls(status_code=status_code, metrics=metrics)
 
     def _get_explanation(self):
-        """
-        Return an explanation of the response status code.
-        """
+        """Return an explanation of the response status code."""
 
         if self.status_code1 == self.STATUS_CODE_OKAY:
             return "Feature registered successfully."
@@ -89,11 +91,11 @@ class EvaluationResponse(Response):
         return MetricList.from_object(self.metrics).to_string(kind="user")
 
     def __str__(self):
-        """
+        """ Return string representation of response.
+
         Return a descriptive representation of the response suitable for showing
         Feature Factory users.
         """
-
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()
         return explanation + "\n\n" + metrics_str

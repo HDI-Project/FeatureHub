@@ -18,8 +18,7 @@ def _get_function_and_execute(f_dill, *args):
     return f(*args)
 
 def run_isolated(f, *args):
-    """
-    Execute `f(args)` in an isolated environment.
+    """Execute `f(args)` in an isolated environment.
     
     First, uses dill to serialize the function. Unfortunately, pickle is unable
     to serialize some functions, so we must serialize and deserialize the
@@ -30,8 +29,7 @@ def run_isolated(f, *args):
         return pool.apply(_get_function_and_execute, (f_dill, *args))
 
 def get_source(function):
-    """
-    Extract the source code from a given function.
+    """Extract the source code from a given function.
 
     Recursively extracts the source code for all local functions called by given
     function. The resulting source code is encoded in utf-8.
@@ -39,6 +37,10 @@ def get_source(function):
     Limitations: Cannot use `get_source` on function defined interactively in
     normal Python terminal. Functions defined interactively in IPython are still
     okay.
+
+    Parameters
+    ----------
+    function : function
     """
 
     # Use nested function to allow us to ultimately encode as utf-8 string.
@@ -74,16 +76,16 @@ def get_source(function):
     return code
 
 def get_function(source):
-    """
-    Return a function from given source code that was extracted using `get_source`.
+    """Return a function from given source code.
 
-    Note that the source code produced by get_source includes the source for the
-    top-level function as well as any other local functions it calls. Here, we
-    return the top-level function directly.
+    This function is usually called on source code that was in turn produced by
+    get_source. Note that the source code produced by get_source includes the
+    source for the top-level function as well as any other local functions it
+    calls. Here, we return the top-level function directly.
 
-    Args
-    ----
-        source : str, bytes
+    Parameters
+    ----------
+    source : str or bytes
     """
 
     # decode into str
@@ -107,8 +109,7 @@ def get_function(source):
     return namespace[name]
 
 def get_top_level_function_name(namespace, remove_names=["__builtins__"]):
-    """
-    Figure out which is the top-level function in a namespace.
+    """Figure out which is the top-level function in a namespace.
     
     The top-level function is defined as the function that is not a name in any
     other functions.  co_names is a tuple of local names.  We could make more
@@ -151,10 +152,11 @@ def get_top_level_function_name(namespace, remove_names=["__builtins__"]):
     return names[0]
 
 def get_function2(source):
-    """
-    Return a function from given source code that was extracted using
-    `get_source`. This function differs from `get_function` in the method used
-    is to write the source code to a file and then import that file as a new
+    """Return a function from given source code.
+
+    This function is usually called on source code that was in turn produced by
+    get_source. This function differs from `get_function` in the method used is
+    to write the source code to a file and then import that file as a new
     module.
 
     Note that the source code produced by get_source includes the source for the
@@ -164,9 +166,9 @@ def get_function2(source):
     Caveat: This does not solve the problem of being able to re-extract source
     from the returned function. (Or, at least, as currently implemented.)
 
-    Args
-    ----
-        source : str, bytes
+    Parameters
+    ----------
+    source : str, bytes
     """
 
     # decode into str
@@ -196,12 +198,14 @@ def get_function2(source):
         return getattr(module, top_level_name)
 
 def compute_dataset_hash(dataset):
-    """
-    Return hash value of dataset contents.
+    """Return hash value of dataset contents.
 
-    Args
-    ----
-        dataset : list of DataFrame
+    Uses xxhash.xxh64 hash algorithm for performance, but this algorithm should
+    not be considered cryptographically secure.
+
+    Parameters
+    ----------
+    dataset : dict mapping str to pd.DataFrame
     """
     h = xxhash.xxh64()
     for d in sorted(dataset.keys()):
@@ -210,6 +214,7 @@ def compute_dataset_hash(dataset):
     return h.hexdigest()
 
 def myhash(obj):
+    """Compute md5 checksum of string-like object."""
     if not isinstance(obj, bytes):
         obj_enc = obj.encode("utf-8")
     else:
@@ -217,8 +222,24 @@ def myhash(obj):
     return hashlib.md5(obj_enc).hexdigest()
 
 @contextmanager
-def possibly_talking_action(action, verbose):
-    """
+def possibly_talking_action(action, verbose=True):
+    """Wrap statements with description of their action.
+
+    Simply prints action before executing statement, without a trailing
+    newline, and prints 'done' afterwards.
+    
+    Parameters
+    ----------
+    action : str
+        description of action
+    verbose : bool, optional (default=True)
+        whether to print anything at all
+
+    Examples
+    --------
+    >>> with possibly_talking_action("Calling foo...", True):
+            foo()
+    Calling foo...done
     """
     if verbose:
         vprint = print

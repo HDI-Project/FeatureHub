@@ -27,17 +27,16 @@ class EvaluatorClient(object):
             self.__dataset_hash = None
 
     def check_if_registered(self, feature, verbose=False):
-        """
-        Check if feature is registered.
+        """Check if feature is registered.
 
         Extracts source code, then looks for the identical source code in the
         feature database.
 
-        Args
-        ---
-            feature : function
-            verbose : bool
-                Whether to print output.
+        Parameters
+        ----------
+        feature : function
+        verbose : bool
+            Whether to print output.
         """
         code    = get_source(feature)
         return self._check_if_registered(code, verbose=verbose)
@@ -61,22 +60,22 @@ class EvaluatorClient(object):
         return False
 
     def register_feature(self, feature, description):
-        """
-        Submit feature to server for evaluation on test data. If successful,
-        registers feature in feature database and returns key performance
-        metrics.
+        """Submit feature to server for evaluation on test data.
+        
+        If successful, registers feature in feature database and returns key
+        performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
         feature, performs cross validation, and returns key performance
         metrics.
 
-        Args
-        ----
-            feature : function
-                Feature to evaluate
-            description : str
-                Feature description
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
+        description : str
+            Feature description
         """
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
@@ -120,9 +119,7 @@ class EvaluatorClient(object):
                 pass
 
     def evaluate(self, feature):
-        """
-        Evaluate feature on training dataset, returning key performance
-        metrics.
+        """Evaluate feature on training dataset and return key performance metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
@@ -130,10 +127,10 @@ class EvaluatorClient(object):
         returns a dictionary with (metric => value) entries. If the feature is
         invalid, prints reason and returns empty dictionary.
 
-        Args
-        ----
-            feature : function
-                Feature to evaluate
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
         try:
             metrics = self._evaluate(feature, verbose=True)
@@ -188,8 +185,6 @@ class EvaluatorClient(object):
         return metrics
 
     def _extract_features(self, feature):
-        """
-        """
         assert isinstance(feature, collections.Callable), \
                 "feature must be a function!"
 
@@ -204,9 +199,9 @@ class EvaluatorClient(object):
         return self.dataset[target_table_name][y_column]
 
     def _load_dataset(self):
-        """
-        Load dataset if dataset is not present, and compute/re-compute dataset
-        hash.
+        """Load dataset if not present.
+        
+        Also computes/re-computes dataset hash.
         """
 
         # TODO check for dtypes file, facilitating lower memory usage
@@ -243,13 +238,16 @@ class EvaluatorClient(object):
         self._load_dataset()
 
     def _validate_feature_values(self, feature_values):
-        """
-        Return validity of feature values.
+        """Check whether feature values are valid.
 
         Currently checks if the feature is a DataFrame of the correct
         dimensions. If the feature is valid, returns an empty string. Otherwise,
         returns a semicolon-delimited list of reasons that the feature is
         invalid.
+
+        Parameters
+        ----------
+        feature_values : np array-like
         """
 
         with self.orm.session_scope() as session:
@@ -281,8 +279,6 @@ class EvaluatorClient(object):
         return result
 
     def _verify_dataset_integrity(self):
-        """
-        """
         new_hash = compute_dataset_hash(self.dataset)
         if self.__dataset_hash != new_hash:
             print("Old hash: {}".format(self.__dataset_hash), file=sys.stderr)
@@ -295,27 +291,30 @@ class EvaluatorServer(EvaluatorClient):
         super().__init__(problem_id, username, orm, dataset)
 
     def check_if_registered(self, code, verbose=False):
-        """
-        Check if feature is registered.
+        """Check if feature is registered.
 
         Overwrites client method by expecting code to be passed directly. This
         is because on the server, we are limited to be unable to do code ->
         function -> code.
 
-        Args
-        ---
-            code : str
-            verbose : bool
-                Whether to print output.
+        Parameters
+        ----------
+        code : str
+        verbose : bool, optional (default=False)
+            Whether to print output.
         """
         return self._check_if_registered(code, verbose=verbose)
 
     def evaluate(self, feature):
-        """
-        Evaluate feature.
+        """Evaluate feature.
 
         Returns a dictionary with (metric => value) entries. If the feature is
         invalid, re-raises the ValueError.
+
+        Parameters
+        ----------
+        feature : function
+            Feature to evaluate
         """
         try:
             metrics = self._evaluate(feature, verbose=False)
@@ -324,7 +323,11 @@ class EvaluatorServer(EvaluatorClient):
             raise
 
     def register_feature(self, feature, description):
-        """Register_feature is a no-op in this subclass."""
+        """Does nothing.
+
+        This class is instantiated at the server, thus we are already
+        registering the feature.
+        """
         pass
 
     def _compute_metrics(self, X, Y, verbose=False):
@@ -333,6 +336,9 @@ class EvaluatorServer(EvaluatorClient):
         return metrics
 
     def _verify_dataset_integrity(self):
-        # Don't need to verify dataset integrity on server because we re-load
-        # the dataset for every new feature.
+        """Does nothing.
+
+        Don't need to verify dataset integrity on server because we re-load
+        the dataset for every new feature.
+        """
         pass

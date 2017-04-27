@@ -3,7 +3,6 @@ docker>=2.0.0
 flask>=0.12
 jupyter
 jupyterhub>=0.7.2
-git+https://github.com/minrk/jupyterhub-client.git@99b856e81925690d5546fd8457a6e333fb709513#egg=jupyterhub_client-0.2.0
 matplotlib
 numpy
 mysqlclient

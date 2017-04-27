@@ -10,6 +10,17 @@ from featurefactory.modeling.metrics import Metric, MetricList
 from featurefactory.util import RANDOM_STATE
 
 class Model(object):
+    """Versatile modeling object.
+
+    Handles classification and regression problems and computes variety of
+    performance metrics.
+
+    Parameters
+    ----------
+    problem_type : str
+        One of "classification" or "regression"
+    """
+
     CLASSIFICATION = "classification"
     REGRESSION     = "regression"
 
@@ -38,22 +49,21 @@ class Model(object):
             raise NotImplementedError
 
     def cv_score_mean(self, X, Y, scorings):
-        """
-        Compute mean score across cross validation folds.
+        """Compute mean score across cross validation folds.
 
         Split data and labels into cross validation folds and fit the model for
         each fold. Then, for each scoring type in scorings, compute the score.
         Finally, average the scores across folds. Returns a dictionary mapping
         scoring to score.
 
-        Args
-        ----
-            X : np.ndarray
-                data
-            Y : np.ndarray
-                labels
-            scorings : list of str
-                scoring types
+        Parameters
+        ----------
+        X : numpy array-like
+            data
+        Y : numpy array-like
+            labels
+        scorings : list of str
+            scoring types
         """
         # 1d arrays are deprecated by sklearn 0.17 (?)
         if len(X.shape) == 1:
@@ -146,20 +156,20 @@ class Model(object):
         return scoring_outputs
 
     def compute_metrics(self, X, Y):
-        """
-        Compute cross-validated metrics from training model on data X with
-        labels Y.
+        """Compute cross-validated metrics.
+        
+        Trains this model on data X with labels Y.
 
         Returns a MetricList with the name, scoring type, and value for each
         Metric. Note that these values may be numpy floating points, and should
         be converted prior to insertion in a database.
 
-        Args
-        ----
-            X : np.array or pd.DataFrame
-                data
-            Y : np.array or pd.DataFrame or pd.DataSeries
-                labels
+        Parameters
+        ----------
+        X : numpy array-like or pd.DataFrame
+            data
+        Y : numpy array-like or pd.DataFrame or pd.DataSeries
+            labels
         """
 
         # just ensure that we np for everything

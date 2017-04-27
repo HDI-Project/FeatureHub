@@ -2,9 +2,7 @@ from collections import MutableSequence
 import featurefactory.modeling.model
 
 class Metric(object):
-    """
-    Metric
-    """
+    """Metric"""
 
     def __init__(self, name, scoring, value):
         self.name    = name
@@ -32,8 +30,7 @@ class Metric(object):
         return self.name > other.name
 
     def convert(self, kind="user"):
-        """
-        Convert to format suitable for returning to user or inserting into db.
+        """Convert to nice format for returning to user or inserting into db.
 
         Conversion to user format returns a dictinary with one element mapping
         metric name to metric value. Conversion to db format returns a
@@ -41,10 +38,10 @@ class Metric(object):
         respective values. Both formats convert np.floating values to Python
         floats.
 
-        Args
-        ----
-            kind : str
-                One of "user" or "db"
+        Parameters
+        ----------
+        kind : str
+            One of "user" or "db"
         """
 
         try:
@@ -68,6 +65,7 @@ class Metric(object):
         return d
 
     def to_string(self, kind="user"):
+        """Convert to user/db format, then return string representation."""
         if kind=="user":
             return "{}: {}".format(self.name, self.value)
         else:
@@ -75,6 +73,7 @@ class Metric(object):
 
     @classmethod
     def from_dict(cls, d, kind="user"):
+        """Instantiate Metric from user/db format."""
         if kind=="user":
             assert len(d) == 1
             keys = [k for k in d.keys()]
@@ -89,6 +88,7 @@ class Metric(object):
 
     @staticmethod
     def name_to_scoring(name):
+        """Find the scoring type associated with the metric name."""
         def find_in_list(list_):
             for d in list_:
                 if d["name"] == name:
@@ -105,9 +105,7 @@ class Metric(object):
         return None
 
 class MetricList(MutableSequence):
-    """
-    MetricList
-    """
+    """MetricList"""
 
     def __init__(self, data=None):
         super().__init__()
@@ -155,9 +153,7 @@ class MetricList(MutableSequence):
         self._list.append(val)
 
     def to_string(self, kind="user"):
-        """
-        Get user-readable output.
-        """
+        """Get user-readable output."""
         metrics_str = "Feature evaluation metrics: \n"
         line_prefix = "    "
         line_suffix = "\n"
@@ -170,8 +166,7 @@ class MetricList(MutableSequence):
         return metrics_str
 
     def convert(self, kind="user"):
-        """
-        Convert underlying metric objects.
+        """Convert underlying metric objects.
 
         Conversion to user format returns a dictionary with each element mapping
         metric name to metric value. Conversion to db format returns a
@@ -179,10 +174,10 @@ class MetricList(MutableSequence):
         mapping to their respective values. Both formats convert np.floating
         values to Python floats.
 
-        Args
-        ----
-            kind : str
-                One of "user" or "db"
+        Parameters
+        ----------
+        kind : str
+            One of "user" or "db"
         """
         if kind=="user":
             metrics = {}
@@ -199,8 +194,6 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_dict_user(cls, d):
-        """
-        """
         metrics = cls()
         for key in d:
             metrics.append(Metric.from_dict({key:d[key]},kind="user"))
@@ -209,8 +202,6 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_list_db(cls, l):
-        """
-        """
         metrics = cls()
         for item in l:
             metrics.append(Metric.from_dict(item,kind="db"))
@@ -219,7 +210,13 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_object(cls, obj):
-        """
+        """Instantiate MetricList from supported format.
+        
+        Tries to detect the underlying format and deal with that appropriately.
+
+        Parameters
+        ----------
+        obj: MetricList, dict, list of dict, or list of Metric
         """
         if isinstance(obj, MetricList):
             return obj
