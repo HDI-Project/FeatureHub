@@ -38,6 +38,23 @@ class Model(object):
             raise NotImplementedError
 
     def cv_score_mean(self, X, Y, scorings):
+        """
+        Compute mean score across cross validation folds.
+
+        Split data and labels into cross validation folds and fit the model for
+        each fold. Then, for each scoring type in scorings, compute the score.
+        Finally, average the scores across folds. Returns a dictionary mapping
+        scoring to score.
+
+        Args
+        ----
+            X : np.ndarray
+                data
+            Y : np.ndarray
+                labels
+            scorings : list of str
+                scoring types
+        """
         # 1d arrays are deprecated by sklearn 0.17 (?)
         if len(X.shape) == 1:
             X = X.reshape(-1, 1)
@@ -133,9 +150,16 @@ class Model(object):
         Compute cross-validated metrics from training model on data X with
         labels Y.
 
-        Returns a dictionary that maps metric names ("Accuracy") to values. Note
-        that these values may be numpy floating points, and should be
-        converted prior to insertion in a database.
+        Returns a MetricList with the name, scoring type, and value for each
+        Metric. Note that these values may be numpy floating points, and should
+        be converted prior to insertion in a database.
+
+        Args
+        ----
+            X : np.array or pd.DataFrame
+                data
+            Y : np.array or pd.DataFrame or pd.DataSeries
+                labels
         """
 
         # just ensure that we np for everything

@@ -27,6 +27,18 @@ class EvaluatorClient(object):
             self.__dataset_hash = None
 
     def check_if_registered(self, feature, verbose=False):
+        """
+        Check if feature is registered.
+
+        Extracts source code, then looks for the identical source code in the
+        feature database.
+
+        Args
+        ---
+            feature : function
+            verbose : bool
+                Whether to print output.
+        """
         code    = get_source(feature)
         return self._check_if_registered(code, verbose=verbose)
 
@@ -50,6 +62,21 @@ class EvaluatorClient(object):
 
     def register_feature(self, feature, description):
         """
+        Submit feature to server for evaluation on test data. If successful,
+        registers feature in feature database and returns key performance
+        metrics.
+
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature, performs cross validation, and returns key performance
+        metrics.
+
+        Args
+        ----
+            feature : function
+                Feature to evaluate
+            description : str
+                Feature description
         """
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
@@ -94,10 +121,14 @@ class EvaluatorClient(object):
 
     def evaluate(self, feature):
         """
-        Evaluate feature.
+        Evaluate feature on training dataset, returning key performance
+        metrics.
 
-        Prints results and returns a dictionary with (metric => value) entries.
-        If the feature is invalid, prints reason and returns empty dictionary.
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature and computes key cross-validated metrics. Prints results and
+        returns a dictionary with (metric => value) entries. If the feature is
+        invalid, prints reason and returns empty dictionary.
 
         Args
         ----
@@ -270,6 +301,12 @@ class EvaluatorServer(EvaluatorClient):
         Overwrites client method by expecting code to be passed directly. This
         is because on the server, we are limited to be unable to do code ->
         function -> code.
+
+        Args
+        ---
+            code : str
+            verbose : bool
+                Whether to print output.
         """
         return self._check_if_registered(code, verbose=verbose)
 

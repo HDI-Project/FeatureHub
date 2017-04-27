@@ -14,8 +14,6 @@ from featurefactory.modeling import Model
 from featurefactory.util import run_isolated, get_source, compute_dataset_hash
 from featurefactory.evaluation import EvaluatorClient
 
-MD5_ABBREV_LEN = 8
-
 class Session(object):
     """
     Represents a user's session within Feature Factory.
@@ -75,6 +73,12 @@ class Session(object):
         Loads sample of problem training dataset.
 
         Returns a dict mapping table names to pandas DataFrames.
+
+        Example usage:
+        
+            dataset = commands.get_sample_dataset()
+            dataset["users"] # -> returns DataFrame
+            dataset["stores"] # -> returns DataFrame
         """
         if not self.__dataset:
             self._load_dataset()
@@ -89,7 +93,7 @@ class Session(object):
         Print features written by other users.
 
         A code fragment can be used to filter search results. For each feature,
-        prints feature description, metrics, and source code.
+        prints feature id, feature description, metrics, and source code.
 
         Args
         ----
@@ -107,7 +111,7 @@ class Session(object):
         Print features written by me.
 
         A code fragment can be used to filter search results. For each feature,
-        prints feature description, metrics, and source code.
+        prints feature id, feature description, metrics, and source code.
 
         Args
         ----
@@ -156,8 +160,14 @@ class Session(object):
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
-        feature, performs cross validation, and returns key performance
-        metrics.
+        feature and computes key cross-validated metrics. Prints results and
+        returns a dictionary with (metric => value) entries. If the feature is
+        invalid, prints reason and returns empty dictionary.
+
+        Args
+        ----
+            feature : function
+                Feature to evaluate
         """
 
         if self.__evaluation_client.check_if_registered(feature, verbose=True):
@@ -175,6 +185,13 @@ class Session(object):
         values. Validates the feature values. Then, builds a model on that one
         feature, performs cross validation, and returns key performance
         metrics.
+
+        Args
+        ----
+            feature : function
+                Feature to evaluate
+            description : str
+                Feature description. If left empty, will prompt for user imput.
         """
 
         if not description:

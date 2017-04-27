@@ -199,7 +199,7 @@ def evaluate(user):
             )
             session.add(feature_obj)
             for metric in metrics:
-                metric_db = metric.to_db_entry()
+                metric_db = metric.convert(kind="db")
                 metric_obj = Metric(
                     feature = feature_obj,
                     name    = metric_db["name"],

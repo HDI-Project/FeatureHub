@@ -10,12 +10,12 @@ def test_metric():
 def _test_metric(name, scoring, value):
     metric = Metric(name, scoring, value)
 
-    print("metric.to_user_display()")
-    print(metric.to_user_display())
-    print("metric.to_db_entry()")
-    print(metric.to_db_entry())
-    assert metric == Metric.from_dict(metric.to_user_display(), kind="user")
-    assert metric == Metric.from_dict(metric.to_db_entry(), kind="db")
+    print('metric.convert(kind="user")')
+    print(metric.convert(kind="user"))
+    print('metric.convert(kind="db")')
+    print(metric.convert(kind="db"))
+    assert metric == Metric.from_dict(metric.convert(kind="user"), kind="user")
+    assert metric == Metric.from_dict(metric.convert(kind="db"), kind="db")
 
 def test_metric_list():
     # create list

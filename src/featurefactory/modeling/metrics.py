@@ -2,6 +2,10 @@ from collections import MutableSequence
 import featurefactory.modeling.model
 
 class Metric(object):
+    """
+    Metric
+    """
+
     def __init__(self, name, scoring, value):
         self.name    = name
         self.scoring = scoring
@@ -27,29 +31,47 @@ class Metric(object):
     def __gt__(self, other):
         return self.name > other.name
 
-    def to_user_display(self):
-        d = {
-            self.name : self.value,
-        }
-        return d
+    def convert(self, kind="user"):
+        """
+        Convert to format suitable for returning to user or inserting into db.
 
-    def to_db_entry(self):
+        Conversion to user format returns a dictinary with one element mapping
+        metric name to metric value. Conversion to db format returns a
+        dictionary with keys "name", "scoring", and "value" mapping to their
+        respective values. Both formats convert np.floating values to Python
+        floats.
+
+        Args
+        ----
+            kind : str
+                One of "user" or "db"
+        """
+
         try:
             value = float(self.value)
         except Exception:
             value = None
-        d = {
-            "name"    : self.name,
-            "scoring" : self.scoring,
-            "value"   : value,
-        }
+
+        if kind=="user":
+            d = {
+                self.name : value,
+            }
+        elif kind=="db":
+            d = {
+                "name"    : self.name,
+                "scoring" : self.scoring,
+                "value"   : value,
+            }
+        else:
+            raise ValueError("Bad kind: {} ".format(kind))
+
         return d
 
     def to_string(self, kind="user"):
         if kind=="user":
             return "{}: {}".format(self.name, self.value)
         else:
-            raise NotImplementedError()
+            raise NotImplementedError
 
     @classmethod
     def from_dict(cls, d, kind="user"):
@@ -83,8 +105,11 @@ class Metric(object):
         return None
 
 class MetricList(MutableSequence):
+    """
+    MetricList
+    """
+
     def __init__(self, data=None):
-        """Initialize the class"""
         super().__init__()
         if data is not None:
             self._list = list(data)
@@ -95,34 +120,16 @@ class MetricList(MutableSequence):
         return repr(self._list)
 
     def __len__(self):
-        """List length"""
         return len(self._list)
 
     def __getitem__(self, ii):
-        """Get a list item"""
         return self._list[ii]
 
     def __delitem__(self, ii):
-        """Delete an item"""
         del self._list[ii]
 
     def __setitem__(self, ii, val):
         self._list[ii] = val
-
-    def to_string(self, kind="user"):
-        """
-        Get user-readable output from metrics, a dict of metrics
-        """
-        metrics_str = "Feature evaluation metrics: \n"
-        line_prefix = "    "
-        line_suffix = "\n"
-        if self._list:
-            for metric in self._list:
-                metrics_str += line_prefix + metric.to_string(kind=kind) + line_suffix
-        else:
-            metrics_str += line_prefix + "<no metrics returned>" + line_suffix
-
-        return metrics_str
 
     def __eq__(self, other):
         if not isinstance(other, MetricList):
@@ -142,21 +149,49 @@ class MetricList(MutableSequence):
         return True
 
     def insert(self, ii, val):
-        # optional: self._acl_check(val)
         self._list.insert(ii, val)
 
     def append(self, val):
-        self.insert(len(self._list), val)
+        self._list.append(val)
+
+    def to_string(self, kind="user"):
+        """
+        Get user-readable output.
+        """
+        metrics_str = "Feature evaluation metrics: \n"
+        line_prefix = "    "
+        line_suffix = "\n"
+        if self._list:
+            for metric in self._list:
+                metrics_str += line_prefix + metric.to_string(kind=kind) + line_suffix
+        else:
+            metrics_str += line_prefix + "<no metrics returned>" + line_suffix
+
+        return metrics_str
 
     def convert(self, kind="user"):
+        """
+        Convert underlying metric objects.
+
+        Conversion to user format returns a dictionary with each element mapping
+        metric name to metric value. Conversion to db format returns a
+        list of dictionaries, each with keys "name", "scoring", and "value"
+        mapping to their respective values. Both formats convert np.floating
+        values to Python floats.
+
+        Args
+        ----
+            kind : str
+                One of "user" or "db"
+        """
         if kind=="user":
             metrics = {}
             for m in self._list:
-                metrics.update(m.to_user_display())
+                metrics.update(m.convert(kind="user"))
         elif kind=="db":
             metrics = []
             for m in self._list:
-                metrics.append(m.to_db_entry())
+                metrics.append(m.convert(kind="db"))
         else:
             ValueError("Bad kind: {}".format(kind))
 
@@ -164,6 +199,8 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_dict_user(cls, d):
+        """
+        """
         metrics = cls()
         for key in d:
             metrics.append(Metric.from_dict({key:d[key]},kind="user"))
@@ -172,6 +209,8 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_list_db(cls, l):
+        """
+        """
         metrics = cls()
         for item in l:
             metrics.append(Metric.from_dict(item,kind="db"))
@@ -180,6 +219,8 @@ class MetricList(MutableSequence):
 
     @classmethod
     def from_object(cls, obj):
+        """
+        """
         if isinstance(obj, MetricList):
             return obj
         elif isinstance(obj, dict):
