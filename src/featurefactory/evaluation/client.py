@@ -5,8 +5,12 @@ import requests
 import collections
 import traceback
 
-from featurefactory.util                         import compute_dataset_hash, run_isolated, get_source
-from featurefactory.admin.sqlalchemy_declarative import Problem
+from featurefactory.util import (
+    compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
+    myhash
+
+)
+from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.modeling                     import Model
 
@@ -22,7 +26,31 @@ class EvaluatorClient(object):
         else:
             self.__dataset_hash = None
 
+    def check_if_registered(self, feature, verbose=False):
+        code    = get_source(feature)
+        return self._check_if_registered(code, verbose=verbose)
+
+    def _check_if_registered(self, code, verbose=False):
+        md5 = myhash(code)
+
+        with self.orm.session_scope() as session:
+            filters = (
+                Feature.problem_id == self.problem_id,
+                Feature.md5        == md5,
+            )
+            query = session.query(Feature).filter(*filters)
+            result = query.scalar()
+
+        if result:
+            if verbose:
+                print("Feature already registered.")
+            return True
+
+        return False
+
     def register_feature(self, feature, description):
+        """
+        """
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
             os.environ["EVAL_CONTAINER_NAME"],
@@ -88,40 +116,27 @@ class EvaluatorClient(object):
 
     def _evaluate(self, feature, verbose=False):
 
-        if verbose:
-            vprint = print
-        else:
-            def do_nothing(*args, **kwargs): pass
-            vprint = do_nothing
+        with possibly_talking_action("Obtaining dataset...", verbose):
+            self._load_dataset()
 
-        vprint("Obtaining dataset...", end='')
-        self._load_dataset()
-        vprint("done")
-
-
-        vprint("Extracting features...", end='')
-        X = self._extract_features(feature)
-        vprint("done")
+        with possibly_talking_action("Extracting features...", verbose):
+            X = self._extract_features(feature)
 
         # confirm dataset has not been changed
-        vprint("Verifying dataset integrity...", end='')
-        self._verify_dataset_integrity()
-        vprint("done")
+        with possibly_talking_action("Verifying dataset integrity...", verbose):
+            self._verify_dataset_integrity()
 
         # validate
-        vprint("Validating feature values...", end='')
-        result = self._validate_feature_values(X)
-        vprint("done")
+        with possibly_talking_action("Validating feature values...", verbose):
+            result = self._validate_feature_values(X)
 
         # extract label
-        vprint("Extracting label...", end='')
-        Y = self._extract_label()
-        vprint("done")
+        with possibly_talking_action("Extracting label...", verbose):
+            Y = self._extract_label()
 
         # compute metrics
-        vprint("Computing metrics...", end='')
-        metrics = self._compute_metrics(X, Y)
-        vprint("done")
+        with possibly_talking_action("Computing metrics...", verbose):
+            metrics = self._compute_metrics(X, Y)
 
         return metrics
 
@@ -133,7 +148,8 @@ class EvaluatorClient(object):
     def _compute_metrics(self, X, Y):
         with self.orm.session_scope() as session:
             # TODO this may be a sub-transaction
-            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            problem = session.query(Problem)\
+                    .filter(Problem.id == self.problem_id).one()
             problem_type = problem.problem_type
         model = Model(problem_type)
         metrics = model.compute_metrics(X, Y)
@@ -150,7 +166,8 @@ class EvaluatorClient(object):
 
     def _extract_label(self):
         with self.orm.session_scope() as session:
-            problem  = session.query(Problem).filter(Problem.id == self.problem_id).one()
+            problem = session.query(Problem)\
+                    .filter(Problem.id == self.problem_id).one()
             target_table_name = problem.target_table_name
             y_column          = problem.y_column
         return self.dataset[target_table_name][y_column]
@@ -166,7 +183,8 @@ class EvaluatorClient(object):
         if not self.dataset:
             with self.orm.session_scope() as session:
                 # TODO this may be a sub-transaction
-                problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
+                problem = session.query(Problem)\
+                        .filter(Problem.id == self.problem_id).one()
                 problem_files = problem.files
                 problem_table_names = problem.table_names
                 problem_data_path = problem.data_path
@@ -174,7 +192,8 @@ class EvaluatorClient(object):
             for (filename, table_name) in zip(problem_files.split(","),
                     problem_table_names.split(",")):
                 abs_filename = os.path.join(problem_data_path, filename)
-                self.dataset[table_name] = pandas.read_csv(abs_filename, low_memory=False)
+                self.dataset[table_name] = pandas.read_csv(abs_filename,
+                        low_memory=False)
 
             # compute/recompute hash
             self.__dataset_hash = compute_dataset_hash(self.dataset)
@@ -243,6 +262,16 @@ class EvaluatorClient(object):
 class EvaluatorServer(EvaluatorClient):
     def __init__(self, problem_id, username, orm, dataset={}):
         super().__init__(problem_id, username, orm, dataset)
+
+    def check_if_registered(self, code, verbose=False):
+        """
+        Check if feature is registered.
+
+        Overwrites client method by expecting code to be passed directly. This
+        is because on the server, we are limited to be unable to do code ->
+        function -> code.
+        """
+        return self._check_if_registered(code, verbose=verbose)
 
     def evaluate(self, feature):
         """

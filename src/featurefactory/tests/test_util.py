@@ -149,3 +149,9 @@ def test_compute_dataset_hash():
     [d.head() for d in dataset.values()]
     [d.describe() for d in dataset.values()]
     assert dataset_hash == featurefactory.util.compute_dataset_hash(dataset)
+
+def test_myhash():
+    a = "hello world"
+    b = "hello world".encode("utf-8")
+
+    assert featurefactory.util.myhash(a) == featurefactory.util.myhash(b)

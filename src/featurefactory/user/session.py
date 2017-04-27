@@ -6,11 +6,13 @@ import pandas as pd
 from textwrap import dedent
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Problem, Feature, User, Metric
-from featurefactory.modeling                     import Model
-from featurefactory.util                         import run_isolated, get_source, compute_dataset_hash
-from featurefactory.evaluation                   import EvaluatorClient
+from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.admin.sqlalchemy_declarative import (
+    Problem, Feature, User, Metric
+)
+from featurefactory.modeling import Model
+from featurefactory.util import run_isolated, get_source, compute_dataset_hash
+from featurefactory.evaluation import EvaluatorClient
 
 MD5_ABBREV_LEN = 8
 
@@ -70,16 +72,17 @@ class Session(object):
 
     def get_sample_dataset(self):
         """
-        Loads sample of problem dataset, returning a list of
-        DataFrames.
+        Loads sample of problem training dataset.
+
+        Returns a dict mapping table names to pandas DataFrames.
         """
         if not self.__dataset:
             self._load_dataset()
 
         # Return a *copy* of the dataset, ensuring we have enough memory.
         gc.collect()    
-        return {table_name : self.__dataset[table_name].copy() for table_name in
-                self.__dataset}
+        return { table_name : self.__dataset[table_name].copy() for table_name
+                in self.__dataset }
 
     def discover_features(self, code_fragment=None, metric_name=None):
         """
@@ -148,23 +151,31 @@ class Session(object):
 
     def evaluate(self, feature):
         """
-        Evaluate feature on training dataset, returning key performance metrics.
+        Evaluate feature on training dataset, returning key performance
+        metrics.
 
         Runs the feature in an isolated environment to extract the feature
         values. Validates the feature values. Then, builds a model on that one
-        feature, performs cross validation, and returns key performance metrics.
+        feature, performs cross validation, and returns key performance
+        metrics.
         """
+
+        if self.__evaluation_client.check_if_registered(feature, verbose=True):
+            return
 
         return self.__evaluation_client.evaluate(feature)
 
     def register_feature(self, feature, description=""):
         """
-        Creates a new feature entry in database.
-        """
+        Submit feature to server for evaluation on test data. If successful,
+        registers feature in feature database and returns key performance
+        metrics.
 
-        is_registered = self._check_if_registered(feature, description)
-        if is_registered:
-            return
+        Runs the feature in an isolated environment to extract the feature
+        values. Validates the feature values. Then, builds a model on that one
+        feature, performs cross validation, and returns key performance
+        metrics.
+        """
 
         if not description:
             description = self._prompt_description()
@@ -202,26 +213,6 @@ class Session(object):
             )
 
         return session.query(Feature).filter(*filter_)
-
-    def _check_if_registered(self, feature, description, verbose=True):
-        code    = get_source(feature)
-        md5     = hashlib.md5(code).hexdigest()
-
-        with self.__orm.session_scope() as session:
-            filters = (
-                Feature.problem_id == self.__problemid,
-                Feature.md5        == md5,
-                User.name          == self.__username,
-            )
-            query = session.query(Feature, User).filter(*filters)
-            result = query.scalar()
-
-        if result:
-            if verbose:
-                print("Feature already registered.")
-            return True
-
-        return False
 
     def _prompt_description(self):
         print("First, enter feature description. Your feature description "

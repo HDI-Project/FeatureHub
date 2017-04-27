@@ -15,12 +15,13 @@ class EvaluationResponse(Response):
             method, and value.
     """
 
-    STATUS_CODE_OKAY         = "okay"
-    STATUS_CODE_BAD_REQUEST  = "bad_request"
-    STATUS_CODE_BAD_AUTH     = "bad_auth"
-    STATUS_CODE_BAD_FEATURE  = "bad_feature"
-    STATUS_CODE_SERVER_ERROR = "server_error"
-    STATUS_CODE_DB_ERROR     = "db_error"
+    STATUS_CODE_OKAY              = "okay"
+    STATUS_CODE_BAD_REQUEST       = "bad_request"
+    STATUS_CODE_BAD_AUTH          = "bad_auth"
+    STATUS_CODE_BAD_FEATURE       = "bad_feature"
+    STATUS_CODE_DUPLICATE_FEATURE = "duplicate_feature"
+    STATUS_CODE_SERVER_ERROR      = "server_error"
+    STATUS_CODE_DB_ERROR          = "db_error"
 
     try_again = "Please try again later or contact administrator."
 
@@ -73,6 +74,8 @@ class EvaluationResponse(Response):
         elif self.status_code1 == self.STATUS_CODE_BAD_FEATURE:
             return "Feature is invalid and not registered. Try cross " + \
                     "validating it locally to see your problems."
+        elif self.status_code1 == self.STATUS_CODE_DUPLICATE_FEATURE:
+            return "Feature is already registered."
         elif self.status_code1 == self.STATUS_CODE_SERVER_ERROR:
             return "Oops -- server failed to evaluate your feature. " + \
                 self.try_again

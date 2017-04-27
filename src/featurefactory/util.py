@@ -7,7 +7,9 @@ from textwrap import dedent
 import xxhash
 import tempfile
 import importlib.util
+import hashlib
 from types import ModuleType
+from contextlib import contextmanager
 
 RANDOM_STATE = 1754
 
@@ -206,3 +208,26 @@ def compute_dataset_hash(dataset):
         h.update(dataset[d].to_msgpack())
 
     return h.hexdigest()
+
+def myhash(obj):
+    if not isinstance(obj, bytes):
+        obj_enc = obj.encode("utf-8")
+    else:
+        obj_enc = obj
+    return hashlib.md5(obj_enc).hexdigest()
+
+@contextmanager
+def possibly_talking_action(action, verbose):
+    """
+    """
+    if verbose:
+        vprint = print
+    else:
+        def do_nothing(*args, **kwargs): pass
+        vprint = do_nothing
+
+    vprint(action, end='')
+    try:
+        yield
+    finally:
+        vprint('done')

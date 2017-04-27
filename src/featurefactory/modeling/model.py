@@ -117,6 +117,7 @@ class Model(object):
                     score = params[scoring]["scorer"](Y_test, Y_test_pred)
                 except ValueError as e:
                     score = np.nan
+                    print(traceback.format_exc(), file=sys.stderr)
                 scoring_outputs[scoring].append(score)
 
         for scoring in scoring_outputs:

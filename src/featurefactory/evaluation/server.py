@@ -21,7 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
-from featurefactory.util                         import get_function
+from featurefactory.util                         import get_function, myhash
 
 # setup
 prefix = "/services/eval-server"
@@ -137,12 +137,24 @@ def evaluate(user):
             )
         app.logger.debug("Accessed user (name '{}') from db".format(user_name))
 
-        if not isinstance(code, bytes):
-            code_enc = code.encode("utf-8")
-        else:
-            code_enc = code
-        md5 = hashlib.md5(code_enc).hexdigest()
+        md5 = myhash(code)
         app.logger.debug("Computed feature hash.")
+
+        evaluator = EvaluatorServer(problem_id, user_name, orm)
+        try:
+            is_registered = evaluator.check_if_registered(code)
+            if is_registered:
+                app.logger.debug("feature already registered.")
+                return EvaluationResponse(
+                    status_code = EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE
+                )
+        except Exception:
+            app.logger.exception("Unexpected error checking if feature is "
+                                 "registered")
+            return EvaluationResponse(
+                status_code = EvaluationResponse.STATUS_CODE_SERVER_ERROR
+            )
+        app.logger.debug("Confirmed that feature is not already registered")
 
         try:
             feature = get_function(code)
@@ -157,7 +169,6 @@ def evaluate(user):
         # processing
         # - compute the CV score
         # - compute any other metrics
-        evaluator = EvaluatorServer(problem_id, user_name, orm)
         try:
             metrics = evaluator.evaluate(feature)
             # TODO expand schema
