@@ -66,7 +66,7 @@ class Model(object):
             scoring types
         """
         # 1d arrays are deprecated by sklearn 0.17 (?)
-        if len(X.shape) == 1:
+        if X.ndim == 1:
             X = X.reshape(-1, 1)
 
         Y = Y.ravel()
