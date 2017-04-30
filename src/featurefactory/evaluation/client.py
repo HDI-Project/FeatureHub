@@ -84,8 +84,8 @@ class EvaluatorClient(object):
         """
         # request from eval-server directly
         url = "http://{}:{}/services/eval-server/evaluate".format(
-            os.environ["EVAL_CONTAINER_NAME"],
-            os.environ["EVAL_CONTAINER_PORT"]
+            os.environ.get("EVAL_CONTAINER_NAME"),
+            os.environ.get("EVAL_CONTAINER_PORT")
         )
         code = get_source(feature)
         data = {
@@ -96,7 +96,7 @@ class EvaluatorClient(object):
         }
         headers = {
             "Authorization" : "token {}".format(
-                os.environ["JUPYTERHUB_API_TOKEN"]),
+                os.environ.get("JUPYTERHUB_API_TOKEN")),
         }
 
         response = requests.post(url=url, data=data, headers=headers)
