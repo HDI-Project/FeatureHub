@@ -1,6 +1,7 @@
 import json
 from flask import Response
 from featurefactory.modeling import MetricList
+from featurefactory.util import TRY_AGAIN_LATER
 
 class EvaluationResponse(Response):
     """Wrapper class for response from evaluation server.
@@ -26,7 +27,7 @@ class EvaluationResponse(Response):
     STATUS_CODE_SERVER_ERROR      = "server_error"
     STATUS_CODE_DB_ERROR          = "db_error"
 
-    try_again = "Please try again later or contact administrator."
+    try_again = TRY_AGAIN_LATER
 
     def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None):
         if metrics is not None:
@@ -43,6 +44,7 @@ class EvaluationResponse(Response):
 
         self.status_code1 = status_code
         self.metrics = metrics
+
 
     @classmethod
     def from_string(cls, string):

@@ -13,6 +13,9 @@ from contextlib import contextmanager
 
 RANDOM_STATE = 1754
 
+TRY_AGAIN_LATER = "Please try again later or contact administrator."
+TRY_AGAIN = "Please contact administrator."
+
 def _get_function_and_execute(f_dill, *args):
     f = dill.loads(f_dill)
     return f(*args)

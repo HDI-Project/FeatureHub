@@ -1,9 +1,8 @@
 import os
-import sys
+import json
 import gc
-import hashlib
 import pandas as pd
-from textwrap import dedent
+
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from featurefactory.admin.sqlalchemy_main import ORMManager
@@ -11,7 +10,7 @@ from featurefactory.admin.sqlalchemy_declarative import (
     Problem, Feature, User, Metric
 )
 from featurefactory.modeling import Model
-from featurefactory.util import run_isolated, get_source, compute_dataset_hash
+from featurefactory.util import run_isolated, get_source, TRY_AGAIN_LATER
 from featurefactory.evaluation import EvaluatorClient
 
 class Session(object):
@@ -20,34 +19,44 @@ class Session(object):
     Includes commands for discovering, testing, and registering new features.
     """
 
-    def __init__(self, problem, database="featurefactory"):
-        self.__database = database
-        self.__orm      = ORMManager(database)
-        self.__username = None
-        self.__dataset  = {}
+    def __init__(self, problem, database = "featurefactory"):
+        self.__database            = database
+        self.__orm                 = ORMManager(database)
+        self.__username            = None
+        self.__dataset             = {}
+        self.__target              = None
+        self.__entities_featurized = None
 
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem)\
                                  .filter(Problem.name == problem)\
                                  .one()
-                self.__problemid         = problem.id
-                self.__files             = problem.files.split(",")
-                self.__table_names       = problem.table_names.split(",")
-                self.__target_table_name = problem.target_table_name
-                self.__y_column          = problem.y_column
-                self.__data_path         = problem.data_path
-                self.__model             = Model(problem.problem_type)
+                self.__problem_id                             = problem.id
+                self.__problem_data_dir                       = problem.data_dir_train
+                self.__problem_files                          = json.loads(problem.files)
+                self.__problem_table_names                    = json.loads(problem.table_names)
+                self.__problem_entities_table_name            = problem.entities_table_name
+                self.__problem_entities_featurized_table_name = problem.entities_featurized_table_name
+                self.__problem_target_table_name              = problem.target_table_name
             except NoResultFound:
                 raise ValueError("Invalid problem name: {}".format(problem))
-
+            except MultipleResultsFound:
+                raise ValueError("Unexpected issue talking to database. " +
+                                 TRY_AGAIN_LATER)
 
         # "log in" to the system
         self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluatorClient(self.__problemid,
-                self.__username, self.__orm, self.__dataset) 
+        self.__evaluation_client = EvaluatorClient(
+            self.__problem_id,
+            self.__username,
+            self.__orm,
+            self.__dataset,
+            self.__target,
+            self.__entities_featurized
+        )
 
     def _login(self):
         name = os.environ.get("USER")
@@ -70,7 +79,14 @@ class Session(object):
     def get_sample_dataset(self):
         """Loads sample of problem training dataset.
 
-        Returns a dict mapping table names to pandas DataFrames.
+        Returns the dataset a dict mapping table names to pandas DataFrames.
+
+        Returns
+        -------
+        dataset : dict (str => pd.DataFrame)
+            A dict mapping table names to pandas DataFrames.
+        target : pd.DataFrame
+            A DataFrame that holds a single column: the target variable (label).
 
         Examples
         --------
@@ -78,13 +94,18 @@ class Session(object):
         >>> dataset["users"] # -> returns DataFrame
         >>> dataset["stores"] # -> returns DataFrame
         """
-        if not self.__dataset:
+        if not self.__dataset or not self.__target:
             self._load_dataset()
 
         # Return a *copy* of the dataset, ensuring we have enough memory.
         gc.collect()    
-        return { table_name : self.__dataset[table_name].copy() for table_name
-                in self.__dataset }
+        dataset = {
+            table_name : self.__dataset[table_name].copy() for 
+                table_name in self.__dataset
+        }
+        target = self.__target.copy() # pylint: disable=no-member
+
+        return (dataset, target)
 
     def discover_features(self, code_fragment=None, metric_name=None):
         """Print features written by other users.
@@ -192,18 +213,46 @@ class Session(object):
         self.__evaluation_client.register_feature(feature, description)
 
     def _load_dataset(self):
-        # TODO check for dtypes file, assisting in low memory usage
+        # query db for import parameters to load files
+        is_anything_missing = not self.__dataset or \
+                              not self.__entities_featurized or \
+                              not self.__target
+        if is_anything_missing:
+            problem_data_dir = self.__problem_data_dir
+            problem_files = self.__problem_files
+            problem_table_names = self.__problem_table_names
+            problem_entities_featurized_table_name = \
+                self.__problem_entities_featurized_table_name
+            problem_target_table_name = self.__problem_target_table_name
 
+        # load entities and other tables
         if not self.__dataset:
-            for (filename, table_name) in zip(self.__files, self.__table_names):
-                abs_filename = os.path.join(self.__data_path, filename)
-                self.__dataset[table_name] = pd.read_csv(abs_filename, low_memory=False)
+            # load other tables
+            for (table_name, filename) in zip (problem_table_names,
+                    problem_files):
+                if table_name == problem_entities_featurized_table_name or \
+                   table_name == problem_target_table_name:
+                    continue
+                abs_filename = os.path.join(problem_data_dir, filename)
+                self.__dataset[table_name] = pd.read_csv(abs_filename,
+                        low_memory=False)
 
-        return self.__dataset
+        # load entities featurized
+        if not self.__entities_featurized:
+            cols = list(problem_table_names)
+            ind_features = cols.index(problem_entities_featurized_table_name)
+            abs_filename = os.path.join(problem_data_dir,
+                    problem_files[ind_features])
+            self.__entities_featurized = pd.read_csv(abs_filename,
+                    low_memory=False)
 
-    def _reload_dataset(self):
-        self.__dataset = {}
-        return self._load_dataset()
+        # load target
+        if not self.__target:
+            cols = list(problem_table_names)
+            ind_target = cols.index(problem_target_table_name)
+            abs_filename = os.path.join(problem_data_dir,
+                    problem_files[ind_target]) 
+            self.__target = pd.read_csv(abs_filename, low_memory=False)
 
     def _filter_features(self, session, code_fragment):
         """Return query that filters this problem and given code fragment.
@@ -213,7 +262,7 @@ class Session(object):
         caller.
         """
         filter_ = (
-            Feature.problem_id == self.__problemid,
+            Feature.problem_id == self.__problem_id,
         )
 
         if code_fragment:

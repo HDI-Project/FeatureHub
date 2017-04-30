@@ -1,7 +1,7 @@
-from __future__ import print_function
-
 import sys
+import json
 import pandas as pd
+
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import database_exists, create_database, drop_database
 
@@ -67,26 +67,38 @@ class Commands(object):
 
         print("Database {} created successfully".format(url))
 
-    def create_problem(self, name, problem_type, data_path, files, table_names,
-            target_table_name, y_column):
+    def create_problem(self, name, problem_type, problem_type_details,
+        data_dir_train, data_dir_test, files, table_names,
+        entities_table_name, entities_featurized_table_name, target_table_name):
         """Creates a new problem entry in database.
-        
+
         Parameters
         ----------
         name : str
         problem_type : str
-        data_path : str
-            Absolute path of containing directory of data files.
+            Classification or regression
+        problem_type_details : str
+            Dict (JSON-dumped to string) with additional details about problem.
+            For example, the dict may be {"classification_type" : "multiclass"}.
+        data_dir_train : str
+            Absolute path of containing directory of data files for training.
+        data_dir_test : str
+            Absolute path of containing directory of data files for testing
         files : list of str
-            List of file paths relative to data_path
+            List of file paths relative to data_dir; files must be named
+            identically within both data_dir directories.
         table_names : list of str
-            List of table names, corresponding exactly to files
+            List of table names, corresponding exactly to `files`
+        entities_table_name : str
+            Name of table that contains the entity variables. Must be found in
+            `table_names`.
+        entities_featurized_table_name : str
+            Name of table that contains the pre-processed, featurized, entity
+            variables. Must be found in `table_names`.
         target_table_name : str
             Name of table that contains the target variable (label). Must be
-            found in table_names.
-        y_column : str
-            Name of column in target_table_name that identifies the target
-            variable.
+            found in table_names. Table must hold a single column with label
+            values only.
         """
 
         with self.__orm.session_scope() as session:
@@ -99,13 +111,16 @@ class Commands(object):
                 pass    # we will create it
 
             problem = Problem(
-                name              = name,
-                problem_type      = problem_type,
-                data_path         = data_path,
-                files             = ",".join(files),
-                table_names       = ",".join(table_names),
-                target_table_name = target_table_name,
-                y_column          = y_column
+                name                           = name,
+                problem_type                   = problem_type,
+                problem_type_details           = problem_type_details,
+                data_dir_train                 = data_dir_train,
+                data_dir_test                  = data_dir_test,
+                files                          = json.dumps(files),
+                table_names                    = json.dumps(table_names),
+                entities_table_name            = entities_table_name,
+                entities_featurized_table_name = entities_featurized_table_name,
+                target_table_name              = target_table_name,
             )
             session.add(problem)
             self.__problemid = problem.id
