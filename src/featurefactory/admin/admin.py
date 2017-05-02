@@ -1,5 +1,6 @@
 import sys
 import json
+import yaml
 import pandas as pd
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -67,10 +68,39 @@ class Commands(object):
 
         print("Database {} created successfully".format(url))
 
+    def bulk_create_problem_yml(self, path):
+        """Create new problem entries in database from yml document stream.
+
+        Can create a yml file with individual problems delimited into documents
+        using the `---` ... `---` document stream syntax.
+
+        Parameters
+        ----------
+        path: str or path-like
+            Path to yml file
+        """
+        with open(path, "r") as f:
+            obj_all = yaml.load_all(f)
+            for obj in obj_all:
+                self.create_problem(**obj)
+
+    def create_problem_yml(self, path):
+        """Create new problem entry in database from yml file.
+
+        Parameters
+        ----------
+        path: str or path-like
+            Path to yml file
+        """
+        with open(path, "r") as f:
+            obj = yaml.load(f)
+
+        self.create_problem(**obj)
+
     def create_problem(self, name, problem_type, problem_type_details,
         data_dir_train, data_dir_test, files, table_names,
         entities_table_name, entities_featurized_table_name, target_table_name):
-        """Creates a new problem entry in database.
+        """Creates new problem entry in database.
 
         Parameters
         ----------

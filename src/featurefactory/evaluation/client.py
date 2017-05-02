@@ -169,8 +169,8 @@ class EvaluatorClient(object):
             X = self._build_feature_matrix(feature_values)
 
         # target values
-        with possibly_talking_action("Extracting target values...", verbose):
-            Y = self._extract_label()
+        # with possibly_talking_action("Extracting target values...", verbose):
+        Y = self._extract_label()
 
         # compute metrics
         with possibly_talking_action("Fitting model and computing metrics...", verbose):
@@ -183,13 +183,13 @@ class EvaluatorClient(object):
     # functions of those subroutines.
     #
 
-    def _compute_metrics(self, X, Y):
+    def _compute_metrics(self, X, Y, cv=True):
         with self.orm.session_scope() as session:
             problem = session.query(Problem)\
                     .filter(Problem.id == self.problem_id).one()
             problem_type = problem.problem_type
         model = Model(problem_type)
-        metrics = model.compute_metrics(X, Y)
+        metrics = model.compute_metrics(X, Y, cv)
 
         return metrics
 
@@ -251,12 +251,14 @@ class EvaluatorClient(object):
 
         # load entities featurized
         if not self.entities_featurized:
-            cols = list(problem_table_names)
-            ind_features = cols.index(problem_entities_featurized_table_name)
-            abs_filename = os.path.join(problem_data_dir,
-                    problem_files[ind_features])
-            self.entities_featurized = pd.read_csv(abs_filename,
-                    low_memory=False)
+            # if empty string, we simply don't have any features to add
+            if problem_entities_featurized_table_name:
+                cols = list(problem_table_names)
+                ind_features = cols.index(problem_entities_featurized_table_name)
+                abs_filename = os.path.join(problem_data_dir,
+                        problem_files[ind_features])
+                self.entities_featurized = pd.read_csv(abs_filename,
+                        low_memory=False)
 
         # load target
         if not self.target:
@@ -337,7 +339,11 @@ class EvaluatorClient(object):
             self._reload_dataset()
 
     def _build_feature_matrix(self, feature_values):
-        X = pd.concat([self.entities_featurized, feature_values], axis=1) 
+        values_df = pd.DataFrame(feature_values)
+        if self.entities_featurized:
+            X = pd.concat([self.entities_featurized, values_df], axis=1) 
+        else:
+            X = values_df
         return X
 
 class EvaluatorServer(EvaluatorClient):
@@ -387,7 +393,7 @@ class EvaluatorServer(EvaluatorClient):
 
     def _compute_metrics(self, X, Y, verbose=False):
         # doesn't do anything different
-        metrics = super()._compute_metrics(X, Y)
+        metrics = super()._compute_metrics(X, Y, cv=False)
         return metrics
 
     def _verify_dataset_integrity(self):

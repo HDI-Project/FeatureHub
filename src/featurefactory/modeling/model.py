@@ -155,7 +155,7 @@ class Model(object):
 
         return scoring_outputs
 
-    def compute_metrics(self, X, Y):
+    def compute_metrics(self, X, Y, cv):
         """Compute cross-validated metrics.
         
         Trains this model on data X with labels Y.

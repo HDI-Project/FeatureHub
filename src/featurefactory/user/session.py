@@ -210,7 +210,7 @@ class Session(object):
         if not description:
             description = self._prompt_description()
 
-        self.__evaluation_client.register_feature(feature, description)
+        self.__evaluation_client.submit(feature, description)
 
     def _load_dataset(self):
         # query db for import parameters to load files
@@ -239,12 +239,14 @@ class Session(object):
 
         # load entities featurized
         if not self.__entities_featurized:
-            cols = list(problem_table_names)
-            ind_features = cols.index(problem_entities_featurized_table_name)
-            abs_filename = os.path.join(problem_data_dir,
-                    problem_files[ind_features])
-            self.__entities_featurized = pd.read_csv(abs_filename,
-                    low_memory=False)
+            # if empty string, we simply don't have any features to add
+            if problem_entities_featurized_table_name:
+                cols = list(problem_table_names)
+                ind_features = cols.index(problem_entities_featurized_table_name)
+                abs_filename = os.path.join(problem_data_dir,
+                        problem_files[ind_features])
+                self.__entities_featurized = pd.read_csv(abs_filename,
+                        low_memory=False)
 
         # load target
         if not self.__target:

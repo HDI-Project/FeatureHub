@@ -62,5 +62,6 @@ def test_regression():
 def _test_problem_type(problem_type, data):
     model = Model(problem_type)
     metrics = model.compute_metrics(data[problem_type]["X"],
-                                    data[problem_type]["Y"])
+                                    data[problem_type]["Y"],
+                                    cv=True)
     return metrics
