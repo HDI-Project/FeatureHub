@@ -64,7 +64,7 @@ class EvaluatorClient(object):
 
         return False
 
-    def register_feature(self, feature, description):
+    def submit(self, feature, description):
         """Submit feature to server for evaluation on test data.
         
         If successful, registers feature in feature database and returns key
@@ -377,7 +377,7 @@ class EvaluatorServer(EvaluatorClient):
         except ValueError as e:
             raise
 
-    def register_feature(self, feature, description):
+    def submit(self, feature, description):
         """Does nothing.
 
         This class is instantiated at the server, thus we are already

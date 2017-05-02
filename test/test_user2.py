@@ -35,16 +35,16 @@ print("Re-registering existing feature (should fail)...")
 print("executing 'commands.evaluate(example_feature)'")
 commands.evaluate(example_feature)
 description="Age"
-print("executing 'commands.register_feature(example_feature, description=description)'")
-commands.register_feature(example_feature, description=description)
+print("executing 'commands.submit(example_feature, description=description)'")
+commands.submit(example_feature, description=description)
 print("Re-registering existing feature (should fail)...done")
 
 print("Registering new feature (should succeed)...")
 print("executing 'commands.evaluate(example_feature2)'")
 commands.evaluate(example_feature2)
 description="Age"
-print("executing 'commands.register_feature(example_feature2, description=description)'")
-commands.register_feature(example_feature2, description=description)
+print("executing 'commands.submit(example_feature2, description=description)'")
+commands.submit(example_feature2, description=description)
 print("Registering new feature (should succeed)...done")
 
 # test feature discovery

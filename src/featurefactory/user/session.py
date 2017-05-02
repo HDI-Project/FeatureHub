@@ -188,7 +188,7 @@ class Session(object):
 
         return self.__evaluation_client.evaluate(feature)
 
-    def register_feature(self, feature, description=""):
+    def submit(self, feature, description=""):
         """Submit feature to server for evaluation on test data.
         
         If successful, registers feature in feature database and returns key
