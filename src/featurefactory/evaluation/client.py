@@ -29,8 +29,6 @@ class EvaluatorClient(object):
         else:
             self.__dataset_hash = None
 
-        self.SPLIT_TYPE = "train"
-
     def check_if_registered(self, feature, verbose=False):
         """Check if feature is registered.
 
@@ -183,13 +181,16 @@ class EvaluatorClient(object):
     # functions of those subroutines.
     #
 
-    def _compute_metrics(self, X, Y, cv=True):
+    def _create_model(self):
         with self.orm.session_scope() as session:
             problem = session.query(Problem)\
                     .filter(Problem.id == self.problem_id).one()
             problem_type = problem.problem_type
-        model = Model(problem_type)
-        metrics = model.compute_metrics(X, Y, cv)
+        return Model(problem_type)
+
+    def _compute_metrics(self, X, Y):
+        model = self._create_model()
+        metrics = model.compute_metrics_cv(X, Y)
 
         return metrics
 
@@ -205,6 +206,68 @@ class EvaluatorClient(object):
 
         return self.target
 
+    def _load_dataset_split(self, split, dataset, entities_featurized, target,
+            compute_hash=True):
+        # query db for import parameters to load files
+        is_anything_missing = not all([dataset, entities_featurized, target])
+        if is_anything_missing:
+            with self.orm.session_scope() as session:
+                problem = session.query(Problem)\
+                        .filter(Problem.id == self.problem_id).one()
+                problem_data_dir = getattr(problem,
+                        "data_dir_{}".format(split))
+                problem_files = json.loads(problem.files)
+                problem_table_names = json.loads(problem.table_names)
+                problem_entities_featurized_table_name = \
+                    problem.entities_featurized_table_name
+                problem_target_table_name = problem.target_table_name
+
+        # load entities and other tables
+        if not dataset:
+            # load other tables
+            for (table_name, filename) in zip (problem_table_names,
+                    problem_files):
+                if table_name == problem_entities_featurized_table_name or \
+                   table_name == problem_target_table_name:
+                    continue
+                abs_filename = os.path.join(problem_data_dir, filename)
+                dataset[table_name] = pd.read_csv(abs_filename,
+                        low_memory=False)
+
+                # compute/recompute hash
+                if compute_hash:
+                    dataset_hash = compute_dataset_hash(dataset)
+                else:
+                    dataset_hash = None
+
+        # recompute dataset hash. condition only met if we dataset has already
+        # loaded, but dataset hash had not been computed. (because we just
+        # computed hash several lines above!)
+        if compute_hash:
+            if not dataset_hash:
+                dataset_hash = compute_dataset_hash(dataset)
+
+        # load entities featurized
+        if not entities_featurized:
+            # if empty string, we simply don't have any features to add
+            if problem_entities_featurized_table_name:
+                cols = list(problem_table_names)
+                ind_features = cols.index(problem_entities_featurized_table_name)
+                abs_filename = os.path.join(problem_data_dir,
+                        problem_files[ind_features])
+                entities_featurized = pd.read_csv(abs_filename,
+                        low_memory=False)
+
+        # load target
+        if not target:
+            cols = list(problem_table_names)
+            ind_target = cols.index(problem_target_table_name)
+            abs_filename = os.path.join(problem_data_dir,
+                    problem_files[ind_target]) 
+            target = pd.read_csv(abs_filename, low_memory=False)
+
+        return dataset, entities_featurized, target, dataset_hash
+
     def _load_dataset(self):
         """Load dataset if not present.
         
@@ -213,62 +276,10 @@ class EvaluatorClient(object):
 
         # TODO check for dtypes file, facilitating lower memory usage
 
-        # query db for import parameters to load files
-        is_anything_missing = not self.dataset or not self.entities_featurized \
-            or not self.target
-        if is_anything_missing:
-            with self.orm.session_scope() as session:
-                problem = session.query(Problem)\
-                        .filter(Problem.id == self.problem_id).one()
-                problem_data_dir = getattr(problem,
-                        "data_dir_{}".format(self.SPLIT_TYPE))
-                problem_files = json.loads(problem.files)
-                problem_table_names = json.loads(problem.table_names)
-                problem_entities_featurized_table_name = \
-                    problem.entities_featurized_table_name
-                problem_target_table_name = problem.target_table_name
-
-        # load entities and other tables
-        if not self.dataset:
-            # load other tables
-            for (table_name, filename) in zip (problem_table_names,
-                    problem_files):
-                if table_name == problem_entities_featurized_table_name or \
-                   table_name == problem_target_table_name:
-                    continue
-                abs_filename = os.path.join(problem_data_dir, filename)
-                self.dataset[table_name] = pd.read_csv(abs_filename,
-                        low_memory=False)
-
-                # compute/recompute hash
-                self.__dataset_hash = compute_dataset_hash(self.dataset)
-
-        # recompute dataset hash. condition only met if we dataset has already
-        # loaded, but dataset hash had not been computed. (because we just
-        # computed hash several lines above!)
-        if not self.__dataset_hash:
-            self.__dataset_hash = compute_dataset_hash(self.dataset)
-
-        # load entities featurized
-        if not self.entities_featurized:
-            # if empty string, we simply don't have any features to add
-            if problem_entities_featurized_table_name:
-                cols = list(problem_table_names)
-                ind_features = cols.index(problem_entities_featurized_table_name)
-                abs_filename = os.path.join(problem_data_dir,
-                        problem_files[ind_features])
-                self.entities_featurized = pd.read_csv(abs_filename,
-                        low_memory=False)
-
-        # load target
-        if not self.target:
-            cols = list(problem_table_names)
-            ind_target = cols.index(problem_target_table_name)
-            abs_filename = os.path.join(problem_data_dir,
-                    problem_files[ind_target]) 
-            self.target = pd.read_csv(abs_filename, low_memory=False)
-
-        return self.dataset
+        self.dataset, self.entities_featurized, self.target, \
+            self.__dataset_hash = self._load_dataset_split("train",
+            self.dataset, self.entities_featurized, self.target,
+            self.__dataset_hash)
 
     def _reload_dataset(self):
         """Force reload of dataset.
@@ -347,9 +358,16 @@ class EvaluatorClient(object):
         return X
 
 class EvaluatorServer(EvaluatorClient):
-    def __init__(self, problem_id, username, orm, dataset={}):
-        super().__init__(problem_id, username, orm, dataset)
-        self.SPLIT_TYPE = "test"
+    def __init__(self, problem_id, username, orm):
+        super().__init__(problem_id, username, orm)
+
+        # separate training and testing datasets
+        self.dataset_train             = {}
+        self.target_train              = None
+        self.entities_featurized_train = None
+        self.dataset_test              = {}
+        self.target_test               = None
+        self.entities_featurized_test  = None
 
     def check_if_registered(self, code, verbose=False):
         """Check if feature is registered.
@@ -391,9 +409,13 @@ class EvaluatorServer(EvaluatorClient):
         """
         pass
 
-    def _compute_metrics(self, X, Y, verbose=False):
-        # doesn't do anything different
-        metrics = super()._compute_metrics(X, Y, cv=False)
+    def _compute_metrics(self, X, Y):
+        model = self._create_model()
+
+        # split X and Y into train and test
+        n = len(self.target_train)
+        metrics = model.compute_metrics_train_test(X, Y, n)
+
         return metrics
 
     def _verify_dataset_integrity(self):
@@ -403,3 +425,27 @@ class EvaluatorServer(EvaluatorClient):
         the dataset for every new feature.
         """
         pass
+
+    def _load_dataset(self):
+        # load dataset for train data
+        self.dataset_train, self.entities_featurized_train, \
+                self.target_train, _ = self._load_dataset_split("train",
+                self.dataset_train, self.entities_featurized_train,
+                self.target_train, False)
+
+        # load dataset for test data
+        self.dataset_test, self.entities_featurized_test, \
+                self.target_test, _ = self._load_dataset_split("test",
+                self.dataset_test, self.entities_featurized_test,
+                self.target_test, False)
+
+        # concatenate as applicable
+        self.dataset = pd.concat([self.dataset_test, self.dataset_train],
+                axis=0)
+        self.entities_featurized = pd.concat([self.entities_featurized_test,
+            self.entities_featurized_train], axis=0)
+        self.target = pd.concat([self.target_test, self.target_train], axis=0)
+
+    def _evaluate(self, feature, verbose=False):
+        metrics = super()._evaluate(feature, verbose)
+        return metrics

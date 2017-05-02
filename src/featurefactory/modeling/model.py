@@ -48,6 +48,87 @@ class Model(object):
         else:
             raise NotImplementedError
 
+    def compute_metrics(self, X, Y, kind="cv", **kwargs):
+        if kind=="cv":
+            return self.compute_metrics_cv(X, Y, **kwargs)
+        elif kind=="train_test":
+            return self.compute_metrics_train_test(X, Y, **kwargs)
+        else:
+            raise ValueError("Bad kind: {}".format(kind))
+
+    def compute_metrics_cv(self, X, Y):
+        """Compute cross-validated metrics.
+
+        Trains this model on data X with labels Y.
+
+        Returns a MetricList with the name, scoring type, and value for each
+        Metric. Note that these values may be numpy floating points, and should
+        be converted prior to insertion in a database.
+
+        Parameters
+        ----------
+        X : numpy array-like or pd.DataFrame
+            data
+        Y : numpy array-like or pd.DataFrame or pd.DataSeries
+            labels
+        """
+
+        # ensure that we use np for everything
+        X = np.array(X)
+        Y = np.array(Y)
+
+        scorings, scorings_ = self._get_scorings()
+
+        # compute scores
+        scores = self.cv_score_mean(X, Y, scorings_)
+
+        # unpack into MetricList
+        metric_list = self.scores_to_metriclist(scorings, scores)
+        return metric_list
+
+    def compute_metrics_train_test(self, X, Y, n):
+        """
+        """
+
+        # ensure that we use np for everything, and don't use 1d arrays
+        X = np.array(X)
+        if X.ndim == 1:
+            X = X.reshape(-1,1)
+        Y = np.array(Y).ravel()
+
+        X_train, Y_train = X[:n], Y[:n]
+        X_test, Y_test = X[n:], Y[n:]
+
+        scorings, scorings_ = self._get_scorings()
+
+        # Determine binary/multiclass classification
+        n_classes = len(np.unique(Y))
+        if n_classes > 2:
+            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
+        else:
+            metric_aggregation = Model.BINARY_METRIC_AGGREGATION
+
+        params = self._get_params(metric_aggregation, n_classes)
+
+        # fit model on entire training set
+        self.model.fit(X_train, Y_train)
+
+        scores = {}
+        for scoring in scorings_:
+            # Make and evaluate predictions. Note that ROC AUC may raise
+            # exception if somehow we only have examples from one class in
+            # a given fold.
+            Y_test_pred = params[scoring]["predictor"](self.model, X_test)
+            try:
+                score = params[scoring]["scorer"](Y_test, Y_test_pred)
+            except ValueError as e:
+                score = None
+                print(traceback.format_exc(), file=sys.stderr)
+            scores[scoring] = score
+
+        metric_list = self.scores_to_metriclist(scorings, scores)
+        return metric_list
+
     def cv_score_mean(self, X, Y, scorings):
         """Compute mean score across cross validation folds.
 
@@ -80,6 +161,64 @@ class Model(object):
         else:
             metric_aggregation = Model.BINARY_METRIC_AGGREGATION
 
+        params = self._get_params(metric_aggregation, n_classes)
+
+        if self._is_classification():
+            kf = StratifiedKFold(shuffle=True, random_state=RANDOM_STATE+3)
+        else:
+            kf = KFold(shuffle=True, random_state=RANDOM_STATE+4)
+
+        # Split data, train model, and evaluate metric. We fit the model just
+        # once per fold.
+        scoring_outputs = defaultdict(lambda : [])
+        for train_inds, test_inds in kf.split(X, Y):
+            X_train, X_test = X[train_inds], X[test_inds]
+            Y_train, Y_test = Y[train_inds], Y[test_inds]
+
+            self.model.fit(X_train, Y_train)
+
+            for scoring in scorings:
+                # Make and evaluate predictions. Note that ROC AUC may raise
+                # exception if somehow we only have examples from one class in
+                # a given fold.
+                Y_test_pred = params[scoring]["predictor"](self.model, X_test)
+                try:
+                    score = params[scoring]["scorer"](Y_test, Y_test_pred)
+                except ValueError as e:
+                    score = np.nan
+                    print(traceback.format_exc(), file=sys.stderr)
+                scoring_outputs[scoring].append(score)
+
+        for scoring in scoring_outputs:
+            score_mean = np.nanmean(scoring_outputs[scoring])
+            if np.isnan(score_mean):
+                score_mean = None
+            scoring_outputs[scoring] = score_mean
+
+        return scoring_outputs
+
+    def scores_to_metriclist(self, scorings, scores):
+        metric_list = MetricList()
+        for v in scorings:
+            name    = v["name"]
+            scoring = v["scoring"]
+
+            if scoring in scores:
+                value = scores[scoring]
+            else:
+                value = None
+
+            metric_list.append(Metric(name, scoring, value))
+
+        return metric_list
+
+    def _is_classification(self):
+        return self.problem_type == "classification"
+
+    def _is_regression(self):
+        return self.problem_type == "regression"
+
+    def _get_params(self, metric_aggregation, n_classes):
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
         def predict_fn(model, X_test):
@@ -121,92 +260,31 @@ class Model(object):
             },
         }
 
-        if self._is_classification():
-            kf = StratifiedKFold(shuffle=True, random_state=RANDOM_STATE+3)
-        else:
-            kf = KFold(shuffle=True, random_state=RANDOM_STATE+4)
+        return params
 
-        # Split data, train model, and evaluate metric. We fit the model just
-        # once per fold.
-        scoring_outputs = defaultdict(lambda : [])
-        for train_inds, test_inds in kf.split(X, Y):
-            X_train, X_test = X[train_inds], X[test_inds]
-            Y_train, Y_test = Y[train_inds], Y[test_inds]
+    def _get_scorings(self):
+        """Get scorings for this problem type.
 
-            self.model.fit(X_train, Y_train)
-
-            for scoring in scorings:
-                # Make and evaluate predictions. Note that ROC AUC may raise
-                # exception if somehow we only have examples from one class in
-                # a given fold.
-                Y_test_pred = params[scoring]["predictor"](self.model, X_test)
-                try:
-                    score = params[scoring]["scorer"](Y_test, Y_test_pred)
-                except ValueError as e:
-                    score = np.nan
-                    print(traceback.format_exc(), file=sys.stderr)
-                scoring_outputs[scoring].append(score)
-
-        for scoring in scoring_outputs:
-            score_mean = np.nanmean(scoring_outputs[scoring])
-            if np.isnan(score_mean):
-                score_mean = None
-            scoring_outputs[scoring] = score_mean
-
-        return scoring_outputs
-
-    def compute_metrics(self, X, Y, cv):
-        """Compute cross-validated metrics.
-        
-        Trains this model on data X with labels Y.
-
-        Returns a MetricList with the name, scoring type, and value for each
-        Metric. Note that these values may be numpy floating points, and should
-        be converted prior to insertion in a database.
-
-        Parameters
-        ----------
-        X : numpy array-like or pd.DataFrame
-            data
-        Y : numpy array-like or pd.DataFrame or pd.DataSeries
-            labels
+        Returns
+        -------
+        scorings : list of dict
+            Information on metric name and associated "scoring" as defined in
+            sklearn.metrics
+        scorings_ : list
+            List of "scoring" as defined in sklearn.metrics. This is a "utility
+            variable" that can be used where we just need the names of the
+            scoring functions and not the more complete information.
         """
-
-        # just ensure that we np for everything
-        X = np.array(X)
-        Y = np.array(Y)
-
         # scoring_types maps user-readable name to `scoring`, as argument to
         # cross_val_score
         # See also http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
         if self._is_classification():
-            scoring_list = Model.CLASSIFICATION_SCORING
+            scorings = Model.CLASSIFICATION_SCORING
+            scorings_= [s["scoring"] for s in scorings]
         elif self._is_regression():
-            scoring_list = Model.REGRESSION_SCORING
+            scorings = Model.REGRESSION_SCORING
+            scorings_= [s["scoring"] for s in scorings]
         else:
             raise NotImplementedError
 
-        # compute scores
-        scores = self.cv_score_mean(X, Y, scorings=[d["scoring"] for d in
-            scoring_list])
-
-        # unpack into MetricList
-        metric_list = MetricList()
-        for v in scoring_list:
-            name    = v["name"]
-            scoring = v["scoring"]
-
-            if scoring in scores:
-                value = scores[scoring]
-            else:
-                value = None
-
-            metric_list.append(Metric(name, scoring, value))
-
-        return metric_list
-
-    def _is_classification(self):
-        return self.problem_type == "classification"
-
-    def _is_regression(self):
-        return self.problem_type == "regression"
+        return scorings, scorings_
