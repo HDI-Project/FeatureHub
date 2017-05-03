@@ -13,6 +13,8 @@ from featurefactory.evaluation.future import HubAuth
 
 # Feature Factory imports
 import hashlib
+import dill
+from urllib.parse import unquote_to_bytes
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
@@ -84,6 +86,7 @@ def evaluate(user):
     try:
         database    = request.form["database"]
         problem_id  = request.form["problem_id"]
+        feature_dill= request.form["feature_dill"]
         code        = request.form["code"]
         description = request.form["description"]
     except Exception:
@@ -151,7 +154,7 @@ def evaluate(user):
         app.logger.debug("Confirmed that feature is not already registered")
 
         try:
-            feature = get_function(code)
+            feature = dill.loads(unquote_to_bytes(feature_dill))
         except Exception:
             app.logger.exception("Couldn't extract function (code '{}')"
                     .format(code))

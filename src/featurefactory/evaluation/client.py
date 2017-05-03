@@ -4,7 +4,9 @@ import json
 import pandas as pd
 import requests
 import collections
+import dill
 import traceback
+from urllib.parse import quote_from_bytes
 
 from featurefactory.util import (
     compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
@@ -85,10 +87,12 @@ class EvaluatorClient(object):
             os.environ.get("EVAL_CONTAINER_NAME"),
             os.environ.get("EVAL_CONTAINER_PORT")
         )
+        feature_dill = quote_from_bytes(dill.dumps(feature))
         code = get_source(feature)
         data = {
             "database"    : self.orm.database,
             "problem_id"  : self.problem_id,
+            "feature_dill": feature_dill,
             "code"        : code,
             "description" : description,
         }
