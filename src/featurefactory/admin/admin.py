@@ -97,9 +97,10 @@ class Commands(object):
 
         self.create_problem(**obj)
 
-    def create_problem(self, name, problem_type, problem_type_details,
-        data_dir_train, data_dir_test, files, table_names,
-        entities_table_name, entities_featurized_table_name, target_table_name):
+    def create_problem(self, name="", problem_type="", problem_type_details={},
+            data_dir_train="", data_dir_test="", files=[], table_names=[],
+            entities_table_name="", entities_featurized_table_name="",
+            target_table_name=""):
         """Creates new problem entry in database.
 
         Parameters
@@ -107,8 +108,8 @@ class Commands(object):
         name : str
         problem_type : str
             Classification or regression
-        problem_type_details : str
-            Dict (JSON-dumped to string) with additional details about problem.
+        problem_type_details : dict
+            Dict with additional details about problem.
             For example, the dict may be {"classification_type" : "multiclass"}.
         data_dir_train : str
             Absolute path of containing directory of data files for training.
@@ -143,7 +144,7 @@ class Commands(object):
             problem = Problem(
                 name                           = name,
                 problem_type                   = problem_type,
-                problem_type_details           = problem_type_details,
+                problem_type_details           = json.dumps(problem_type_details),
                 data_dir_train                 = data_dir_train,
                 data_dir_test                  = data_dir_test,
                 files                          = json.dumps(files),

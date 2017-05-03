@@ -35,7 +35,7 @@ class Model(object):
         { "name" : "R-squared"          , "scoring" : "r2" },
     ]
 
-    BINARY_METRIC_AGGREGATION = "average"
+    BINARY_METRIC_AGGREGATION = "micro"
     MULTICLASS_METRIC_AGGREGATION = "micro"
 
     def __init__(self, problem_type):
@@ -73,10 +73,6 @@ class Model(object):
             labels
         """
 
-        # ensure that we use np for everything
-        X = np.array(X)
-        Y = np.array(Y)
-
         scorings, scorings_ = self._get_scorings()
 
         # compute scores
@@ -90,11 +86,7 @@ class Model(object):
         """
         """
 
-        # ensure that we use np for everything, and don't use 1d arrays
-        X = np.array(X)
-        if X.ndim == 1:
-            X = X.reshape(-1,1)
-        Y = np.array(Y).ravel()
+        X, Y = self._format_matrices(X, Y)
 
         X_train, Y_train = X[:n], Y[:n]
         X_test, Y_test = X[n:], Y[n:]
@@ -103,12 +95,7 @@ class Model(object):
 
         # Determine binary/multiclass classification
         n_classes = len(np.unique(Y))
-        if n_classes > 2:
-            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
-        else:
-            metric_aggregation = Model.BINARY_METRIC_AGGREGATION
-
-        params = self._get_params(metric_aggregation, n_classes)
+        params = self._get_params(n_classes)
 
         # fit model on entire training set
         self.model.fit(X_train, Y_train)
@@ -146,22 +133,14 @@ class Model(object):
         scorings : list of str
             scoring types
         """
-        # 1d arrays are deprecated by sklearn 0.17 (?)
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
 
-        Y = Y.ravel()
+        X, Y = self._format_matrices(X, Y)
 
         scorings = list(scorings)
 
         # Determine binary/multiclass classification
         n_classes = len(np.unique(Y))
-        if n_classes > 2:
-            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
-        else:
-            metric_aggregation = Model.BINARY_METRIC_AGGREGATION
-
-        params = self._get_params(metric_aggregation, n_classes)
+        params = self._get_params(n_classes)
 
         if self._is_classification():
             kf = StratifiedKFold(shuffle=True, random_state=RANDOM_STATE+3)
@@ -218,7 +197,12 @@ class Model(object):
     def _is_regression(self):
         return self.problem_type == "regression"
 
-    def _get_params(self, metric_aggregation, n_classes):
+    def _get_params(self, n_classes):
+        if n_classes > 2:
+            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
+        else:
+            metric_aggregation = Model.BINARY_METRIC_AGGREGATION
+
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
         def predict_fn(model, X_test):
@@ -288,3 +272,18 @@ class Model(object):
             raise NotImplementedError
 
         return scorings, scorings_
+
+    def _format_matrices(self, X, Y):
+
+        # ensure that we use np for everything
+        # *don't* use 1d array for X
+        X = np.array(X)
+        if X.ndim == 1:
+            X = X.reshape(-1,1)
+        # *do* use 1d array for Y
+        Y = np.array(Y)
+        if Y.ndim > 1 and Y.shape[1] > 1:
+            raise ValueError("Target matrix has too many columns: {}"
+                    .format(Y.shape[1]))
+        Y = Y.ravel()
+        return X, Y

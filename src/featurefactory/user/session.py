@@ -94,7 +94,7 @@ class Session(object):
         >>> dataset["users"] # -> returns DataFrame
         >>> dataset["stores"] # -> returns DataFrame
         """
-        if not self.__dataset or not self.__target:
+        if not self.__dataset or pd.DataFrame(self.__target).empty:
             self._load_dataset()
 
         # Return a *copy* of the dataset, ensuring we have enough memory.
@@ -214,9 +214,12 @@ class Session(object):
 
     def _load_dataset(self):
         # query db for import parameters to load files
-        is_anything_missing = not self.__dataset or \
-                              not self.__entities_featurized or \
-                              not self.__target
+        is_present_dataset = bool(self.__dataset)
+        is_present_entities_featurized = not pd.DataFrame(self.__entities_featurized).empty
+        is_present_target = not pd.DataFrame(self.__target).empty
+        is_anything_missing = not all(
+                [is_present_dataset, is_present_entities_featurized, is_present_target])
+
         if is_anything_missing:
             problem_data_dir = self.__problem_data_dir
             problem_files = self.__problem_files
@@ -238,7 +241,7 @@ class Session(object):
                         low_memory=False)
 
         # load entities featurized
-        if not self.__entities_featurized:
+        if pd.DataFrame(self.__entities_featurized).empty:
             # if empty string, we simply don't have any features to add
             if problem_entities_featurized_table_name:
                 cols = list(problem_table_names)
@@ -249,7 +252,7 @@ class Session(object):
                         low_memory=False)
 
         # load target
-        if not self.__target:
+        if pd.DataFrame(self.__target).empty:
             cols = list(problem_table_names)
             ind_target = cols.index(problem_target_table_name)
             abs_filename = os.path.join(problem_data_dir,

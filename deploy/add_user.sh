@@ -57,6 +57,7 @@ EOF
 mkdir -p $FF_DATA_DIR/users/$_USERNAME/notebooks
 if $admin; then
     cp -r ../notebooks/admin $FF_DATA_DIR/users/$_USERNAME/notebooks
+    cp -r $FF_DATA_DIR/problems $FF_DATA_DIR/users/$_USERNAME
 else
     cp -r ../notebooks/* $FF_DATA_DIR/users/$_USERNAME/notebooks
     rm -r $FF_DATA_DIR/users/$_USERNAME/notebooks/admin
@@ -68,8 +69,11 @@ sudo chmod -R 777 $FF_DATA_DIR/users/$_USERNAME
 _MYSQL_PASSWORD=$(openssl rand -hex 16)
 if $admin; then
     cmd2="GRANT ALL ON *.* TO '$_USERNAME'@'%' WITH GRANT OPTION;"
+    cmd3=""
 else
     cmd2="GRANT INSERT, SELECT ON $MYSQL_DATABASE.* TO '$_USERNAME'@'%';"
+    cmd3=""
+    #cmd3="GRANT INSERT ON $MYSQL_DATABASE.users TO '$_USERNAME'@'%';"
 fi
 
 docker exec -i $MYSQL_CONTAINER_NAME \
@@ -79,6 +83,7 @@ docker exec -i $MYSQL_CONTAINER_NAME \
 DROP USER IF EXISTS '$_USERNAME'@'%';
 CREATE USER '$_USERNAME'@'%' IDENTIFIED BY '$_MYSQL_PASSWORD';
 $cmd2
+$cmd3
 EOF
 
 cat >$FF_DATA_DIR/users/$_USERNAME/.my.cnf <<EOF

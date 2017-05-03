@@ -109,15 +109,35 @@ def test_get_function2():
 def f(a):
     return a+1
 
+def g(a):
+    from sklearn.preprocessing import binarize
+    return f(a)
+
 def test_run_isolated():
     args = [1,3,7]
     for arg in args:
         assert f(arg) == featurefactory.util.run_isolated(f, arg)
+        assert g(arg) == featurefactory.util.run_isolated(g, arg)
 
-    source = b'def f(a):\n    return a+1\n'
-    f1 = featurefactory.util.get_function(source)
+def test_run_isolated_from_function_from_source():
+    args = [1,3,7]
+    f_source = b'def f(a):\n    return a+1\n'
+    f1 = featurefactory.util.get_function(f_source)
+    g_source = b'def f(a):\n    return a+1\n\ndef g(a):\n    from sklearn.preprocessing import binarize\n    return f(a)\n'
+    g1 = featurefactory.util.get_function(g_source)
     for arg in args:
         assert f1(arg) == featurefactory.util.run_isolated(f1, arg)
+        assert g1(arg) == featurefactory.util.run_isolated(g1, arg)
+
+def test_run_isolated_from_function2_from_source():
+    args = [1,3,7]
+    f_source = b'def f(a):\n    return a+1\n'
+    f1 = featurefactory.util.get_function2(f_source)
+    g_source = b'def f(a):\n    return a+1\n\ndef g(a):\n    from sklearn.preprocessing import binarize\n    return f(a)\n'
+    g1 = featurefactory.util.get_function2(g_source)
+    for arg in args:
+        assert f1(arg) == featurefactory.util.run_isolated(f1, arg)
+        assert g1(arg) == featurefactory.util.run_isolated(g1, arg)
 
 # ------------------------------------------------------------------------------ 
 # Test compute_dataset_hash

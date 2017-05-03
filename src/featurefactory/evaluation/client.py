@@ -8,7 +8,7 @@ import traceback
 
 from featurefactory.util import (
     compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
-    myhash
+    myhash, concat_datasets
 )
 from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
 from featurefactory.evaluation                   import EvaluationResponse
@@ -143,6 +143,7 @@ class EvaluatorClient(object):
             return metrics_user
         except ValueError as e:
             print("Feature is not valid: {}".format(str(e)), file=sys.stderr)
+            print(traceback.format_exc(), file=sys.stderr)
             return {}
 
     def _evaluate(self, feature, verbose=False):
@@ -201,15 +202,20 @@ class EvaluatorClient(object):
         return run_isolated(feature, self.dataset)
 
     def _extract_label(self):
-        if not self.target:
+        if pd.DataFrame(self.target).empty:
             self._load_dataset()
 
         return self.target
 
     def _load_dataset_split(self, split, dataset, entities_featurized, target,
-            compute_hash=True):
+            dataset_hash=None, compute_hash=True):
         # query db for import parameters to load files
-        is_anything_missing = not all([dataset, entities_featurized, target])
+        is_present_dataset = bool(dataset)
+        is_present_entities_featurized = not pd.DataFrame(entities_featurized).empty
+        is_present_target = not pd.DataFrame(target).empty
+        is_anything_missing = not all(
+                [is_present_dataset, is_present_entities_featurized, is_present_target])
+
         if is_anything_missing:
             with self.orm.session_scope() as session:
                 problem = session.query(Problem)\
@@ -223,7 +229,7 @@ class EvaluatorClient(object):
                 problem_target_table_name = problem.target_table_name
 
         # load entities and other tables
-        if not dataset:
+        if not is_present_dataset:
             # load other tables
             for (table_name, filename) in zip (problem_table_names,
                     problem_files):
@@ -248,7 +254,7 @@ class EvaluatorClient(object):
                 dataset_hash = compute_dataset_hash(dataset)
 
         # load entities featurized
-        if not entities_featurized:
+        if not is_present_entities_featurized:
             # if empty string, we simply don't have any features to add
             if problem_entities_featurized_table_name:
                 cols = list(problem_table_names)
@@ -259,7 +265,7 @@ class EvaluatorClient(object):
                         low_memory=False)
 
         # load target
-        if not target:
+        if not is_present_target:
             cols = list(problem_table_names)
             ind_target = cols.index(problem_target_table_name)
             abs_filename = os.path.join(problem_data_dir,
@@ -312,34 +318,35 @@ class EvaluatorClient(object):
         reasons that the feature is invalid.
         """
 
-        result = []
+        problems = []
 
         # must be coerced to DataFrame
         try:
             feature_values_df = pd.DataFrame(feature_values)
         except Exception:
-            result.append("cannot be coerced to DataFrame")
-            result = "; ".join(result)
-            raise ValueError(result)
+            problems.append("cannot be coerced to DataFrame")
+            problems = "; ".join(problems)
+            raise ValueError(problems)
 
-        if not self.target:
+        if pd.DataFrame(self.target).empty:
             self._load_dataset()
 
         # must have the right shape
         expected_shape = (self.target.shape[0], 1) # pylint: disable=no-member
         if feature_values_df.shape != expected_shape:
-            result.append(
+            problems.append(
                 "returns DataFrame of invalid shape "
                 "(actual {}, expected {})".format(
                     feature_values_df.shape, expected_shape)
             )
 
-        result = "; ".join(result)
+        problems = "; ".join(problems)
 
-        if bool(result):
-            raise ValueError(result)
+        if problems:
+            raise ValueError(problems)
 
-        return result
+        # problems must be an empty string
+        return problems
 
     def _verify_dataset_integrity(self):
         new_hash = compute_dataset_hash(self.dataset)
@@ -351,7 +358,7 @@ class EvaluatorClient(object):
 
     def _build_feature_matrix(self, feature_values):
         values_df = pd.DataFrame(feature_values)
-        if self.entities_featurized:
+        if not pd.DataFrame(self.entities_featurized).empty:
             X = pd.concat([self.entities_featurized, values_df], axis=1) 
         else:
             X = values_df
@@ -431,20 +438,24 @@ class EvaluatorServer(EvaluatorClient):
         self.dataset_train, self.entities_featurized_train, \
                 self.target_train, _ = self._load_dataset_split("train",
                 self.dataset_train, self.entities_featurized_train,
-                self.target_train, False)
+                self.target_train, compute_hash=False)
 
         # load dataset for test data
         self.dataset_test, self.entities_featurized_test, \
                 self.target_test, _ = self._load_dataset_split("test",
                 self.dataset_test, self.entities_featurized_test,
-                self.target_test, False)
+                self.target_test, compute_hash=False)
 
         # concatenate as applicable
-        self.dataset = pd.concat([self.dataset_test, self.dataset_train],
-                axis=0)
-        self.entities_featurized = pd.concat([self.entities_featurized_test,
-            self.entities_featurized_train], axis=0)
-        self.target = pd.concat([self.target_test, self.target_train], axis=0)
+        self.dataset = concat_datasets(self.dataset_train, self.dataset_test)
+        try:
+            self.entities_featurized = pd.concat([self.entities_featurized_train,
+                self.entities_featurized_test], axis=0)
+        except ValueError:
+            # if there are no preprocessed features in the first place, all
+            # will be None, and pd.concat fails
+            self.entities_featurized = None
+        self.target = pd.concat([self.target_train, self.target_test], axis=0)
 
     def _evaluate(self, feature, verbose=False):
         metrics = super()._evaluate(feature, verbose)
