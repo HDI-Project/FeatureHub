@@ -102,19 +102,28 @@ class Model(object):
 
         scores = {}
         for scoring in scorings_:
-            # Make and evaluate predictions. Note that ROC AUC may raise
-            # exception if somehow we only have examples from one class in
-            # a given fold.
-            Y_test_pred = params[scoring]["predictor"](self.model, X_test)
-            try:
-                score = params[scoring]["scorer"](Y_test, Y_test_pred)
-            except ValueError as e:
-                score = None
-                print(traceback.format_exc(), file=sys.stderr)
-            scores[scoring] = score
+            scores[scoring] = self._do_scoring(scoring, params, self.model,
+                    X_test, Y_test)
 
         metric_list = self.scores_to_metriclist(scorings, scores)
         return metric_list
+
+    def _do_scoring(self, scoring, params, model, X_test, Y_test,
+            failure_value=None):
+        # Make and evaluate predictions. Note that ROC AUC may raise
+        # exception if somehow we only have examples from one class in
+        # a given fold.
+        Y_test_transformed = params[scoring]["pred_transformer"](Y_test)
+        Y_test_pred = params[scoring]["predictor"](model, X_test)
+
+        try:
+            score = params[scoring]["scorer"](Y_test_transformed, Y_test_pred)
+        except ValueError as e:
+            score = failure_value
+            print(traceback.format_exc(), file=sys.stderr)
+            raise RuntimeError
+
+        return score
 
     def cv_score_mean(self, X, Y, scorings):
         """Compute mean score across cross validation folds.
@@ -157,16 +166,8 @@ class Model(object):
             self.model.fit(X_train, Y_train)
 
             for scoring in scorings:
-                # Make and evaluate predictions. Note that ROC AUC may raise
-                # exception if somehow we only have examples from one class in
-                # a given fold.
-                Y_test_pred = params[scoring]["predictor"](self.model, X_test)
-                try:
-                    score = params[scoring]["scorer"](Y_test, Y_test_pred)
-                except ValueError as e:
-                    score = np.nan
-                    print(traceback.format_exc(), file=sys.stderr)
-                    raise RuntimeError
+                score = self._do_scoring(scoring, params, self.model, X_test,
+                        Y_test, failure_value=np.nan)
                 scoring_outputs[scoring].append(score)
 
         for scoring in scoring_outputs:
@@ -207,42 +208,56 @@ class Model(object):
 
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
-        def predict_fn(model, X_test):
+
+        # predictors
+        def predict(model, X_test):
             return model.predict(X_test)
-        def predict_prob_fn(model, X_test):
+        def predict_prob(model, X_test):
             return model.predict_proba(X_test)
-        def roc_auc_scorer(y_true, y_pred):
-            if is_binary:
-                y_true = label_binarize(y_true, classes=[x for x in
-                    range(n_classes)])
-            return sklearn.metrics.roc_auc_score(y_true, y_pred,
-                    average=metric_aggregation)
+
+        # transformers
+        def noop(y_true):
+            return y_true
+        def transformer_binarize(y_true):
+            y_true = label_binarize(y_true, classes=[x for x in
+                range(n_classes)])
+            return y_true
+
+        # scorers
+        # nothing here
 
         params = {
             "accuracy" : {
-                "predictor" : predict_fn,
+                "predictor" : predict,
+                "pred_transformer" : noop,
                 "scorer" : sklearn.metrics.accuracy_score,
             },
             "precision" : {
-                "predictor" : predict_fn,
+                "predictor" : predict,
+                "pred_transformer" : noop,
                 "scorer" : lambda y_true, y_pred: sklearn.metrics.precision_score(
                         y_true, y_pred, average=metric_aggregation),
             },
             "recall" : {
-                "predictor" : predict_fn,
+                "predictor" : predict,
+                "pred_transformer" : noop,
                 "scorer" : lambda y_true, y_pred: sklearn.metrics.recall_score(
                         y_true, y_pred, average=metric_aggregation),
             },
             "roc_auc" : {
-                "predictor" : predict_fn if is_binary else predict_prob_fn,
-                "scorer" : roc_auc_scorer,
+                "predictor" : predict if is_binary else predict_prob,
+                "pred_transformer" : noop if is_binary else transformer_binarize,
+                "scorer" : lambda y_true, y_pred: sklearn.metrics.roc_auc_score(
+                    y_true, y_pred, average=metric_aggregation),
             },
             "mean_squared_error" : {
-                "predictor" : predict_fn,
+                "predictor" : predict,
+                "pred_transformer" : noop,
                 "scorer" : sklearn.metrics.mean_squared_error,
             },
             "r2" : {
-                "predictor" : predict_fn,
+                "predictor" : predict,
+                "pred_transformer" : noop,
                 "scorer" : sklearn.metrics.r2_score
             },
         }
