@@ -23,22 +23,13 @@ class Session(object):
         self.__database            = database
         self.__orm                 = ORMManager(database)
         self.__username            = None
-        self.__dataset             = {}
-        self.__target              = None
-        self.__entities_featurized = None
 
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem)\
                                  .filter(Problem.name == problem)\
                                  .one()
-                self.__problem_id                             = problem.id
-                self.__problem_data_dir                       = problem.data_dir_train
-                self.__problem_files                          = json.loads(problem.files)
-                self.__problem_table_names                    = json.loads(problem.table_names)
-                self.__problem_entities_table_name            = problem.entities_table_name
-                self.__problem_entities_featurized_table_name = problem.entities_featurized_table_name
-                self.__problem_target_table_name              = problem.target_table_name
+                self.__problem_id = problem.id
             except NoResultFound:
                 raise ValueError("Invalid problem name: {}".format(problem))
             except MultipleResultsFound:
@@ -49,14 +40,16 @@ class Session(object):
         self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluatorClient(
-            self.__problem_id,
-            self.__username,
-            self.__orm,
-            self.__dataset,
-            self.__target,
-            self.__entities_featurized
-        )
+        self.__evaluation_client = EvaluatorClient(self.__problem_id,
+                self.__username, self.__orm)
+
+    @property
+    def __target(self):
+        return self.__evaluation_client.target
+
+    @property
+    def __dataset(self):
+        return self.__evaluation_client.dataset
 
     def _login(self):
         name = os.environ.get("USER")
@@ -94,8 +87,7 @@ class Session(object):
         >>> dataset["users"] # -> returns DataFrame
         >>> dataset["stores"] # -> returns DataFrame
         """
-        if not self.__dataset or pd.DataFrame(self.__target).empty:
-            self._load_dataset()
+        self.__evaluation_client._load_dataset()
 
         # Return a *copy* of the dataset, ensuring we have enough memory.
         gc.collect()    
@@ -211,53 +203,6 @@ class Session(object):
             description = self._prompt_description()
 
         self.__evaluation_client.submit(feature, description)
-
-    def _load_dataset(self):
-        # query db for import parameters to load files
-        is_present_dataset = bool(self.__dataset)
-        is_present_entities_featurized = not pd.DataFrame(self.__entities_featurized).empty
-        is_present_target = not pd.DataFrame(self.__target).empty
-        is_anything_missing = not all(
-                [is_present_dataset, is_present_entities_featurized, is_present_target])
-
-        if is_anything_missing:
-            problem_data_dir = self.__problem_data_dir
-            problem_files = self.__problem_files
-            problem_table_names = self.__problem_table_names
-            problem_entities_featurized_table_name = \
-                self.__problem_entities_featurized_table_name
-            problem_target_table_name = self.__problem_target_table_name
-
-        # load entities and other tables
-        if not self.__dataset:
-            # load other tables
-            for (table_name, filename) in zip (problem_table_names,
-                    problem_files):
-                if table_name == problem_entities_featurized_table_name or \
-                   table_name == problem_target_table_name:
-                    continue
-                abs_filename = os.path.join(problem_data_dir, filename)
-                self.__dataset[table_name] = pd.read_csv(abs_filename,
-                        low_memory=False)
-
-        # load entities featurized
-        if pd.DataFrame(self.__entities_featurized).empty:
-            # if empty string, we simply don't have any features to add
-            if problem_entities_featurized_table_name:
-                cols = list(problem_table_names)
-                ind_features = cols.index(problem_entities_featurized_table_name)
-                abs_filename = os.path.join(problem_data_dir,
-                        problem_files[ind_features])
-                self.__entities_featurized = pd.read_csv(abs_filename,
-                        low_memory=False)
-
-        # load target
-        if pd.DataFrame(self.__target).empty:
-            cols = list(problem_table_names)
-            ind_target = cols.index(problem_target_table_name)
-            abs_filename = os.path.join(problem_data_dir,
-                    problem_files[ind_target]) 
-            self.__target = pd.read_csv(abs_filename, low_memory=False)
 
     def _filter_features(self, session, code_fragment):
         """Return query that filters this problem and given code fragment.
