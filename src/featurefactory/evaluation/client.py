@@ -82,11 +82,7 @@ class EvaluatorClient(object):
         description : str
             Feature description
         """
-        # request from eval-server directly
-        url = "http://{}:{}/services/eval-server/submit".format(
-            os.environ.get("EVAL_CONTAINER_NAME"),
-            os.environ.get("EVAL_CONTAINER_PORT")
-        )
+        from featurefactory.user.session import Session
         feature_dill = quote_from_bytes(dill.dumps(feature))
         code = get_source(feature)
         data = {
@@ -96,12 +92,7 @@ class EvaluatorClient(object):
             "code"        : code,
             "description" : description,
         }
-        headers = {
-            "Authorization" : "token {}".format(
-                os.environ.get("JUPYTERHUB_API_TOKEN")),
-        }
-
-        response = requests.post(url=url, data=data, headers=headers)
+        response = Session._eval_server_post("submit", data)
 
         if response.ok:
             try:
@@ -158,24 +149,14 @@ class EvaluatorClient(object):
         return metrics_str
 
     def _log_evaluation_attempt(self, feature):
-        url = "http://{}:{}/services/eval-server/evaluate".format(
-            os.environ.get("EVAL_CONTAINER_NAME"),
-            os.environ.get("EVAL_CONTAINER_PORT")
-        )
-
+        from featurefactory.user.session import Session
         code = get_source(feature)
-
         data = {
             "database"    : self.orm.database,
             "problem_id"  : self.problem_id,
             "code"        : code,
         }
-        headers = {
-            "Authorization" : "token {}".format(
-                os.environ.get("JUPYTERHUB_API_TOKEN")),
-        }
-
-        requests.post(url=url, data=data, headers=headers)
+        Session._eval_server_post("log-evaluation-attempt", data)
 
     def _evaluate(self, feature, verbose=False):
 

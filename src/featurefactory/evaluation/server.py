@@ -97,9 +97,9 @@ def create_user(user):
     return Response(status=201)
 
 
-@app.route(prefix + "/evaluate", methods=["POST"])
+@app.route(prefix + "/log-evaluation-attempt", methods=["POST"])
 @authenticated
-def evaluate(user):
+def log_evaluation_attempt(user):
     """Log user evaluation of feature.
 
     Extracts 'database', 'problem_id', and 'code' from POST body.

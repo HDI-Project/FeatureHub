@@ -56,6 +56,19 @@ class Session(object):
     def __target(self):
         return self.__evaluation_client.target
 
+    @staticmethod
+    def _eval_server_post(route, data):
+        url = "http://{}:{}/services/eval-server/{}".format(
+            os.environ.get("EVAL_CONTAINER_NAME"),
+            os.environ.get("EVAL_CONTAINER_PORT"),
+            route
+        )
+        headers = {
+            "Authorization" : "token {}".format(
+                os.environ.get("JUPYTERHUB_API_TOKEN")),
+        }
+        return requests.post(url=url, data=data, headers=headers)
+
     def _login(self):
         name = os.environ.get("USER")
         if not name:
@@ -69,18 +82,8 @@ class Session(object):
                               .one()
                 self.__username = user.name
             except NoResultFound:
-                url = "http://{}:{}/services/eval-server/create-user".format(
-                    os.environ.get("EVAL_CONTAINER_NAME"),
-                    os.environ.get("EVAL_CONTAINER_PORT")
-                )
-                data = {
-                    "database" : self.__orm.database,
-                }
-                headers = {
-                    "Authorization" : "token {}".format(
-                        os.environ.get("JUPYTERHUB_API_TOKEN")),
-                }
-                response = requests.post(url=url, data=data, headers=headers)
+                data = { "database" : self.__orm.database }
+                response = Session._eval_server_post("create-user", data)
                 if response.ok:
                     self.__username = name
                 else:
