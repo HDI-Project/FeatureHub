@@ -188,11 +188,12 @@ def evaluate(user):
         try:
             # write to db
             feature_obj = Feature(
-                description = description,
-                code        = code,
-                md5         = md5,
-                user        = user_obj,
-                problem     = problem_obj
+                description         = description,
+                feature_dill_quoted = feature_dill,
+                code                = code,
+                md5                 = md5,
+                user                = user_obj,
+                problem             = problem_obj
             )
             session.add(feature_obj)
             for metric in metrics:

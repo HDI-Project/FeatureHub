@@ -32,15 +32,16 @@ class Problem(Base):
 class Feature(Base):
     __tablename__ = 'features'
 
-    id          = Column(Integer, primary_key=True, autoincrement=True)
-    user_id     = Column(Integer, ForeignKey('users.id'))
-    user        = relationship('User')
-    problem_id  = Column(Integer, ForeignKey('problems.id'))
-    problem     = relationship('Problem')
-    code        = Column(Text, nullable=False)
-    md5         = Column(String(32), nullable=True)
-    description = Column(Text, nullable=True)
-    created_at  = Column(DateTime, default=datetime.now)
+    id                  = Column(Integer, primary_key=True, autoincrement=True)
+    user_id             = Column(Integer, ForeignKey('users.id'))
+    user                = relationship('User')
+    problem_id          = Column(Integer, ForeignKey('problems.id'))
+    problem             = relationship('Problem')
+    code                = Column(Text, nullable=False)
+    feature_dill_quoted = Column(Text, nullable=True)
+    md5                 = Column(String(32), nullable=False)
+    description         = Column(String(1000), nullable=False)
+    created_at          = Column(DateTime, default=datetime.now)
 
 class Metric(Base):
     __tablename__ = 'metrics'
