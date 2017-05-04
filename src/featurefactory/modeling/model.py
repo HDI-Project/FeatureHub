@@ -94,8 +94,8 @@ class Model(object):
         scorings, scorings_ = self._get_scorings()
 
         # Determine binary/multiclass classification
-        n_classes = len(np.unique(Y))
-        params = self._get_params(n_classes)
+        classes = np.unique(Y)
+        params = self._get_params(classes)
 
         # fit model on entire training set
         self.model.fit(X_train, Y_train)
@@ -148,8 +148,8 @@ class Model(object):
         scorings = list(scorings)
 
         # Determine binary/multiclass classification
-        n_classes = len(np.unique(Y))
-        params = self._get_params(n_classes)
+        classes = np.unique(Y)
+        params = self._get_params(classes)
 
         if self._is_classification():
             kf = StratifiedKFold(shuffle=True, random_state=RANDOM_STATE+3)
@@ -199,7 +199,8 @@ class Model(object):
     def _is_regression(self):
         return self.problem_type == "regression"
 
-    def _get_params(self, n_classes):
+    def _get_params(self, classes):
+        n_classes = len(classes)
         is_binary = n_classes == 2
         if is_binary:
             metric_aggregation = Model.BINARY_METRIC_AGGREGATION
@@ -219,9 +220,7 @@ class Model(object):
         def noop(y_true):
             return y_true
         def transformer_binarize(y_true):
-            y_true = label_binarize(y_true, classes=[x for x in
-                range(n_classes)])
-            return y_true
+            return label_binarize(y_true, classes=classes)
 
         # scorers
         # nothing here
