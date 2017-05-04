@@ -83,7 +83,7 @@ class Model(object):
         return metric_list
 
     def compute_metrics_train_test(self, X, Y, n):
-        """
+        """Compute metrics on test set.
         """
 
         X, Y = self._format_matrices(X, Y)
@@ -166,6 +166,7 @@ class Model(object):
                 except ValueError as e:
                     score = np.nan
                     print(traceback.format_exc(), file=sys.stderr)
+                    raise RuntimeError
                 scoring_outputs[scoring].append(score)
 
         for scoring in scoring_outputs:
@@ -198,10 +199,11 @@ class Model(object):
         return self.problem_type == "regression"
 
     def _get_params(self, n_classes):
-        if n_classes > 2:
-            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
-        else:
+        is_binary = n_classes == 2
+        if is_binary:
             metric_aggregation = Model.BINARY_METRIC_AGGREGATION
+        else:
+            metric_aggregation = Model.MULTICLASS_METRIC_AGGREGATION
 
         # Determine predictor (labels, label probabilities, or values) and
         # scoring function.
@@ -210,8 +212,9 @@ class Model(object):
         def predict_prob_fn(model, X_test):
             return model.predict_proba(X_test)
         def roc_auc_scorer(y_true, y_pred):
-            y_true = label_binarize(y_true, classes=[x for x in
-                range(n_classes)])
+            if is_binary:
+                y_true = label_binarize(y_true, classes=[x for x in
+                    range(n_classes)])
             return sklearn.metrics.roc_auc_score(y_true, y_pred,
                     average=metric_aggregation)
 
@@ -231,7 +234,7 @@ class Model(object):
                         y_true, y_pred, average=metric_aggregation),
             },
             "roc_auc" : {
-                "predictor" : predict_prob_fn,
+                "predictor" : predict_fn if is_binary else predict_prob_fn,
                 "scorer" : roc_auc_scorer,
             },
             "mean_squared_error" : {

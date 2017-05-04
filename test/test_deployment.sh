@@ -50,5 +50,5 @@ do
     docker cp ./test_${USER_}.py \
         ${FF_CONTAINER_NAME}-${USER_}:/tmp/test_${USER_}.py
     docker exec -u ${USER_} -i ${FF_CONTAINER_NAME}-${USER_} \
-        /opt/conda/bin/ipython -i /tmp/test_${USER_}.py
+        /opt/conda/bin/ipython --pdb -i /tmp/test_${USER_}.py
 done
