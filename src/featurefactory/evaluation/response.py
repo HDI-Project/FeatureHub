@@ -27,8 +27,6 @@ class EvaluationResponse(Response):
     STATUS_CODE_SERVER_ERROR      = "server_error"
     STATUS_CODE_DB_ERROR          = "db_error"
 
-    try_again = TRY_AGAIN_LATER
-
     def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None):
         if metrics is not None:
             metrics = MetricList.from_object(metrics).convert(kind="user")
@@ -72,20 +70,22 @@ class EvaluationResponse(Response):
         if self.status_code1 == self.STATUS_CODE_OKAY:
             return "Feature registered successfully."
         elif self.status_code1 == self.STATUS_CODE_BAD_REQUEST:
-            return "Oops -- failed to communicate with server. " + self.try_again
+            return "Oops -- failed to communicate with server. " \
+                + TRY_AGAIN_LATER
         elif self.status_code1 == self.STATUS_CODE_BAD_AUTH:
-            return "Oops -- couldn't verify your identity. " + self.try_again
+            return "Oops -- couldn't verify your identity. " \
+                + TRY_AGAIN_LATER
         elif self.status_code1 == self.STATUS_CODE_BAD_FEATURE:
-            return "Feature is invalid and not registered. Try cross " + \
-                    "validating it locally to see your problems."
+            return ("Feature is invalid and not registered. Try cross "
+                    "validating it locally to see your problems.")
         elif self.status_code1 == self.STATUS_CODE_DUPLICATE_FEATURE:
             return "Feature is already registered."
         elif self.status_code1 == self.STATUS_CODE_SERVER_ERROR:
-            return "Oops -- server failed to evaluate your feature. " + \
-                self.try_again
+            return "Oops -- server failed to evaluate your feature. " \
+                + TRY_AGAIN_LATER
         elif self.status_code1 == self.STATUS_CODE_DB_ERROR:
-            return "Oops -- failed to register feature with database. " + \
-                self.try_again 
+            return "Oops -- failed to register feature with database. " \
+                + TRY_AGAIN_LATER
         else:
             return ""
 
