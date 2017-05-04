@@ -269,7 +269,7 @@ class EvaluatorClient(object):
                     continue
                 abs_filename = os.path.join(problem_data_dir, filename)
                 dataset[table_name] = pd.read_csv(abs_filename,
-                        low_memory=False)
+                        low_memory=False, header=0)
 
                 # compute/recompute hash
                 if compute_hash:
@@ -293,7 +293,7 @@ class EvaluatorClient(object):
                 abs_filename = os.path.join(problem_data_dir,
                         problem_files[ind_features])
                 entities_featurized = pd.read_csv(abs_filename,
-                        low_memory=False)
+                        low_memory=False, header=0)
 
         # load target
         if not is_present_target:
@@ -301,7 +301,7 @@ class EvaluatorClient(object):
             ind_target = cols.index(problem_target_table_name)
             abs_filename = os.path.join(problem_data_dir,
                     problem_files[ind_target]) 
-            target = pd.read_csv(abs_filename, low_memory=False)
+            target = pd.read_csv(abs_filename, low_memory=False, header=0)
 
         return dataset, entities_featurized, target, dataset_hash
 
