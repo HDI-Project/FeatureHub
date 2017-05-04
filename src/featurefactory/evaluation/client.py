@@ -144,11 +144,38 @@ class EvaluatorClient(object):
             metrics_str = metrics.to_string(kind="user")
             metrics_user = metrics.convert(kind="user")
             print(metrics_str)
-            return metrics_user
         except ValueError as e:
             print("Feature is not valid: {}".format(str(e)), file=sys.stderr)
             print(traceback.format_exc(), file=sys.stderr)
-            return {}
+            metrics_str = {}
+
+        try:
+            # TODO this can be an async procedure
+            self._log_evaluation_attempt(feature)
+        except Exception:
+            pass
+
+        return metrics_str
+
+    def _log_evaluation_attempt(self, feature):
+        url = "http://{}:{}/services/eval-server/evaluate".format(
+            os.environ.get("EVAL_CONTAINER_NAME"),
+            os.environ.get("EVAL_CONTAINER_PORT")
+        )
+
+        code = get_source(feature)
+
+        data = {
+            "database"    : self.orm.database,
+            "problem_id"  : self.problem_id,
+            "code"        : code,
+        }
+        headers = {
+            "Authorization" : "token {}".format(
+                os.environ.get("JUPYTERHUB_API_TOKEN")),
+        }
+
+        requests.post(url=url, data=data, headers=headers)
 
     def _evaluate(self, feature, verbose=False):
 

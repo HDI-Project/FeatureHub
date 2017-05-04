@@ -19,7 +19,9 @@ from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
+from featurefactory.admin.sqlalchemy_declarative import (
+    Feature, Problem, User, Metric, EvaluationAttempt
+)
 from featurefactory.util                         import get_function, myhash
 
 # setup
@@ -73,6 +75,43 @@ def authenticated(f):
                 status_code = EvaluationResponse.STATUS_CODE_BAD_AUTH
             )
     return decorated
+
+@app.route(prefix + "/evaluate", methods=["POST"])
+@authenticated
+def evaluate(user):
+    """Log user evaluation of feature.
+
+    Extracts 'database', 'problem_id', and 'code' from POST body.
+    """
+
+    try:
+        try:
+            database    = request.form["database"]
+            problem_id  = request.form["problem_id"]
+            code        = request.form["code"]
+        except Exception:
+            app.logger.exception("Couldn't read parameters from form.")
+        app.logger.debug("Read parameters from form.")
+
+        try:
+            user_name = user["name"]
+            orm = ORMManager(database, admin=True)
+            with orm.session_scope() as session:
+                user_obj = session.query(User).filter(User.name == user_name).one()
+                problem_obj = session.query(Problem).filter(Problem.id ==
+                        problem_id).one()
+                evaluation_attempt_obj = EvaluationAttempt(
+                    user    = user_obj,
+                    problem = problem_obj,
+                    code    = code
+                )
+                session.add(evaluation_attempt_obj)
+        except Exception:
+            app.logger.exception("Couldn't insert evaluation attempt into "
+                                 "database.")
+        app.logger.debug("Inserted evaluation attempt into database.")
+    finally:
+        return Response()
 
 @app.route(prefix + "/submit", methods=["POST"])
 @authenticated

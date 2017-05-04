@@ -53,3 +53,14 @@ class Metric(Base):
     scoring    = Column(String(100), nullable=False)
     value      = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
+
+class EvaluationAttempt(Base):
+    __tablename__ = "evaluationattempts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id             = Column(Integer, ForeignKey('users.id'))
+    user                = relationship('User')
+    problem_id          = Column(Integer, ForeignKey('problems.id'))
+    problem             = relationship('Problem')
+    code                = Column(Text, nullable=False)
+    created_at          = Column(DateTime, default=datetime.now)
