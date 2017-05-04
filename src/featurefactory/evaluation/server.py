@@ -74,10 +74,10 @@ def authenticated(f):
             )
     return decorated
 
-@app.route(prefix + "/evaluate", methods=["POST"])
+@app.route(prefix + "/submit", methods=["POST"])
 @authenticated
-def evaluate(user):
-    """Process user request to evaluate and register feature.
+def submit(user):
+    """Process user request to submit feature.
 
     Extracts 'database', 'problem_id', 'code', and 'description' from POST
     body.

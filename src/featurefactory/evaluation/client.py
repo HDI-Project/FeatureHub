@@ -83,7 +83,7 @@ class EvaluatorClient(object):
             Feature description
         """
         # request from eval-server directly
-        url = "http://{}:{}/services/eval-server/evaluate".format(
+        url = "http://{}:{}/services/eval-server/submit".format(
             os.environ.get("EVAL_CONTAINER_NAME"),
             os.environ.get("EVAL_CONTAINER_PORT")
         )
