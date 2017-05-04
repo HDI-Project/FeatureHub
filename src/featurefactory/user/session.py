@@ -44,12 +44,16 @@ class Session(object):
                 self.__username, self.__orm)
 
     @property
-    def __target(self):
-        return self.__evaluation_client.target
-
-    @property
     def __dataset(self):
         return self.__evaluation_client.dataset
+
+    @property
+    def __entities_featurized(self):
+        return self.__evaluation_client.entities_featurized
+    
+    @property
+    def __target(self):
+        return self.__evaluation_client.target
 
     def _login(self):
         name = os.environ.get("USER")
@@ -98,6 +102,20 @@ class Session(object):
         target = self.__target.copy() # pylint: disable=no-member
 
         return (dataset, target)
+
+    def get_entity_features(self):
+        """Loads preprocessed entity-level features of problem training dataset.
+        
+        The entity-level features are the same length as the entity DataFrame
+        and the target DataFrame.
+
+        Returns
+        -------
+        entity_features : pd.DataFrame or None
+        """
+        self.__evaluation_client._load_dataset()
+        entity_features = self.__entities_featurized.copy()
+        return entity_features
 
     def discover_features(self, code_fragment=None, metric_name=None):
         """Print features written by other users.
