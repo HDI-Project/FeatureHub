@@ -1,6 +1,6 @@
 # Test of airbnb problem
 
-from featurefactory.problems import commands
+from featurefactory.problems.airbnb import commands
 dataset, target = commands.get_sample_dataset()
 
 def example_feature(dataset):
