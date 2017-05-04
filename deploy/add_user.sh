@@ -71,7 +71,7 @@ if $admin; then
     cmd2="GRANT ALL ON *.* TO '$_USERNAME'@'%' WITH GRANT OPTION;"
     cmd3=""
 else
-    cmd2="GRANT INSERT, SELECT ON $MYSQL_DATABASE.* TO '$_USERNAME'@'%';"
+    cmd2="GRANT SELECT ON $MYSQL_DATABASE.* TO '$_USERNAME'@'%';"
     cmd3=""
     #cmd3="GRANT INSERT ON $MYSQL_DATABASE.users TO '$_USERNAME'@'%';"
 fi

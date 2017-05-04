@@ -76,6 +76,27 @@ def authenticated(f):
             )
     return decorated
 
+@app.route(prefix + "/create-user", methods=["POST"])
+@authenticated
+def create_user(user):
+    """Create User object in the database.
+    """
+
+    user_name = user["name"]
+    try:
+        database = request.form["database"]
+        orm = ORMManager(database, admin=True)
+        with orm.session_scope() as session:
+            session.add(User(name=user_name))
+    except Exception:
+        app.logger.exception("Couldn't create new user (name '{}') in db"
+                .format(user_name))
+        return Response(status=500)
+
+    app.logger.debug("Created new user (name '{}') in db".format(user_name))
+    return Response(status=201)
+
+
 @app.route(prefix + "/evaluate", methods=["POST"])
 @authenticated
 def evaluate(user):

@@ -2,6 +2,7 @@ import os
 import json
 import gc
 import pandas as pd
+import requests
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -68,10 +69,27 @@ class Session(object):
                               .one()
                 self.__username = user.name
             except NoResultFound:
-                session.add(User(name=name))
-                self.__username = name
+                url = "http://{}:{}/services/eval-server/create-user".format(
+                    os.environ.get("EVAL_CONTAINER_NAME"),
+                    os.environ.get("EVAL_CONTAINER_PORT")
+                )
+                data = {
+                    "database" : self.__orm.database,
+                }
+                headers = {
+                    "Authorization" : "token {}".format(
+                        os.environ.get("JUPYTERHUB_API_TOKEN")),
+                }
+                response = requests.post(url=url, data=data, headers=headers)
+                if response.ok:
+                    self.__username = name
+                else:
+                    raise ValueError("Couldn't log in to Feature Factory. " \
+                                     + TRY_AGAIN_LATER) 
+
             except MultipleResultsFound as e:
-                raise e
+                raise ValueError("Unexpected error logging in to Feature Factory. " \
+                                 + TRY_AGAIN_LATER) 
 
     def get_sample_dataset(self):
         """Loads sample of problem training dataset.
