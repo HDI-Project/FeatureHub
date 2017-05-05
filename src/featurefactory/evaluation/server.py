@@ -22,6 +22,7 @@ from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import (
     Feature, Problem, User, Metric, EvaluationAttempt
 )
+from featurefactory.evaluation.discourse         import post_feature
 from featurefactory.util                         import get_function, myhash
 
 # setup
@@ -265,13 +266,21 @@ def submit(user):
                     value   = metric_db["value"]
                 )
                 session.add(metric_obj)
-
         except Exception:
             app.logger.exception("Unexpected error inserting into db")
             return EvaluationResponse(
                 status_code = EvaluationResponse.STATUS_CODE_DB_ERROR
             )
         app.logger.debug("Inserted into db.")
+
+        # post to forum
+        try:
+            new_topic_url = post_feature(feature_obj, metrics)
+        except Exception:
+            app.logger.exception("Unexpected error posting to forum")
+            new_topic_url = ""
+        app.logger.debug("Posted to forum")
+
 
     # return
     # - status code

@@ -86,11 +86,11 @@ class EvaluatorClient(object):
         feature_dill = quote_from_bytes(dill.dumps(feature))
         code = get_source(feature)
         data = {
-            "database"    : self.orm.database,
-            "problem_id"  : self.problem_id,
-            "feature_dill": feature_dill,
-            "code"        : code,
-            "description" : description,
+            "database"     : self.orm.database,
+            "problem_id"   : self.problem_id,
+            "feature_dill" : feature_dill,
+            "code"         : code,
+            "description"  : description,
         }
         response = Session._eval_server_post("submit", data)
 

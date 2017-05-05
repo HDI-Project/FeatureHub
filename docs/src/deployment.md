@@ -42,8 +42,14 @@ Definitely override values for these variables:
 - `MYSQL_ROOT_PASSWORD`: password for DB root user
 - `EVAL_API_TOKEN`: API token for eval server. You should generate a valid API token by
     executing `openssl rand -hex 32`.
-- `API_CLIENT_API_TOKEN` : API token for Hub API client script. You generate a valid API
-    token by executing `openssl rand -hex 32`.
+- `API_CLIENT_API_TOKEN` : API token for Hub API client script. You should generate a valid
+    API token by executing `openssl rand -hex 32`.
+- `DISCOURSE_DOMAIN_NAME` :
+- `DISCOURSE_CLIENT_API_USERNAME` : Username for Discourse admin, to use with Discourse API
+    client. You must use the same username when setting up the Discourse instance.
+- `DISCOURSE_CLIENT_API_TOKEN` : API token for Discourse API client. You should generate a
+    valid API token by executing `openssl rand -hex 32`. You must use the same token when
+    setting up the Discourse instance.
 
 You can usually leave these variables at their default values:
 
@@ -73,6 +79,11 @@ You can usually leave these variables at their default values:
     container, this will be the exact name.
 - `EVAL_CONTAINER_PORT` : port for eval server to listen on
 - `EVAL_FLASK_DEBUG` : whether eval server Flask app should be started with DEBUG flag
+- `DISCOURSE_FEATURE_GROUP_NAME` : Group for new users to be added to on Discourse. This
+    group will control the visibility of the feature category.
+- `DISCOURSE_FEATURE_CATEGORY_NAME` : Category for new features to be posted to on
+    Discourse. Posts to this category will only be visible by members of the feature group
+    (above) and administrators.
 
 ### Userlist
 
@@ -112,7 +123,8 @@ authentication for each user with the DB.
 Most files are stored directly on the host machine and mounted in the Hub and User
 containers:
 
-- Experiment data: `FF_DATA_DIR/data`
+- Experiment data: `FF_DATA_DIR/data/train` and `FF_DATA_DIR/data/test`
+- Problem definitions: `FF_DATA_DIR/problems`
 - Notebooks and other user-created files: `FF_DATA_DIR/users`
 - Configuration files for FeatureFactory and JupyterHub: `FF_DATA_DIR/config`
 - Log files for Hub and eval server: `FF_DATA_DIR/log`
