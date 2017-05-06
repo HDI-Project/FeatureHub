@@ -18,10 +18,14 @@ def post_feature(feature, metrics):
     ]
     content = _render_feature_post_template(*params)
 
-    client.create_post(
+    result = client.create_post(
             category=os.environ.get("DISCOURSE_FEATURE_CATEGORY_NAME"),
             title="[New Feature] {}".format(feature.description),
             content=content)
+
+    # return the url of the new post
+    result = ""
+    return result
 
 _template = \
 """
