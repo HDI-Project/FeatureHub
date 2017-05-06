@@ -275,11 +275,11 @@ def submit(user):
 
         # post to forum
         try:
-            new_topic_url = post_feature(feature_obj, metrics)
+            topic_url = post_feature(feature_obj, metrics)
+            app.logger.debug("Posted to forum")
         except Exception:
+            topic_url = "<not available>"
             app.logger.exception("Unexpected error posting to forum")
-            new_topic_url = ""
-        app.logger.debug("Posted to forum")
 
 
     # return
@@ -287,7 +287,8 @@ def submit(user):
     # - metrics dict
     return EvaluationResponse(
         status_code=EvaluationResponse.STATUS_CODE_OKAY,
-        metrics=metrics
+        metrics=metrics,
+        topic_url=topic_url,
     )
 
 if __name__ == "__main__":

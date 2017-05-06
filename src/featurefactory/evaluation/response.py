@@ -27,13 +27,15 @@ class EvaluationResponse(Response):
     STATUS_CODE_SERVER_ERROR      = "server_error"
     STATUS_CODE_DB_ERROR          = "db_error"
 
-    def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None):
+    def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None,
+            topic_url="<not available>"):
         if metrics is not None:
             metrics = MetricList.from_object(metrics).convert(kind="user")
 
         d = {
             "status_code" : status_code,
             "metrics"     : metrics,
+            "topic_url"   : topic_url,
         }
         response = json.dumps(d, indent=1, sort_keys=True)
         mimetype = "application/json"
@@ -42,6 +44,7 @@ class EvaluationResponse(Response):
 
         self.status_code1 = status_code
         self.metrics = metrics
+        self.topic_url = topic_url
 
 
     @classmethod
@@ -61,8 +64,9 @@ class EvaluationResponse(Response):
 
         status_code = d["status_code"]
         metrics     = d["metrics"]
+        topic_url   = d["topic_url"]
 
-        return cls(status_code=status_code, metrics=metrics)
+        return cls(status_code=status_code, metrics=metrics, topic_url=topic_url)
 
     def _get_explanation(self):
         """Return an explanation of the response status code."""
@@ -92,6 +96,9 @@ class EvaluationResponse(Response):
     def _get_metrics_str(self):
         return MetricList.from_object(self.metrics).to_string(kind="user")
 
+    def _get_topic_url_str(self):
+        return "Feature posted to forum => {}".format(self.topic_url)
+
     def __str__(self):
         """ Return string representation of response.
 
@@ -100,4 +107,5 @@ class EvaluationResponse(Response):
         """
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()
-        return explanation + "\n\n" + metrics_str
+        topic_url_str = self._get_topic_url_str()
+        return explanation + "\n\n" + metrics_str + "\n\n" + topic_url_str

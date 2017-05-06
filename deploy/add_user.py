@@ -52,13 +52,13 @@ EOM
 
     os.makedirs(pjoin(c["FF_DATA_DIR"], "users", username), exist_ok=True)
     if admin:
-        shutil.copytree(pjoin("..","notebooks","admin"),
+        shutil.copytree(pjoin(c["FF_DATA_DIR"],"notebooks","admin"),
                         pjoin(c["FF_DATA_DIR"], "users", username,
                             "notebooks", "admin"))
         shutil.copytree(pjoin(c["FF_DATA_DIR"], "problems"),
                         pjoin(c["FF_DATA_DIR"], "users", username))
     else:
-        shutil.copytree(pjoin("..","notebooks"),
+        shutil.copytree(pjoin(c["FF_DATA_DIR"],"notebooks"),
                         pjoin(c["FF_DATA_DIR"], "users", username, "notebooks"))
         shutil.rmtree(pjoin(c["FF_DATA_DIR"], "users", username, "notebooks",
             "admin"))

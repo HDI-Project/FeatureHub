@@ -23,9 +23,13 @@ def post_feature(feature, metrics):
             title="[New Feature] {}".format(feature.description),
             content=content)
 
+    url = "https://{}/t/{}".format(
+            os.environ.get("DISCOURSE_DOMAIN_NAME"),
+            result["topic_slug"])
+
     # return the url of the new post
-    result = ""
-    return result
+    # result = ""
+    return url
 
 _template = \
 """
@@ -43,7 +47,7 @@ What do you think? What do you like about this feature? How could it be improved
 
 ----------
 
-(submitted by user {user_name})
+(submitted by user _{user_name}_)
 """
 
 def _render_feature_post_template(problem_name, feature_description,
@@ -52,7 +56,8 @@ def _render_feature_post_template(problem_name, feature_description,
     # format a couple objects
     indent = "    "
     bullet = " * "
-    feature_code = textwrap.indent(code, indent)
+
+    feature_code = "\n".join([indent + line for line in code.split("\n")])
 
     tmp = []
     for metric in metrics:
@@ -60,7 +65,7 @@ def _render_feature_post_template(problem_name, feature_description,
         tmp.append(bullet + "{}: {}".format(d["name"], d["value"]))
     feature_metrics = "\n".join(tmp)
 
-    user_name = escape_user_name(user_name)
+    user_name = _escape_user_name(user_name)
 
     # render template
     return _template.format(problem_name=problem_name,
@@ -69,5 +74,5 @@ def _render_feature_post_template(problem_name, feature_description,
             feature_metrics=feature_metrics,
             user_name=user_name)
 
-def escape_user_name(name):
+def _escape_user_name(name):
     return name.replace("_", "&lowbar;")

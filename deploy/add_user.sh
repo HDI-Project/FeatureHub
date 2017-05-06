@@ -56,10 +56,10 @@ EOF
 # later. Note that "the user ID has to match for mounted files".
 mkdir -p $FF_DATA_DIR/users/$_USERNAME/notebooks
 if $admin; then
-    cp -r ../notebooks/admin $FF_DATA_DIR/users/$_USERNAME/notebooks
+    cp -r $FF_DATA_DIR/notebooks/admin $FF_DATA_DIR/users/$_USERNAME/notebooks
     cp -r $FF_DATA_DIR/problems $FF_DATA_DIR/users/$_USERNAME
 else
-    cp -r ../notebooks/* $FF_DATA_DIR/users/$_USERNAME/notebooks
+    cp -r $FF_DATA_DIR/notebooks/* $FF_DATA_DIR/users/$_USERNAME/notebooks
     rm -r $FF_DATA_DIR/users/$_USERNAME/notebooks/admin
 fi
 sudo chmod -R 777 $FF_DATA_DIR/users/$_USERNAME

@@ -135,7 +135,10 @@ class Session(object):
         entity_features : pd.DataFrame or None
         """
         self.__evaluation_client._load_dataset()
-        entity_features = self.__entities_featurized.copy()
+        if not pd.DataFrame(self.__entities_featurized).empty:
+            entity_features = self.__entities_featurized.copy()
+        else:
+            entity_features = None
         return entity_features
 
     def discover_features(self, code_fragment=None, metric_name=None):

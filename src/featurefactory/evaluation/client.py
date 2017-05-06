@@ -138,7 +138,7 @@ class EvaluatorClient(object):
         except ValueError as e:
             print("Feature is not valid: {}".format(str(e)), file=sys.stderr)
             print(traceback.format_exc(), file=sys.stderr)
-            metrics_str = {}
+            metrics_user = {}
 
         try:
             # TODO this can be an async procedure
@@ -146,7 +146,7 @@ class EvaluatorClient(object):
         except Exception:
             pass
 
-        return metrics_str
+        return metrics_user
 
     def _log_evaluation_attempt(self, feature):
         from featurefactory.user.session import Session
