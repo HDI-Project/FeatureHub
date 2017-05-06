@@ -67,7 +67,7 @@ def test_regression():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Mean Squared Error"] - 20.7262935) < EPSILON
+    assert abs(metrics_user["Root Mean Squared Error"] - 4.4761438) < EPSILON
     assert abs(metrics_user["R-squared"]          -  0.7393219) < EPSILON
 
 def test_regression_train_test():
@@ -77,7 +77,7 @@ def test_regression_train_test():
     assert metrics==metrics_pd
 
     metrics_user = metrics.convert(kind="user")
-    assert abs(metrics_user["Mean Squared Error"] - 48.7246710) < EPSILON
+    assert abs(metrics_user["Root Mean Squared Error"] - 6.9803059) < EPSILON
     assert abs(metrics_user["R-squared"]          -  0.2656004) < EPSILON
 
 def _test_problem_type_cv(problem_type, data):

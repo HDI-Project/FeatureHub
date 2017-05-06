@@ -31,7 +31,7 @@ class Model(object):
         { "name" : "ROC AUC"   , "scoring" : "roc_auc" },
     ]
     REGRESSION_SCORING = [
-        { "name" : "Mean Squared Error" , "scoring" : "mean_squared_error" },
+        { "name" : "Root Mean Squared Error" , "scoring" : "root_mean_squared_error" },
         { "name" : "R-squared"          , "scoring" : "r2" },
     ]
 
@@ -249,10 +249,12 @@ class Model(object):
                 "scorer" : lambda y_true, y_pred: sklearn.metrics.roc_auc_score(
                     y_true, y_pred, average=metric_aggregation),
             },
-            "mean_squared_error" : {
+            "root_mean_squared_error" : {
                 "predictor" : predict,
                 "pred_transformer" : noop,
-                "scorer" : sklearn.metrics.mean_squared_error,
+                "scorer" : lambda y_true, y_pred:
+                    np.sqrt(sklearn.metrics.mean_squared_error(y_true,
+                        y_pred)),
             },
             "r2" : {
                 "predictor" : predict,
