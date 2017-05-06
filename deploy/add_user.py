@@ -6,12 +6,13 @@ import shutil
 import subprocess
 import binascii
 import docker
-import pydiscourse
+from pydiscourse import DiscourseClient
 import fire
 
 from api_client import ApiClient
 
 MINIMUM_DOCKER_VERSION = (0,0,0)
+DISCOURSE_MIN_PASSWORD_LENGTH = 10
 c = None
 docker_client = None
 discourse_client = None
@@ -38,6 +39,14 @@ def load_config():
 
 
 def add_user(username, password, admin=False, discourse=False, email=""):
+    if discourse:
+        if len(password) < DISCOURSE_MIN_PASSWORD_LENGTH:
+            raise ValueError("Password too short (minimum {})."
+                    .format(DISCOURSE_MIN_PASSWORD_LENGTH))
+
+        if not email:
+            email = username + "@example.com"
+
     # create user on hub machine
     subprocess.call(\
 """
@@ -56,7 +65,8 @@ EOM
                         pjoin(c["FF_DATA_DIR"], "users", username,
                             "notebooks", "admin"))
         shutil.copytree(pjoin(c["FF_DATA_DIR"], "problems"),
-                        pjoin(c["FF_DATA_DIR"], "users", username))
+                        pjoin(c["FF_DATA_DIR"], "users", username,
+                            "problems"))
     else:
         shutil.copytree(pjoin(c["FF_DATA_DIR"],"notebooks"),
                         pjoin(c["FF_DATA_DIR"], "users", username, "notebooks"))
@@ -91,9 +101,36 @@ EOM
             "user={0}\n"
             "password={1}\n".format(username, password_mysql))
 
-
     client = ApiClient()
     client.hub.create_user(name=username, admin=admin)
+
+    if discourse:
+        discourse_client = DiscourseClient(
+            host="https://{}".format(c["DISCOURSE_DOMAIN_NAME"]),
+            api_username=c["DISCOURSE_CLIENT_API_USERNAME"],
+            api_key=c["DISCOURSE_CLIENT_API_TOKEN"])
+
+        result = discourse_client.create_user(
+            name = "",
+            username = username,
+            email = email,
+            password = password,
+            active = "true")
+
+        if c["DISCOURSE_FEATURE_GROUP_NAME"]:
+            result = discourse_client.groups()
+            groupid = None
+            for group in result:
+                if group["name"] == c["DISCOURSE_FEATURE_GROUP_NAME"]:
+                    groupid = group["id"]
+                    break
+
+            if groupid is not None:
+                result = discourse_client.add_group_member(
+                    username = username,
+                    groupid = groupid)
+            else:
+                print("Couldn't add to group (name not found).")
 
 if __name__ == "__main__":
     assert docker.version_info >= MINIMUM_DOCKER_VERSION
