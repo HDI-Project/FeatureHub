@@ -309,8 +309,11 @@ class Session(object):
         result += "\n" + \
                   "Feature code:\n"
 
+        indent = "    "
+        tmp = []
         for line in feature_code.split("\n"):
-            result += "    " + line + "\n"
+            tmp.append(indent + line)
+        result += "\n".join(tmp)
 
         result += "\n" + \
                   "Feature metrics:\n"

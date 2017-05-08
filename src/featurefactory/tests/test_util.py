@@ -178,3 +178,10 @@ def test_myhash():
     b = "hello world".encode("utf-8")
 
     assert featurefactory.util.myhash(a) == featurefactory.util.myhash(b)
+
+def test_is_positive_env():
+    for y in ["yes", "Yes", "y", "Y", "true", "True", True, 1, "1"]:
+        assert featurefactory.util.is_positive_env(y) == True
+
+    for n in ["", "no", "No", "blargh", "zam", "zot", False, 0, "0"]:
+        assert featurefactory.util.is_positive_env(n) == False

@@ -7,7 +7,8 @@ import shutil
 import subprocess
 import binascii
 import docker
-from pydiscourse import DiscourseClient, DiscourseClientError
+from pydiscourse import DiscourseClient
+from pydiscourse.exceptions import DiscourseClientError
 import fire
 
 from api_client import ApiClient

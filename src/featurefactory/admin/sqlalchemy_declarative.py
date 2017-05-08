@@ -72,5 +72,5 @@ User.features = relationship("Feature", back_populates="user")
 Problem.features = relationship("Feature", back_populates="problem")
 User.evaluationattempts = relationship("EvaluationAttempt",
         back_populates="user")
-Problem.evaluationattempts = relationship("EvaluatioAttempt",
+Problem.evaluationattempts = relationship("EvaluationAttempt",
         back_populates="problem")

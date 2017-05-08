@@ -66,10 +66,13 @@ c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
 # Data/directories
 c.JupyterHub.db_url                            = os.path.join("sqlite:///", jupyterhub_config_dir, "jupyterhub.sqlite")
 c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_dir, "jupyterhub_cookie_secret")
-c.JupyterHub.extra_log_file                    = os.path.join(jupyterhub_config_dir, "jupyterhub.log")
+c.JupyterHub.extra_log_file                    = os.path.join(ff_data_dir, "log", "jupyterhub", "jupyterhub.log")
 c.Spawner.notebook_dir                         = "~/notebooks"
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, "data/train") : "/data/train" }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, "users", "{username}")
+
+if not os.path.exists(os.path.join(ff_data_dir, "log", "jupyterhub")):
+    os.makedirs(os.path.join(ff_data_dir, "log", "jupyterhub"))
 
 # Services - definitions
 c.JupyterHub.services = [

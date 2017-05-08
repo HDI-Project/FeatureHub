@@ -98,7 +98,8 @@ class EvaluationResponse(Response):
         return MetricList.from_object(self.metrics).to_string(kind="user")
 
     def _get_topic_url_str(self):
-        return "Feature posted to forum => {}".format(self.topic_url)
+        topic_url = self.topic_url if self.topic_url else "<not available>"
+        return "Feature posted to forum => {}".format(topic_url)
 
     def __str__(self):
         """ Return string representation of response.
@@ -108,4 +109,8 @@ class EvaluationResponse(Response):
         """
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()
-        return explanation + "\n\n" + metrics_str + "\n" + topic_url_str
+        result = explanation + "\n\n" + metrics_str 
+        if self.topic_url:
+            topic_url_str = self._get_topic_url_str()
+            result += "\n" + topic_url_str
+        return result

@@ -20,10 +20,10 @@ make up
 sleep 15 # wait to complete
 
 # create users
-./add_user.sh -a ${ADMIN_USERNAME} ${ADMIN_PASSWORD}
-./add_user.sh ${USER1_USERNAME} ${USER1_PASSWORD}
-./add_user.sh ${USER2_USERNAME} ${USER2_PASSWORD}
-./add_user.sh ${USER3_USERNAME} ${USER3_PASSWORD}
+./add_user.py ${ADMIN_USERNAME} ${ADMIN_PASSWORD} --admin=True
+./add_user.py ${USER1_USERNAME} ${USER1_PASSWORD}
+./add_user.py ${USER2_USERNAME} ${USER2_PASSWORD}
+./add_user.py ${USER3_USERNAME} ${USER3_PASSWORD}
 
 # start all containers
 ./api_client.py start-server ${ADMIN_USERNAME}

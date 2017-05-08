@@ -263,4 +263,4 @@ def is_positive_env(value):
         return value in ["yes", "Yes", "y", "Y", "true", "True", 1, "1",
         "totally"]
 
-    return false
+    return False

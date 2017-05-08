@@ -184,7 +184,7 @@ class Commands(object):
         with self.__orm.session_scope() as session:
             results = self._get_features(session, user_name).all()
             feature_dicts = []
-            for feature, user_name, metrics in results:
+            for feature, user_name in results:
                 d = {
                     "user"        : user_name,
                     "description" : feature.description,
@@ -194,6 +194,7 @@ class Commands(object):
                 feature_metrics = session.query(Metric.name,
                         Metric.value).filter(Metric.feature_id ==
                                 feature.id).all()
+                # feature_metrics = feature.metrics
                 for metric in feature_metrics:
                     d[metric.name] = metric.value
 
