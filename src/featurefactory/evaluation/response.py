@@ -13,6 +13,7 @@ class EvaluationResponse(Response):
     metrics : list of Metric, optional (default=None)
         List of Metric objects, which each encode metric name, metric scoring
         method, and value.
+    topic_url : str
 
     Examples
     --------
@@ -28,7 +29,7 @@ class EvaluationResponse(Response):
     STATUS_CODE_DB_ERROR          = "db_error"
 
     def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None,
-            topic_url="<not available>"):
+            topic_url=""):
         if metrics is not None:
             metrics = MetricList.from_object(metrics).convert(kind="user")
 
@@ -107,5 +108,4 @@ class EvaluationResponse(Response):
         """
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()
-        topic_url_str = self._get_topic_url_str()
-        return explanation + "\n\n" + metrics_str + "\n\n" + topic_url_str
+        return explanation + "\n\n" + metrics_str + "\n" + topic_url_str

@@ -84,6 +84,8 @@ You can usually leave these variables at their default values:
 - `DISCOURSE_FEATURE_CATEGORY_NAME` : Category for new features to be posted to on
     Discourse. Posts to this category will only be visible by members of the feature group
     (above) and administrators.
+- `USE_DISCOURSE`: flag to use Discourse integration (`"yes"`). If Discourse integration is
+    enabled, then forum posts are created for each feature that is successfully added.
 
 ### Userlist
 

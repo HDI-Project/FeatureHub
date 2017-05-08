@@ -15,6 +15,7 @@ cd ../deploy
 # build
 make clean
 make build
+make ssl
 make up
 sleep 15 # wait to complete
 

@@ -74,7 +74,6 @@ build_static: network setup_files
 	    docker-compose -p $(FF_PROJECT_NAME) -f docker-compose-static.yml build;\
 	}
 
-# ssl
 .PHONY: build_services
 build_services: network volumes setup_files
 	@{\

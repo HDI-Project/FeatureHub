@@ -257,3 +257,10 @@ def possibly_talking_action(action, verbose=True):
     except Exception:
         vprint("error")
         raise
+
+def is_positive_env(value):
+    if value is not None:
+        return value in ["yes", "Yes", "y", "Y", "true", "True", 1, "1",
+        "totally"]
+
+    return false
