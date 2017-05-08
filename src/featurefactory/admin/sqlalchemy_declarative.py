@@ -1,10 +1,8 @@
 from datetime import datetime
-from urllib.parse import urlencode
 
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_method
 
 Base = declarative_base()
 
@@ -18,35 +16,32 @@ class User(Base):
 class Problem(Base):
     __tablename__ = 'problems'
 
-    id                = Column(Integer, primary_key=True, autoincrement=True)
-    name              = Column(String(100), nullable=False)
-    problem_type      = Column(String(100), nullable=False)
-    data_path         = Column(String(200), nullable=False)
-    files             = Column(String(500), nullable=False)
-    table_names       = Column(String(500), nullable=False)
-    target_table_name = Column(String(100), nullable=False)
-    y_column          = Column(String(100), nullable=False)
-    created_at        = Column(DateTime, default=datetime.now)
-
-    @hybrid_method
-    def urlencode(self):
-        d = {
-            'problem_id' : self.id,
-        }
-        return urlencode(d)
+    id                             = Column(Integer, primary_key   = True, autoincrement = True)
+    name                           = Column(String(100), nullable  = False)
+    problem_type                   = Column(String(100), nullable  = False)
+    problem_type_details           = Column(String(1000), nullable  = True)
+    data_dir_train                 = Column(String(200), nullable  = False)
+    data_dir_test                  = Column(String(200), nullable  = False)
+    files                          = Column(String(1000), nullable = False)
+    table_names                    = Column(String(1000), nullable = False)
+    entities_table_name            = Column(String(100), nullable  = False)
+    entities_featurized_table_name = Column(String(100), nullable  = True)
+    target_table_name              = Column(String(100), nullable  = False)
+    created_at                     = Column(DateTime, default      = datetime.now)
 
 class Feature(Base):
     __tablename__ = 'features'
 
-    id          = Column(Integer, primary_key=True, autoincrement=True)
-    user_id     = Column(Integer, ForeignKey('users.id'))
-    user        = relationship('User')
-    problem_id  = Column(Integer, ForeignKey('problems.id'))
-    problem     = relationship('Problem')
-    code        = Column(Text, nullable=False)
-    md5         = Column(String(32), nullable=True)
-    description = Column(Text, nullable=True)
-    created_at  = Column(DateTime, default=datetime.now)
+    id                  = Column(Integer, primary_key=True, autoincrement=True)
+    user_id             = Column(Integer, ForeignKey('users.id'))
+    user                = relationship('User')
+    problem_id          = Column(Integer, ForeignKey('problems.id'))
+    problem             = relationship('Problem')
+    code                = Column(Text, nullable=False)
+    feature_dill_quoted = Column(Text, nullable=True)
+    md5                 = Column(String(32), nullable=False)
+    description         = Column(String(1000), nullable=False)
+    created_at          = Column(DateTime, default=datetime.now)
 
 class Metric(Base):
     __tablename__ = 'metrics'
@@ -58,3 +53,14 @@ class Metric(Base):
     scoring    = Column(String(100), nullable=False)
     value      = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
+
+class EvaluationAttempt(Base):
+    __tablename__ = "evaluationattempts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id             = Column(Integer, ForeignKey('users.id'))
+    user                = relationship('User')
+    problem_id          = Column(Integer, ForeignKey('problems.id'))
+    problem             = relationship('Problem')
+    code                = Column(Text, nullable=False)
+    created_at          = Column(DateTime, default=datetime.now)

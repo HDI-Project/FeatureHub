@@ -1,12 +1,16 @@
-from __future__ import print_function
-
 import sys
+import json
+import yaml
 import pandas as pd
+
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import database_exists, create_database, drop_database
 
-from featurefactory.admin.sqlalchemy_declarative import Base, Feature, Problem, User, Metric
+from featurefactory.admin.sqlalchemy_declarative import (
+    Base, Feature, Problem, User, Metric, EvaluationAttempt
+)
 from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.util import possibly_talking_action
 
 
 class Commands(object):
@@ -37,56 +41,107 @@ class Commands(object):
         elif  problem:
             try:
                 with self.__orm.session_scope() as session:
-                    problem = session.query(Problem).filter(Problem.name == problem).one()
+                    problem = session.query(Problem)\
+                                     .filter(Problem.name == problem).one()
                     self.__problemid = problem.id
             except NoResultFound:
                 print("WARNING: Problem {} does not exist!".format(problem))
-                print("You might want to create it by calling create_problem method")
+                print("You might want to create it by calling create_problem"
+                      " method")
 
     def set_up(self, drop=False):
         """Create a new DB and create the initial scheme.
+
+        If the database exists and drop=True, the existing database is dropped
+        and recreated. Regardless, any tables defined by the schema that do not
+        exist are created.
 
         Parameters
         ----------
         drop : bool, optional (default=False)
             Drop database if it already exists.
         """
-        url = self.__orm.engine.url
-        if database_exists(url):
+
+        # todo extract database name from engine url and report for brevity
+        engine = self.__orm.engine
+        if database_exists(engine.url):
+            print("Database {} already exists.".format(engine.url))
             if drop:
-                print("Dropping old database {}".format(url))
-                drop_database(url)
-            else:
-                print("WARNING! Database {} already exists.\n"
-                      "Set drop=True if you want to drop it.".format(url),
-                      file=sys.stderr)
-                return
+                print("Dropping old database {}".format(engine.url))
+                drop_database(engine.url)
+                with possibly_talking_action("Re-creating database..."):
+                    create_database(engine.url)
+        else:
+            with possibly_talking_action("Creating database..."):
+                create_database(engine.url)
 
-        create_database(url)
-        Base.metadata.create_all(self.__orm.engine)
+        with possibly_talking_action("Creating tables..."):
+            Base.metadata.create_all(engine)
 
-        print("Database {} created successfully".format(url))
+        print("Database {} created successfully".format(engine.url))
 
-    def create_problem(self, name, problem_type, data_path, files, table_names,
-            target_table_name, y_column):
-        """Creates a new problem entry in database.
-        
+    def bulk_create_problem_yml(self, path):
+        """Create new problem entries in database from yml document stream.
+
+        Can create a yml file with individual problems delimited into documents
+        using the `---` ... `---` document stream syntax.
+
+        Parameters
+        ----------
+        path: str or path-like
+            Path to yml file
+        """
+        with open(path, "r") as f:
+            obj_all = yaml.load_all(f)
+            for obj in obj_all:
+                self.create_problem(**obj)
+
+    def create_problem_yml(self, path):
+        """Create new problem entry in database from yml file.
+
+        Parameters
+        ----------
+        path: str or path-like
+            Path to yml file
+        """
+        with open(path, "r") as f:
+            obj = yaml.load(f)
+
+        self.create_problem(**obj)
+
+    def create_problem(self, name="", problem_type="", problem_type_details={},
+            data_dir_train="", data_dir_test="", files=[], table_names=[],
+            entities_table_name="", entities_featurized_table_name="",
+            target_table_name=""):
+        """Creates new problem entry in database.
+
         Parameters
         ----------
         name : str
         problem_type : str
-        data_path : str
-            Absolute path of containing directory of data files.
+            Classification or regression
+        problem_type_details : dict
+            Dict with additional details about problem.
+            For example, the dict may be {"classification_type" : "multiclass"}.
+        data_dir_train : str
+            Absolute path of containing directory of data files for training.
+        data_dir_test : str
+            Absolute path of containing directory of data files for testing
         files : list of str
-            List of file paths relative to data_path
+            List of file paths relative to data_dir; files must be named
+            identically within both data_dir directories.
         table_names : list of str
-            List of table names, corresponding exactly to files
+            List of table names, corresponding exactly to `files`
+        entities_table_name : str
+            Name of table that contains the entity variables. Must be found in
+            `table_names`.
+        entities_featurized_table_name : str
+            Name of table that contains the pre-processed, featurized, entity
+            variables. Must be found in `table_names`.
         target_table_name : str
             Name of table that contains the target variable (label). Must be
-            found in table_names.
-        y_column : str
-            Name of column in target_table_name that identifies the target
-            variable.
+            found in table_names. Table must hold a single column with label
+            values only.
         """
 
         with self.__orm.session_scope() as session:
@@ -99,13 +154,16 @@ class Commands(object):
                 pass    # we will create it
 
             problem = Problem(
-                name              = name,
-                problem_type      = problem_type,
-                data_path         = data_path,
-                files             = ",".join(files),
-                table_names       = ",".join(table_names),
-                target_table_name = target_table_name,
-                y_column          = y_column
+                name                           = name,
+                problem_type                   = problem_type,
+                problem_type_details           = json.dumps(problem_type_details),
+                data_dir_train                 = data_dir_train,
+                data_dir_test                  = data_dir_test,
+                files                          = json.dumps(files),
+                table_names                    = json.dumps(table_names),
+                entities_table_name            = entities_table_name,
+                entities_featurized_table_name = entities_featurized_table_name,
+                target_table_name              = target_table_name,
             )
             session.add(problem)
             self.__problemid = problem.id

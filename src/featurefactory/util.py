@@ -1,17 +1,21 @@
 import sys
 import os
 import dill
-from multiprocessing import Pool
 import inspect
-from textwrap import dedent
-import xxhash
-import tempfile
 import importlib.util
-import hashlib
+from multiprocessing import Pool
+from textwrap import dedent
+from xxhash import xxh64
+from tempfile import TemporaryDirectory
+from hashlib import md5
 from types import ModuleType
 from contextlib import contextmanager
+from pandas import concat
 
 RANDOM_STATE = 1754
+
+TRY_AGAIN_LATER = "Please try again later or contact administrator."
+TRY_AGAIN = "Please contact administrator."
 
 def _get_function_and_execute(f_dill, *args):
     f = dill.loads(f_dill)
@@ -19,7 +23,7 @@ def _get_function_and_execute(f_dill, *args):
 
 def run_isolated(f, *args):
     """Execute `f(args)` in an isolated environment.
-    
+
     First, uses dill to serialize the function. Unfortunately, pickle is unable
     to serialize some functions, so we must serialize and deserialize the
     function ourselves.
@@ -110,7 +114,7 @@ def get_function(source):
 
 def get_top_level_function_name(namespace, remove_names=["__builtins__"]):
     """Figure out which is the top-level function in a namespace.
-    
+
     The top-level function is defined as the function that is not a name in any
     other functions.  co_names is a tuple of local names.  We could make more
     efficient, using constant lookups of names, stopping when there is only name
@@ -180,7 +184,7 @@ def get_function2(source):
         raise ValueError
 
     # first, write source to a file
-    with tempfile.TemporaryDirectory() as d:
+    with TemporaryDirectory() as d:
         module_name = "temp"
         file_name = os.path.join(d, module_name + ".py")
         with open(file_name, "w") as f:
@@ -190,7 +194,6 @@ def get_function2(source):
         spec = importlib.util.spec_from_file_location(module_name, file_name)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        print(dir(module))
         top_level_name = get_top_level_function_name(module,
                 remove_names=["__builtins__", "__cached__", "__doc__",
                               "__file__", "__loader__", "__name__",
@@ -207,7 +210,7 @@ def compute_dataset_hash(dataset):
     ----------
     dataset : dict mapping str to pd.DataFrame
     """
-    h = xxhash.xxh64()
+    h = xxh64()
     for d in sorted(dataset.keys()):
         h.update(dataset[d].to_msgpack())
 
@@ -219,7 +222,7 @@ def myhash(obj):
         obj_enc = obj.encode("utf-8")
     else:
         obj_enc = obj
-    return hashlib.md5(obj_enc).hexdigest()
+    return md5(obj_enc).hexdigest()
 
 @contextmanager
 def possibly_talking_action(action, verbose=True):
@@ -227,7 +230,7 @@ def possibly_talking_action(action, verbose=True):
 
     Simply prints action before executing statement, without a trailing
     newline, and prints 'done' afterwards.
-    
+
     Parameters
     ----------
     action : str
@@ -250,5 +253,15 @@ def possibly_talking_action(action, verbose=True):
     vprint(action, end='')
     try:
         yield
-    finally:
-        vprint('done')
+        vprint("done")
+    except Exception:
+        vprint("error")
+        raise
+
+def concat_datasets(*datasets):
+    result = {}
+    if datasets:
+        for key in datasets[0]:
+            result[key] = concat([d[key] for d in datasets], axis=0)
+
+    return result

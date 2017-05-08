@@ -7,14 +7,13 @@ from featurefactory.user.session import Session
 from featurefactory.admin.admin import Commands
 
 try:
-    for problem in Commands().get_problems():
+    for _problem in Commands().get_problems():
         # Create a session for each problem and make it importable
-        commands = Session(problem)
-        module = imp.new_module(problem)
-        module.__dict__['commands'] = commands
-        sys.modules['problems.' + problem] = module
+        _commands = Session(_problem)
+        _module = imp.new_module(_problem)
+        _module.__dict__['commands'] = _commands
+        sys.modules['featurefactory.problems.' + _problem] = _module
 except ProgrammingError:
     print("Competition not initialized properly. User commands "
           "unavailable. Please contact the competition administrator.",
           file=sys.stderr)
-

@@ -8,6 +8,7 @@ numpy
 mysqlclient
 mysql-connector-python-rf
 pandas
+pydiscourse
 scikit-learn
 scipy
 sqlalchemy

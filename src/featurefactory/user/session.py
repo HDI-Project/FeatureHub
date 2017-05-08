@@ -1,9 +1,9 @@
 import os
-import sys
+import json
 import gc
-import hashlib
 import pandas as pd
-from textwrap import dedent
+import requests
+
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from featurefactory.admin.sqlalchemy_main import ORMManager
@@ -11,7 +11,7 @@ from featurefactory.admin.sqlalchemy_declarative import (
     Problem, Feature, User, Metric
 )
 from featurefactory.modeling import Model
-from featurefactory.util import run_isolated, get_source, compute_dataset_hash
+from featurefactory.util import run_isolated, get_source, TRY_AGAIN_LATER
 from featurefactory.evaluation import EvaluatorClient
 
 class Session(object):
@@ -20,34 +20,54 @@ class Session(object):
     Includes commands for discovering, testing, and registering new features.
     """
 
-    def __init__(self, problem, database="featurefactory"):
-        self.__database = database
-        self.__orm      = ORMManager(database)
-        self.__username = None
-        self.__dataset  = {}
+    def __init__(self, problem, database = "featurefactory"):
+        self.__database            = database
+        self.__orm                 = ORMManager(database)
+        self.__username            = None
 
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem)\
                                  .filter(Problem.name == problem)\
                                  .one()
-                self.__problemid         = problem.id
-                self.__files             = problem.files.split(",")
-                self.__table_names       = problem.table_names.split(",")
-                self.__target_table_name = problem.target_table_name
-                self.__y_column          = problem.y_column
-                self.__data_path         = problem.data_path
-                self.__model             = Model(problem.problem_type)
+                self.__problem_id = problem.id
             except NoResultFound:
                 raise ValueError("Invalid problem name: {}".format(problem))
-
+            except MultipleResultsFound:
+                raise ValueError("Unexpected issue talking to database. " +
+                                 TRY_AGAIN_LATER)
 
         # "log in" to the system
         self._login()
 
         # initialize evaluation client
-        self.__evaluation_client = EvaluatorClient(self.__problemid,
-                self.__username, self.__orm, self.__dataset) 
+        self.__evaluation_client = EvaluatorClient(self.__problem_id,
+                self.__username, self.__orm)
+
+    @property
+    def __dataset(self):
+        return self.__evaluation_client.dataset
+
+    @property
+    def __entities_featurized(self):
+        return self.__evaluation_client.entities_featurized
+    
+    @property
+    def __target(self):
+        return self.__evaluation_client.target
+
+    @staticmethod
+    def _eval_server_post(route, data):
+        url = "http://{}:{}/services/eval-server/{}".format(
+            os.environ.get("EVAL_CONTAINER_NAME"),
+            os.environ.get("EVAL_CONTAINER_PORT"),
+            route
+        )
+        headers = {
+            "Authorization" : "token {}".format(
+                os.environ.get("JUPYTERHUB_API_TOKEN")),
+        }
+        return requests.post(url=url, data=data, headers=headers)
 
     def _login(self):
         name = os.environ.get("USER")
@@ -62,15 +82,29 @@ class Session(object):
                               .one()
                 self.__username = user.name
             except NoResultFound:
-                session.add(User(name=name))
-                self.__username = name
+                data = { "database" : self.__orm.database }
+                response = Session._eval_server_post("create-user", data)
+                if response.ok:
+                    self.__username = name
+                else:
+                    raise ValueError("Couldn't log in to Feature Factory. " \
+                                     + TRY_AGAIN_LATER) 
+
             except MultipleResultsFound as e:
-                raise e
+                raise ValueError("Unexpected error logging in to Feature Factory. " \
+                                 + TRY_AGAIN_LATER) 
 
     def get_sample_dataset(self):
         """Loads sample of problem training dataset.
 
-        Returns a dict mapping table names to pandas DataFrames.
+        Returns the dataset a dict mapping table names to pandas DataFrames.
+
+        Returns
+        -------
+        dataset : dict (str => pd.DataFrame)
+            A dict mapping table names to pandas DataFrames.
+        target : pd.DataFrame
+            A DataFrame that holds a single column: the target variable (label).
 
         Examples
         --------
@@ -78,13 +112,34 @@ class Session(object):
         >>> dataset["users"] # -> returns DataFrame
         >>> dataset["stores"] # -> returns DataFrame
         """
-        if not self.__dataset:
-            self._load_dataset()
+        self.__evaluation_client._load_dataset()
 
         # Return a *copy* of the dataset, ensuring we have enough memory.
         gc.collect()    
-        return { table_name : self.__dataset[table_name].copy() for table_name
-                in self.__dataset }
+        dataset = {
+            table_name : self.__dataset[table_name].copy() for 
+                table_name in self.__dataset
+        }
+        target = self.__target.copy() # pylint: disable=no-member
+
+        return (dataset, target)
+
+    def get_entity_features(self):
+        """Loads preprocessed entity-level features of problem training dataset.
+        
+        The entity-level features are the same length as the entity DataFrame
+        and the target DataFrame.
+
+        Returns
+        -------
+        entity_features : pd.DataFrame or None
+        """
+        self.__evaluation_client._load_dataset()
+        if not pd.DataFrame(self.__entities_featurized).empty:
+            entity_features = self.__entities_featurized.copy()
+        else:
+            entity_features = None
+        return entity_features
 
     def discover_features(self, code_fragment=None, metric_name=None):
         """Print features written by other users.
@@ -167,7 +222,7 @@ class Session(object):
 
         return self.__evaluation_client.evaluate(feature)
 
-    def register_feature(self, feature, description=""):
+    def submit(self, feature, description=""):
         """Submit feature to server for evaluation on test data.
         
         If successful, registers feature in feature database and returns key
@@ -189,21 +244,7 @@ class Session(object):
         if not description:
             description = self._prompt_description()
 
-        self.__evaluation_client.register_feature(feature, description)
-
-    def _load_dataset(self):
-        # TODO check for dtypes file, assisting in low memory usage
-
-        if not self.__dataset:
-            for (filename, table_name) in zip(self.__files, self.__table_names):
-                abs_filename = os.path.join(self.__data_path, filename)
-                self.__dataset[table_name] = pd.read_csv(abs_filename, low_memory=False)
-
-        return self.__dataset
-
-    def _reload_dataset(self):
-        self.__dataset = {}
-        return self._load_dataset()
+        self.__evaluation_client.submit(feature, description)
 
     def _filter_features(self, session, code_fragment):
         """Return query that filters this problem and given code fragment.
@@ -213,7 +254,7 @@ class Session(object):
         caller.
         """
         filter_ = (
-            Feature.problem_id == self.__problemid,
+            Feature.problem_id == self.__problem_id,
         )
 
         if code_fragment:

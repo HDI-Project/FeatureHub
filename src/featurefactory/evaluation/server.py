@@ -13,11 +13,16 @@ from featurefactory.evaluation.future import HubAuth
 
 # Feature Factory imports
 import hashlib
+import dill
+from urllib.parse import unquote_to_bytes
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import Feature, Problem, User, Metric
+from featurefactory.admin.sqlalchemy_declarative import (
+    Feature, Problem, User, Metric, EvaluationAttempt
+)
+from featurefactory.evaluation.discourse         import post_feature
 from featurefactory.util                         import get_function, myhash
 
 # setup
@@ -72,10 +77,68 @@ def authenticated(f):
             )
     return decorated
 
-@app.route(prefix + "/evaluate", methods=["POST"])
+@app.route(prefix + "/create-user", methods=["POST"])
 @authenticated
-def evaluate(user):
-    """Process user request to evaluate and register feature.
+def create_user(user):
+    """Create User object in the database.
+    """
+
+    user_name = user["name"]
+    try:
+        database = request.form["database"]
+        orm = ORMManager(database, admin=True)
+        with orm.session_scope() as session:
+            session.add(User(name=user_name))
+    except Exception:
+        app.logger.exception("Couldn't create new user (name '{}') in db"
+                .format(user_name))
+        return Response(status=500)
+
+    app.logger.debug("Created new user (name '{}') in db".format(user_name))
+    return Response(status=201)
+
+
+@app.route(prefix + "/log-evaluation-attempt", methods=["POST"])
+@authenticated
+def log_evaluation_attempt(user):
+    """Log user evaluation of feature.
+
+    Extracts 'database', 'problem_id', and 'code' from POST body.
+    """
+
+    try:
+        try:
+            database    = request.form["database"]
+            problem_id  = request.form["problem_id"]
+            code        = request.form["code"]
+        except Exception:
+            app.logger.exception("Couldn't read parameters from form.")
+        app.logger.debug("Read parameters from form.")
+
+        try:
+            user_name = user["name"]
+            orm = ORMManager(database, admin=True)
+            with orm.session_scope() as session:
+                user_obj = session.query(User).filter(User.name == user_name).one()
+                problem_obj = session.query(Problem).filter(Problem.id ==
+                        problem_id).one()
+                evaluation_attempt_obj = EvaluationAttempt(
+                    user    = user_obj,
+                    problem = problem_obj,
+                    code    = code
+                )
+                session.add(evaluation_attempt_obj)
+        except Exception:
+            app.logger.exception("Couldn't insert evaluation attempt into "
+                                 "database.")
+        app.logger.debug("Inserted evaluation attempt into database.")
+    finally:
+        return Response()
+
+@app.route(prefix + "/submit", methods=["POST"])
+@authenticated
+def submit(user):
+    """Process user request to submit feature.
 
     Extracts 'database', 'problem_id', 'code', and 'description' from POST
     body.
@@ -84,6 +147,7 @@ def evaluate(user):
     try:
         database    = request.form["database"]
         problem_id  = request.form["problem_id"]
+        feature_dill= request.form["feature_dill"]
         code        = request.form["code"]
         description = request.form["description"]
     except Exception:
@@ -151,7 +215,7 @@ def evaluate(user):
         app.logger.debug("Confirmed that feature is not already registered")
 
         try:
-            feature = get_function(code)
+            feature = dill.loads(unquote_to_bytes(feature_dill))
         except Exception:
             app.logger.exception("Couldn't extract function (code '{}')"
                     .format(code))
@@ -185,11 +249,12 @@ def evaluate(user):
         try:
             # write to db
             feature_obj = Feature(
-                description = description,
-                code        = code,
-                md5         = md5,
-                user        = user_obj,
-                problem     = problem_obj
+                description         = description,
+                feature_dill_quoted = feature_dill,
+                code                = code,
+                md5                 = md5,
+                user                = user_obj,
+                problem             = problem_obj
             )
             session.add(feature_obj)
             for metric in metrics:
@@ -201,7 +266,6 @@ def evaluate(user):
                     value   = metric_db["value"]
                 )
                 session.add(metric_obj)
-
         except Exception:
             app.logger.exception("Unexpected error inserting into db")
             return EvaluationResponse(
@@ -209,12 +273,22 @@ def evaluate(user):
             )
         app.logger.debug("Inserted into db.")
 
+        # post to forum
+        try:
+            topic_url = post_feature(feature_obj, metrics)
+            app.logger.debug("Posted to forum")
+        except Exception:
+            topic_url = "<not available>"
+            app.logger.exception("Unexpected error posting to forum")
+
+
     # return
     # - status code
     # - metrics dict
     return EvaluationResponse(
         status_code=EvaluationResponse.STATUS_CODE_OKAY,
-        metrics=metrics
+        metrics=metrics,
+        topic_url=topic_url,
     )
 
 if __name__ == "__main__":

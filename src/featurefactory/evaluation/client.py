@@ -1,25 +1,30 @@
 import sys
 import os
-import pandas
+import json
+import pandas as pd
 import requests
 import collections
+import dill
 import traceback
+from urllib.parse import quote_from_bytes
 
 from featurefactory.util import (
     compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
-    myhash
-
+    myhash, concat_datasets
 )
 from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
 from featurefactory.evaluation                   import EvaluationResponse
 from featurefactory.modeling                     import Model
 
 class EvaluatorClient(object):
-    def __init__(self, problem_id, username, orm, dataset={}):
-        self.problem_id = problem_id
-        self.username  = username
-        self.orm       = orm
-        self.dataset   = dataset
+    def __init__(self, problem_id, username, orm, dataset={}, target=None,
+            entities_featurized=None):
+        self.problem_id          = problem_id
+        self.username            = username
+        self.orm                 = orm
+        self.dataset             = dataset
+        self.target              = target
+        self.entities_featurized = entities_featurized
 
         if self.dataset:
             self.__dataset_hash = compute_dataset_hash(self.dataset)
@@ -59,7 +64,7 @@ class EvaluatorClient(object):
 
         return False
 
-    def register_feature(self, feature, description):
+    def submit(self, feature, description):
         """Submit feature to server for evaluation on test data.
         
         If successful, registers feature in feature database and returns key
@@ -77,24 +82,17 @@ class EvaluatorClient(object):
         description : str
             Feature description
         """
-        # request from eval-server directly
-        url = "http://{}:{}/services/eval-server/evaluate".format(
-            os.environ["EVAL_CONTAINER_NAME"],
-            os.environ["EVAL_CONTAINER_PORT"]
-        )
+        from featurefactory.user.session import Session
+        feature_dill = quote_from_bytes(dill.dumps(feature))
         code = get_source(feature)
         data = {
-            "database"    : self.orm.database,
-            "problem_id"  : self.problem_id,
-            "code"        : code,
-            "description" : description,
+            "database"     : self.orm.database,
+            "problem_id"   : self.problem_id,
+            "feature_dill" : feature_dill,
+            "code"         : code,
+            "description"  : description,
         }
-        headers = {
-            "Authorization" : "token {}".format(
-                os.environ["JUPYTERHUB_API_TOKEN"]),
-        }
-
-        response = requests.post(url=url, data=data, headers=headers)
+        response = Session._eval_server_post("submit", data)
 
         if response.ok:
             try:
@@ -137,10 +135,28 @@ class EvaluatorClient(object):
             metrics_str = metrics.to_string(kind="user")
             metrics_user = metrics.convert(kind="user")
             print(metrics_str)
-            return metrics_user
         except ValueError as e:
             print("Feature is not valid: {}".format(str(e)), file=sys.stderr)
-            return {}
+            print(traceback.format_exc(), file=sys.stderr)
+            metrics_user = {}
+
+        try:
+            # TODO this can be an async procedure
+            self._log_evaluation_attempt(feature)
+        except Exception:
+            pass
+
+        return metrics_user
+
+    def _log_evaluation_attempt(self, feature):
+        from featurefactory.user.session import Session
+        code = get_source(feature)
+        data = {
+            "database"    : self.orm.database,
+            "problem_id"  : self.problem_id,
+            "code"        : code,
+        }
+        Session._eval_server_post("log-evaluation-attempt", data)
 
     def _evaluate(self, feature, verbose=False):
 
@@ -148,7 +164,7 @@ class EvaluatorClient(object):
             self._load_dataset()
 
         with possibly_talking_action("Extracting features...", verbose):
-            X = self._extract_features(feature)
+            feature_values = self._extract_features(feature)
 
         # confirm dataset has not been changed
         with possibly_talking_action("Verifying dataset integrity...", verbose):
@@ -156,14 +172,19 @@ class EvaluatorClient(object):
 
         # validate
         with possibly_talking_action("Validating feature values...", verbose):
-            result = self._validate_feature_values(X)
+            result = self._validate_feature_values(feature_values)
 
-        # extract label
-        with possibly_talking_action("Extracting label...", verbose):
-            Y = self._extract_label()
+        # full feature matrix
+        with possibly_talking_action("Building full feature matrix...",
+                verbose):
+            X = self._build_feature_matrix(feature_values)
+
+        # target values
+        # with possibly_talking_action("Extracting target values...", verbose):
+        Y = self._extract_label()
 
         # compute metrics
-        with possibly_talking_action("Computing metrics...", verbose):
+        with possibly_talking_action("Fitting model and computing metrics...", verbose):
             metrics = self._compute_metrics(X, Y)
 
         return metrics
@@ -173,14 +194,16 @@ class EvaluatorClient(object):
     # functions of those subroutines.
     #
 
-    def _compute_metrics(self, X, Y):
+    def _create_model(self):
         with self.orm.session_scope() as session:
-            # TODO this may be a sub-transaction
             problem = session.query(Problem)\
                     .filter(Problem.id == self.problem_id).one()
             problem_type = problem.problem_type
-        model = Model(problem_type)
-        metrics = model.compute_metrics(X, Y)
+        return Model(problem_type)
+
+    def _compute_metrics(self, X, Y):
+        model = self._create_model()
+        metrics = model.compute_metrics_cv(X, Y)
 
         return metrics
 
@@ -191,12 +214,77 @@ class EvaluatorClient(object):
         return run_isolated(feature, self.dataset)
 
     def _extract_label(self):
-        with self.orm.session_scope() as session:
-            problem = session.query(Problem)\
-                    .filter(Problem.id == self.problem_id).one()
-            target_table_name = problem.target_table_name
-            y_column          = problem.y_column
-        return self.dataset[target_table_name][y_column]
+        if pd.DataFrame(self.target).empty:
+            self._load_dataset()
+
+        return self.target
+
+    def _load_dataset_split(self, split, dataset, entities_featurized, target,
+            dataset_hash=None, compute_hash=True):
+        # query db for import parameters to load files
+        is_present_dataset = bool(dataset)
+        is_present_entities_featurized = not pd.DataFrame(entities_featurized).empty
+        is_present_target = not pd.DataFrame(target).empty
+        is_anything_missing = not all(
+                [is_present_dataset, is_present_entities_featurized, is_present_target])
+
+        if is_anything_missing:
+            with self.orm.session_scope() as session:
+                problem = session.query(Problem)\
+                        .filter(Problem.id == self.problem_id).one()
+                problem_data_dir = getattr(problem,
+                        "data_dir_{}".format(split))
+                problem_files = json.loads(problem.files)
+                problem_table_names = json.loads(problem.table_names)
+                problem_entities_featurized_table_name = \
+                    problem.entities_featurized_table_name
+                problem_target_table_name = problem.target_table_name
+
+        # load entities and other tables
+        if not is_present_dataset:
+            # load other tables
+            for (table_name, filename) in zip (problem_table_names,
+                    problem_files):
+                if table_name == problem_entities_featurized_table_name or \
+                   table_name == problem_target_table_name:
+                    continue
+                abs_filename = os.path.join(problem_data_dir, filename)
+                dataset[table_name] = pd.read_csv(abs_filename,
+                        low_memory=False, header=0)
+
+                # compute/recompute hash
+                if compute_hash:
+                    dataset_hash = compute_dataset_hash(dataset)
+                else:
+                    dataset_hash = None
+
+        # recompute dataset hash. condition only met if we dataset has already
+        # loaded, but dataset hash had not been computed. (because we just
+        # computed hash several lines above!)
+        if compute_hash:
+            if not dataset_hash:
+                dataset_hash = compute_dataset_hash(dataset)
+
+        # load entities featurized
+        if not is_present_entities_featurized:
+            # if empty string, we simply don't have any features to add
+            if problem_entities_featurized_table_name:
+                cols = list(problem_table_names)
+                ind_features = cols.index(problem_entities_featurized_table_name)
+                abs_filename = os.path.join(problem_data_dir,
+                        problem_files[ind_features])
+                entities_featurized = pd.read_csv(abs_filename,
+                        low_memory=False, header=0)
+
+        # load target
+        if not is_present_target:
+            cols = list(problem_table_names)
+            ind_target = cols.index(problem_target_table_name)
+            abs_filename = os.path.join(problem_data_dir,
+                    problem_files[ind_target]) 
+            target = pd.read_csv(abs_filename, low_memory=False, header=0)
+
+        return dataset, entities_featurized, target, dataset_hash
 
     def _load_dataset(self):
         """Load dataset if not present.
@@ -206,33 +294,16 @@ class EvaluatorClient(object):
 
         # TODO check for dtypes file, facilitating lower memory usage
 
-        if not self.dataset:
-            with self.orm.session_scope() as session:
-                # TODO this may be a sub-transaction
-                problem = session.query(Problem)\
-                        .filter(Problem.id == self.problem_id).one()
-                problem_files = problem.files
-                problem_table_names = problem.table_names
-                problem_data_path = problem.data_path
-
-            for (filename, table_name) in zip(problem_files.split(","),
-                    problem_table_names.split(",")):
-                abs_filename = os.path.join(problem_data_path, filename)
-                self.dataset[table_name] = pandas.read_csv(abs_filename,
-                        low_memory=False)
-
-            # compute/recompute hash
-            self.__dataset_hash = compute_dataset_hash(self.dataset)
-
-        if self.dataset and not self.__dataset_hash:
-            self.__dataset_hash = compute_dataset_hash(self.dataset)
-
-
-        return self.dataset
+        self.dataset, self.entities_featurized, self.target, \
+            self.__dataset_hash = self._load_dataset_split("train",
+            self.dataset, self.entities_featurized, self.target,
+            self.__dataset_hash)
 
     def _reload_dataset(self):
-        """
-        Force reload of dataset.
+        """Force reload of dataset.
+
+        Doesn't reload entities_featurized or target, because we only call this
+        routine when the dataset hash has changed.
         """
         self.dataset = {}
         self._load_dataset()
@@ -242,41 +313,52 @@ class EvaluatorClient(object):
 
         Currently checks if the feature is a DataFrame of the correct
         dimensions. If the feature is valid, returns an empty string. Otherwise,
-        returns a semicolon-delimited list of reasons that the feature is
-        invalid.
+        raises ValueError with message of a str containing a semicolon-delimited
+        list of reasons that the feature is invalid.
 
         Parameters
         ----------
         feature_values : np array-like
+
+        Returns
+        -------
+        Empty string if feature values are valid.
+
+        Raises
+        ------
+        ValueError with message of a str containing semicolon-delimited list of
+        reasons that the feature is invalid.
         """
 
-        with self.orm.session_scope() as session:
-            # TODO this may be a sub-transaction
-            problem = session.query(Problem).filter(Problem.id == self.problem_id).one()
-            target_table_name = problem.target_table_name
+        problems = []
 
-        result = []
+        # must be coerced to DataFrame
+        try:
+            feature_values_df = pd.DataFrame(feature_values)
+        except Exception:
+            problems.append("cannot be coerced to DataFrame")
+            problems = "; ".join(problems)
+            raise ValueError(problems)
 
-        # must be a data frame
-        if not isinstance(feature_values, pandas.core.frame.DataFrame):
-            result.append("does not return DataFrame")
-            return "; ".join(result)
+        if pd.DataFrame(self.target).empty:
+            self._load_dataset()
 
         # must have the right shape
-        expected_shape = (self.dataset[target_table_name].shape[0], 1)
-        if feature_values.shape != expected_shape:
-            result.append(
+        expected_shape = (self.target.shape[0], 1) # pylint: disable=no-member
+        if feature_values_df.shape != expected_shape:
+            problems.append(
                 "returns DataFrame of invalid shape "
                 "(actual {}, expected {})".format(
-                    feature_values.shape, expected_shape)
+                    feature_values_df.shape, expected_shape)
             )
 
-        result = "; ".join(result)
+        problems = "; ".join(problems)
 
-        if bool(result):
-            raise ValueError(result)
+        if problems:
+            raise ValueError(problems)
 
-        return result
+        # problems must be an empty string
+        return problems
 
     def _verify_dataset_integrity(self):
         new_hash = compute_dataset_hash(self.dataset)
@@ -286,9 +368,25 @@ class EvaluatorClient(object):
             #TODO exception handling
             self._reload_dataset()
 
+    def _build_feature_matrix(self, feature_values):
+        values_df = pd.DataFrame(feature_values)
+        if not pd.DataFrame(self.entities_featurized).empty:
+            X = pd.concat([self.entities_featurized, values_df], axis=1) 
+        else:
+            X = values_df
+        return X
+
 class EvaluatorServer(EvaluatorClient):
-    def __init__(self, problem_id, username, orm, dataset={}):
-        super().__init__(problem_id, username, orm, dataset)
+    def __init__(self, problem_id, username, orm):
+        super().__init__(problem_id, username, orm)
+
+        # separate training and testing datasets
+        self.dataset_train             = {}
+        self.target_train              = None
+        self.entities_featurized_train = None
+        self.dataset_test              = {}
+        self.target_test               = None
+        self.entities_featurized_test  = None
 
     def check_if_registered(self, code, verbose=False):
         """Check if feature is registered.
@@ -322,7 +420,7 @@ class EvaluatorServer(EvaluatorClient):
         except ValueError as e:
             raise
 
-    def register_feature(self, feature, description):
+    def submit(self, feature, description):
         """Does nothing.
 
         This class is instantiated at the server, thus we are already
@@ -330,9 +428,13 @@ class EvaluatorServer(EvaluatorClient):
         """
         pass
 
-    def _compute_metrics(self, X, Y, verbose=False):
-        # doesn't do anything different
-        metrics = super()._compute_metrics(X, Y)
+    def _compute_metrics(self, X, Y):
+        model = self._create_model()
+
+        # split X and Y into train and test
+        n = len(self.target_train)
+        metrics = model.compute_metrics_train_test(X, Y, n)
+
         return metrics
 
     def _verify_dataset_integrity(self):
@@ -342,3 +444,31 @@ class EvaluatorServer(EvaluatorClient):
         the dataset for every new feature.
         """
         pass
+
+    def _load_dataset(self):
+        # load dataset for train data
+        self.dataset_train, self.entities_featurized_train, \
+                self.target_train, _ = self._load_dataset_split("train",
+                self.dataset_train, self.entities_featurized_train,
+                self.target_train, compute_hash=False)
+
+        # load dataset for test data
+        self.dataset_test, self.entities_featurized_test, \
+                self.target_test, _ = self._load_dataset_split("test",
+                self.dataset_test, self.entities_featurized_test,
+                self.target_test, compute_hash=False)
+
+        # concatenate as applicable
+        self.dataset = concat_datasets(self.dataset_train, self.dataset_test)
+        try:
+            self.entities_featurized = pd.concat([self.entities_featurized_train,
+                self.entities_featurized_test], axis=0)
+        except ValueError:
+            # if there are no preprocessed features in the first place, all
+            # will be None, and pd.concat fails
+            self.entities_featurized = None
+        self.target = pd.concat([self.target_train, self.target_test], axis=0)
+
+    def _evaluate(self, feature, verbose=False):
+        metrics = super()._evaluate(feature, verbose)
+        return metrics
