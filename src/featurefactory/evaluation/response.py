@@ -80,8 +80,8 @@ class EvaluationResponse(Response):
             return "Oops -- couldn't verify your identity. " \
                 + TRY_AGAIN_LATER
         elif self.status_code1 == self.STATUS_CODE_BAD_FEATURE:
-            return ("Feature is invalid and not registered. Try cross "
-                    "validating it locally to see your problems.")
+            return ("Feature is invalid and not registered. Try evaluating"
+                    " it locally to see your problems.")
         elif self.status_code1 == self.STATUS_CODE_DUPLICATE_FEATURE:
             return "Feature is already registered."
         elif self.status_code1 == self.STATUS_CODE_SERVER_ERROR:

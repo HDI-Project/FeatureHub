@@ -38,8 +38,8 @@ _template = \
 * _Problem name_: {problem_name}
 * _Feature description_: {feature_description}
 * _Feature code_:
-
 {feature_code}
+
 * _Feature metrics_:
 {feature_metrics}
 
@@ -57,7 +57,12 @@ def _render_feature_post_template(problem_name, feature_description,
     indent = "    "
     bullet = " * "
 
-    feature_code = "\n".join([indent + line for line in code.split("\n")])
+    tmp = []
+    tmp.append(indent + "```")
+    for line in code.split("\n"):
+        tmp.append(indent + line)
+    tmp.append(indent + "```")
+    feature_code = "\n".join(tmp)
 
     tmp = []
     for metric in metrics:

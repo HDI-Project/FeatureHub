@@ -182,11 +182,11 @@ class Commands(object):
     def get_features(self, user_name=None):
         """Get a DataFrame with the details about all registered features."""
         with self.__orm.session_scope() as session:
-            features = self._get_features(session, user_name).all()
+            results = self._get_features(session, user_name).all()
             feature_dicts = []
-            for feature in features:
+            for feature, user_name, metrics in results:
                 d = {
-                    "user"        : feature.user.name,
+                    "user"        : user_name,
                     "description" : feature.description,
                     "md5"         : feature.md5,
                     "created_at"  : feature.created_at,
@@ -214,7 +214,8 @@ class Commands(object):
         """
 
         #TODO pivot metrics tables
-        query = session.query(Feature, User.name, Metric)
+        query = session.query(Feature, User.name)
+        #query = session.query(Feature, User.name, Metric)
 
         if user_name:
             query = query.filter(User.name == user_name)

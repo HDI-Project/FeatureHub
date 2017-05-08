@@ -2,11 +2,12 @@
 
 import os
 from os.path import join as pjoin
+import sys
 import shutil
 import subprocess
 import binascii
 import docker
-from pydiscourse import DiscourseClient
+from pydiscourse import DiscourseClient, DiscourseClientError
 import fire
 
 from api_client import ApiClient
@@ -46,6 +47,9 @@ def add_user(username, password, admin=False, discourse=False, email=""):
 
         if not email:
             email = username + "@example.com"
+            has_email = False
+        else:
+            has_email = True
 
     # create user on hub machine
     subprocess.call(\
@@ -110,17 +114,25 @@ EOM
             api_username=c["DISCOURSE_CLIENT_API_USERNAME"],
             api_key=c["DISCOURSE_CLIENT_API_TOKEN"])
 
-        result = discourse_client.create_user(
+        user = discourse_client.create_user(
             name = "",
             username = username,
             email = email,
             password = password,
             active = "true")
 
+        if not has_email:
+            try:
+                userid = user["user_id"]
+                discourse_client._put("/admin/users/{0}/activate".format(userid))
+            except DiscourseClientError:
+                print("Failed to activate user {}".format(user["username"]),
+                        file=sys.stderr)
+
         if c["DISCOURSE_FEATURE_GROUP_NAME"]:
-            result = discourse_client.groups()
+            groups = discourse_client.groups()
             groupid = None
-            for group in result:
+            for group in groups:
                 if group["name"] == c["DISCOURSE_FEATURE_GROUP_NAME"]:
                     groupid = group["id"]
                     break

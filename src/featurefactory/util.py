@@ -257,11 +257,3 @@ def possibly_talking_action(action, verbose=True):
     except Exception:
         vprint("error")
         raise
-
-def concat_datasets(*datasets):
-    result = {}
-    if datasets:
-        for key in datasets[0]:
-            result[key] = concat([d[key] for d in datasets], axis=0)
-
-    return result
