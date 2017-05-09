@@ -43,8 +43,6 @@ docker cp ./test_admin.py ${FF_CONTAINER_NAME}-${ADMIN_USERNAME}:/tmp/test_admin
 docker exec -u ${ADMIN_USERNAME} -i ${FF_CONTAINER_NAME}-${ADMIN_USERNAME} \
     /opt/conda/bin/ipython /tmp/test_admin.py
 
-exit 0
-
 # user1 test
 # USER1_USERNAME=demo USER2_USERNAME=airbnb USER3_USERNAME=sberbank FF_CONTAINER_NAME=featurefactoryuser 
 for USER_ in $USER1_USERNAME $USER2_USERNAME $USER3_USERNAME;
