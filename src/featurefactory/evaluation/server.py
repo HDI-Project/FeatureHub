@@ -38,6 +38,8 @@ auth = HubAuth(
     cookie_cache_max_age = 60,
 )
 
+DEMO_PROBLEM_NAME = "demo"
+
 # app
 app = Flask("eval-server")
 
@@ -274,7 +276,9 @@ def submit(user):
         app.logger.debug("Inserted into db.")
 
         # post to forum
-        if is_positive_env(os.environ.get("USE_DISCOURSE")):
+        problem_name = problem_obj.name
+        if is_positive_env(os.environ.get("USE_DISCOURSE")) and \
+            problem_name != DEMO_PROBLEM_NAME:
             try:
                 topic_url = post_feature(feature_obj, metrics)
                 app.logger.debug("Posted to forum")
