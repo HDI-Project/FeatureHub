@@ -13,6 +13,7 @@ class EvaluationResponse(Response):
     metrics : list of Metric, optional (default=None)
         List of Metric objects, which each encode metric name, metric scoring
         method, and value.
+    topic_url : str
 
     Examples
     --------
@@ -28,7 +29,7 @@ class EvaluationResponse(Response):
     STATUS_CODE_DB_ERROR          = "db_error"
 
     def __init__(self, status_code=STATUS_CODE_OKAY, metrics=None,
-            topic_url="<not available>"):
+            topic_url=""):
         if metrics is not None:
             metrics = MetricList.from_object(metrics).convert(kind="user")
 
@@ -80,8 +81,8 @@ class EvaluationResponse(Response):
             return "Oops -- couldn't verify your identity. " \
                 + TRY_AGAIN_LATER
         elif self.status_code1 == self.STATUS_CODE_BAD_FEATURE:
-            return ("Feature is invalid and not registered. Try cross "
-                    "validating it locally to see your problems.")
+            return ("Feature is invalid and not registered. Try evaluating"
+                    " it locally to see your problems.")
         elif self.status_code1 == self.STATUS_CODE_DUPLICATE_FEATURE:
             return "Feature is already registered."
         elif self.status_code1 == self.STATUS_CODE_SERVER_ERROR:
@@ -97,7 +98,8 @@ class EvaluationResponse(Response):
         return MetricList.from_object(self.metrics).to_string(kind="user")
 
     def _get_topic_url_str(self):
-        return "Feature posted to forum => {}".format(self.topic_url)
+        topic_url = self.topic_url if self.topic_url else "<not available>"
+        return "Feature posted to forum => {}".format(topic_url)
 
     def __str__(self):
         """ Return string representation of response.
@@ -107,5 +109,8 @@ class EvaluationResponse(Response):
         """
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()
-        topic_url_str = self._get_topic_url_str()
-        return explanation + "\n\n" + metrics_str + "\n\n" + topic_url_str
+        result = explanation + "\n\n" + metrics_str 
+        if self.topic_url:
+            topic_url_str = self._get_topic_url_str()
+            result += "\n" + topic_url_str
+        return result

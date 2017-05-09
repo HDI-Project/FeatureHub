@@ -20,10 +20,10 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
 from featurefactory.admin.sqlalchemy_main        import ORMManager
 from featurefactory.admin.sqlalchemy_declarative import (
-    Feature, Problem, User, Metric, EvaluationAttempt
-)
+    Feature, Problem, User, Metric, EvaluationAttempt)
 from featurefactory.evaluation.discourse         import post_feature
-from featurefactory.util                         import get_function, myhash
+from featurefactory.util                         import (
+    get_function, myhash, is_positive_env)
 
 # setup
 prefix = "/services/eval-server"
@@ -37,6 +37,8 @@ auth = HubAuth(
     api_url              = hub_api_url,
     cookie_cache_max_age = 60,
 )
+
+DEMO_PROBLEM_NAME = "demo"
 
 # app
 app = Flask("eval-server")
@@ -274,13 +276,17 @@ def submit(user):
         app.logger.debug("Inserted into db.")
 
         # post to forum
-        try:
-            topic_url = post_feature(feature_obj, metrics)
-            app.logger.debug("Posted to forum")
-        except Exception:
-            topic_url = "<not available>"
-            app.logger.exception("Unexpected error posting to forum")
-
+        problem_name = problem_obj.name
+        if is_positive_env(os.environ.get("USE_DISCOURSE")) and \
+            problem_name != DEMO_PROBLEM_NAME:
+            try:
+                topic_url = post_feature(feature_obj, metrics)
+                app.logger.debug("Posted to forum")
+            except Exception:
+                topic_url = ""
+                app.logger.exception("Unexpected error posting to forum")
+        else:
+            topic_url = ""
 
     # return
     # - status code

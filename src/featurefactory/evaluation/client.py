@@ -10,7 +10,7 @@ from urllib.parse import quote_from_bytes
 
 from featurefactory.util import (
     compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
-    myhash, concat_datasets
+    myhash
 )
 from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
 from featurefactory.evaluation                   import EvaluationResponse
@@ -459,7 +459,16 @@ class EvaluatorServer(EvaluatorClient):
                 self.target_test, compute_hash=False)
 
         # concatenate as applicable
-        self.dataset = concat_datasets(self.dataset_train, self.dataset_test)
+        self.dataset = self.dataset_train
+        with self.orm.session_scope() as session:
+            problem = session.query(Problem)\
+                    .filter(Problem.id == self.problem_id).one()
+            x = problem.entities_table_name
+        self.dataset[x] = pd.concat([self.dataset_train[x],
+            self.dataset_test[x]], axis=0)
+
+        self.target = pd.concat([self.target_train, self.target_test], axis=0)
+
         try:
             self.entities_featurized = pd.concat([self.entities_featurized_train,
                 self.entities_featurized_test], axis=0)
@@ -467,7 +476,13 @@ class EvaluatorServer(EvaluatorClient):
             # if there are no preprocessed features in the first place, all
             # will be None, and pd.concat fails
             self.entities_featurized = None
-        self.target = pd.concat([self.target_train, self.target_test], axis=0)
+
+        # Reset indices. Otherwise, since we did a vertical concatenation, we
+        # have duplicate values in our indices.
+        self.dataset[x].reset_index(drop=True, inplace=True)
+        self.target.reset_index(drop=True, inplace=True)
+        if self.entities_featurized is not None:
+            self.entities_featurized.reset_index(drop=True, inplace=True)
 
     def _evaluate(self, feature, verbose=False):
         metrics = super()._evaluate(feature, verbose)

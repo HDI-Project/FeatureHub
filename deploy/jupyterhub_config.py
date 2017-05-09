@@ -29,7 +29,7 @@ eval_server_url       = "http://{}:{}".format(eval_container_name,
     eval_container_port)
 eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
-api_client_api_token = os.environ["API_CLIENT_API_TOKEN"]
+hub_client_api_token = os.environ["HUB_CLIENT_API_TOKEN"]
 
 # General Hub config
 c.JupyterHub.logo_file               = logo_file
@@ -66,10 +66,13 @@ c.JupyterHub.ssl_cert = os.environ["SSL_CERT"]
 # Data/directories
 c.JupyterHub.db_url                            = os.path.join("sqlite:///", jupyterhub_config_dir, "jupyterhub.sqlite")
 c.JupyterHub.cookie_secret_file                = os.path.join(jupyterhub_config_dir, "jupyterhub_cookie_secret")
-c.JupyterHub.extra_log_file                    = os.path.join(jupyterhub_config_dir, "jupyterhub.log")
+c.JupyterHub.extra_log_file                    = os.path.join(ff_data_dir, "log", "jupyterhub", "jupyterhub.log")
 c.Spawner.notebook_dir                         = "~/notebooks"
 c.DockerSpawner.read_only_volumes              = { os.path.join(ff_data_dir, "data/train") : "/data/train" }
 c.SystemUserSpawner.host_homedir_format_string = os.path.join(ff_data_dir, "users", "{username}")
+
+if not os.path.exists(os.path.join(ff_data_dir, "log", "jupyterhub")):
+    os.makedirs(os.path.join(ff_data_dir, "log", "jupyterhub"))
 
 # Services - definitions
 c.JupyterHub.services = [
@@ -89,7 +92,7 @@ c.JupyterHub.services = [
         "name": "api-client",
         "admin": True,
         "url": "0.0.0.0",
-        "api_token": api_client_api_token,
+        "api_token": hub_client_api_token,
     }
 ]
 

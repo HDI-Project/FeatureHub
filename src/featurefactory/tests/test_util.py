@@ -22,10 +22,15 @@ def test_get_source():
         g(1)
         c+d
 
+    def zeros(dataset):
+        import numpy as np
+        return np.zeros(len(dataset["users"]))
+
     # should throw no errors
-    code_f = featurefactory.util.get_source(f)
-    code_g = featurefactory.util.get_source(g)
-    code_h = featurefactory.util.get_source(h)
+    code_f     = featurefactory.util.get_source(f)
+    code_g     = featurefactory.util.get_source(g)
+    code_h     = featurefactory.util.get_source(h)
+    code_zeros = featurefactory.util.get_source(zeros)
 
 # ------------------------------------------------------------------------------ 
 # Test get_function()
@@ -178,3 +183,10 @@ def test_myhash():
     b = "hello world".encode("utf-8")
 
     assert featurefactory.util.myhash(a) == featurefactory.util.myhash(b)
+
+def test_is_positive_env():
+    for y in ["yes", "Yes", "y", "Y", "true", "True", True, 1, "1"]:
+        assert featurefactory.util.is_positive_env(y) == True
+
+    for n in ["", "no", "No", "blargh", "zam", "zot", False, 0, "0"]:
+        assert featurefactory.util.is_positive_env(n) == False

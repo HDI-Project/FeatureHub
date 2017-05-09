@@ -50,22 +50,19 @@ def get_source(function):
     # Use nested function to allow us to ultimately encode as utf-8 string.
     def _get_source(function):
         out = []
-        try:
-            # Python 2
-            # TODO __code__ and __globals__ should even work in Python 2
-            func_code, func_globals = function.func_code, function.func_globals
-        except AttributeError:
-            # Python 3
-            func_code, func_globals = function.__code__, function.__globals__
+        func_code    = function.__code__
+        func_globals = function.__globals__
+        func_name    = function.__name__
 
         # known limitation: cannot use from stdin
         if func_code.co_filename == '<stdin>':
             raise ValueError("Cannot use `get_source` on function defined interactively.")
 
         for name in func_code.co_names:
-            obj = func_globals.get(name)
-            if obj and inspect.isfunction(obj):
-                out.append(_get_source(obj))
+            if name != func_name:
+                obj = func_globals.get(name)
+                if obj and inspect.isfunction(obj):
+                    out.append(_get_source(obj))
 
         out.append(inspect.getsource(function))
 
@@ -258,10 +255,9 @@ def possibly_talking_action(action, verbose=True):
         vprint("error")
         raise
 
-def concat_datasets(*datasets):
-    result = {}
-    if datasets:
-        for key in datasets[0]:
-            result[key] = concat([d[key] for d in datasets], axis=0)
+def is_positive_env(value):
+    if value is not None:
+        return value in ["yes", "Yes", "y", "Y", "true", "True", 1, "1",
+        "totally"]
 
-    return result
+    return False

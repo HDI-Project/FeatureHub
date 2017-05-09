@@ -15,20 +15,21 @@ cd ../deploy
 # build
 make clean
 make build
+make ssl
 make up
 sleep 15 # wait to complete
 
 # create users
-./add_user.sh -a ${ADMIN_USERNAME} ${ADMIN_PASSWORD}
-./add_user.sh ${USER1_USERNAME} ${USER1_PASSWORD}
-./add_user.sh ${USER2_USERNAME} ${USER2_PASSWORD}
-./add_user.sh ${USER3_USERNAME} ${USER3_PASSWORD}
+./users.py add ${ADMIN_USERNAME} ${ADMIN_PASSWORD} --admin=True
+./users.py add ${USER1_USERNAME} ${USER1_PASSWORD}
+./users.py add ${USER2_USERNAME} ${USER2_PASSWORD}
+./users.py add ${USER3_USERNAME} ${USER3_PASSWORD}
 
 # start all containers
-./api_client.py start-server ${ADMIN_USERNAME}
-./api_client.py start-server ${USER1_USERNAME}
-./api_client.py start-server ${USER2_USERNAME}
-./api_client.py start-server ${USER3_USERNAME}
+./hub_client.py start-server ${ADMIN_USERNAME}
+./hub_client.py start-server ${USER1_USERNAME}
+./hub_client.py start-server ${USER2_USERNAME}
+./hub_client.py start-server ${USER3_USERNAME}
 
 # wait for it to start
 sleep 5
@@ -41,8 +42,6 @@ cd ../test
 docker cp ./test_admin.py ${FF_CONTAINER_NAME}-${ADMIN_USERNAME}:/tmp/test_admin.py
 docker exec -u ${ADMIN_USERNAME} -i ${FF_CONTAINER_NAME}-${ADMIN_USERNAME} \
     /opt/conda/bin/ipython /tmp/test_admin.py
-
-exit 0
 
 # user1 test
 # USER1_USERNAME=demo USER2_USERNAME=airbnb USER3_USERNAME=sberbank FF_CONTAINER_NAME=featurefactoryuser 
