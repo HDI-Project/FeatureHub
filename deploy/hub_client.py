@@ -4,11 +4,11 @@ import os
 from jupyterhub_client import JupyterHubClient
 import fire
 
-class ApiClient(object):
+class HubClient(object):
     def __init__(self):
         self.load_config()
 
-        hub_api_token = self.c["API_CLIENT_API_TOKEN"]
+        hub_api_token = self.c["HUB_CLIENT_API_TOKEN"]
         hub_api_url = "http://{}:{}/hub/api".format(
             "127.0.0.1",
             self.c["HUB_API_PORT"]
@@ -39,5 +39,5 @@ class ApiClient(object):
         return c
 
 if __name__ == "__main__":
-    client = ApiClient()
+    client = HubClient()
     fire.Fire(client.hub)

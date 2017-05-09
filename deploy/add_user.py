@@ -11,7 +11,7 @@ from pydiscourse import DiscourseClient
 from pydiscourse.exceptions import DiscourseClientError
 import fire
 
-from api_client import ApiClient
+from hub_client import HubClient
 
 MINIMUM_DOCKER_VERSION = (0,0,0)
 DISCOURSE_MIN_PASSWORD_LENGTH = 10
@@ -106,7 +106,7 @@ EOM
             "user={0}\n"
             "password={1}\n".format(username, password_mysql))
 
-    client = ApiClient()
+    client = HubClient()
     client.hub.create_user(name=username, admin=admin)
 
     if discourse:

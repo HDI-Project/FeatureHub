@@ -26,10 +26,10 @@ sleep 15 # wait to complete
 ./add_user.py ${USER3_USERNAME} ${USER3_PASSWORD}
 
 # start all containers
-./api_client.py start-server ${ADMIN_USERNAME}
-./api_client.py start-server ${USER1_USERNAME}
-./api_client.py start-server ${USER2_USERNAME}
-./api_client.py start-server ${USER3_USERNAME}
+./hub_client.py start-server ${ADMIN_USERNAME}
+./hub_client.py start-server ${USER1_USERNAME}
+./hub_client.py start-server ${USER2_USERNAME}
+./hub_client.py start-server ${USER3_USERNAME}
 
 # wait for it to start
 sleep 5

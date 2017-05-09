@@ -42,7 +42,7 @@ services:
             EVAL_API_TOKEN: ${EVAL_API_TOKEN}
             SSL_KEY: "/etc/letsencrypt/privkey.pem"
             SSL_CERT: "/etc/letsencrypt/cert.pem"
-            API_CLIENT_API_TOKEN: ${API_CLIENT_API_TOKEN}
+            HUB_CLIENT_API_TOKEN: ${HUB_CLIENT_API_TOKEN}
         command: >
             jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
     db:

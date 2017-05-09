@@ -29,7 +29,7 @@ eval_server_url       = "http://{}:{}".format(eval_container_name,
     eval_container_port)
 eval_server_api_token = os.environ["EVAL_API_TOKEN"]
 
-api_client_api_token = os.environ["API_CLIENT_API_TOKEN"]
+hub_client_api_token = os.environ["HUB_CLIENT_API_TOKEN"]
 
 # General Hub config
 c.JupyterHub.logo_file               = logo_file
@@ -92,7 +92,7 @@ c.JupyterHub.services = [
         "name": "api-client",
         "admin": True,
         "url": "0.0.0.0",
-        "api_token": api_client_api_token,
+        "api_token": hub_client_api_token,
     }
 ]
 

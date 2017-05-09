@@ -42,7 +42,7 @@ Definitely override values for these variables:
 - `MYSQL_ROOT_PASSWORD`: password for DB root user
 - `EVAL_API_TOKEN`: API token for eval server. You should generate a valid API token by
     executing `openssl rand -hex 32`.
-- `API_CLIENT_API_TOKEN` : API token for Hub API client script. You should generate a valid
+- `HUB_CLIENT_API_TOKEN` : API token for Hub API client script. You should generate a valid
     API token by executing `openssl rand -hex 32`.
 - `DISCOURSE_DOMAIN_NAME` :
 - `DISCOURSE_CLIENT_API_USERNAME` : Username for Discourse admin, to use with Discourse API
@@ -162,22 +162,22 @@ Experiment admin
 ### Hub API client
 
 Admins can also use a command line API client to interact with the Hub's REST API. To use
-this, you must set an API key for the client to use in the `API_CLIENT_API_TOKEN`
+this, you must set an API key for the client to use in the `HUB_CLIENT_API_TOKEN`
 environment variable. See [App Deployment](#app-deployment) above.
 
 See the available commands:
 ```
-api_client.py -- --help
+hub_client.py -- --help
 ```
 
 List all users:
 ```
-api_client.py list-users
+hub_client.py list-users
 ```
 
 Start the server of a user that already exists:
 ```
-api_client.py start-server username
+hub_client.py start-server username
 ```
 
 ## Manage app lifecycle
