@@ -1,4 +1,4 @@
-FROM jupyterhub/systemuser
+FROM jupyterhub/systemuser:0.6.0
 
 # Clean up from existing systemuser setup
 RUN rm -rf /home/jovyan
