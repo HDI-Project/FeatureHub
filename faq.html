@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>FAQ &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="user-guide.html" title="User Guide"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -56,8 +56,8 @@
             
   <div class="section" id="faq">
 <span id="faq"></span><h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="restarting-your-server">
-<span id="restarting-your-server"></span><h2>Restarting your server<a class="headerlink" href="#restarting-your-server" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="how-do-i-restart-my-feature-factory-server">
+<span id="how-do-i-restart-my-feature-factory-server"></span><h2>How do I restart my Feature Factory server?<a class="headerlink" href="#how-do-i-restart-my-feature-factory-server" title="Permalink to this headline">¶</a></h2>
 <p>You may want or be asked to restart your notebook server, possibly in order to access
 software udpates. If you follow these instructions, you will be able to do this without
 loss of any data or work.</p>
@@ -68,6 +68,30 @@ save them manually to be sure. Press <em>File -&gt; Save and Checkpoint</em>.</l
 After a few moments, your server should stop and the button should disappear.</li>
 <li><em>Start your server.</em> You can now press <em>My Server</em> to restart your server.</li>
 </ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Restarting your Feature Factory server is different than restarting the IPython kernel.</p>
+</div>
+</div>
+<div class="section" id="why-is-my-feature-rejected-by-the-submit-function">
+<span id="why-is-my-feature-rejected-by-the-submit-function"></span><h2>Why is my feature rejected by the submit function?<a class="headerlink" href="#why-is-my-feature-rejected-by-the-submit-function" title="Permalink to this headline">¶</a></h2>
+<p>You may try to submit a feature only to receive a message that it was invalid and was
+rejected. This can happen if any of the requirements Feature Factory imposes on your feature
+are not met. Try evaluating your feature locally to see more detailed debugging information.</p>
+<p>If your feature evaluates successfully locally but still is rejected by the server, make
+sure that you do all of your imports within the function body and do not use global
+variables.</p>
+<p>If you are still having problems, contact an administrator or post for help in the forum (if
+available).</p>
+</div>
+<div class="section" id="how-can-i-see-every-column-of-a-wide-dataframe">
+<span id="how-can-i-see-every-column-of-a-wide-dataframe"></span><h2>How can I see every column of a wide DataFrame?<a class="headerlink" href="#how-can-i-see-every-column-of-a-wide-dataframe" title="Permalink to this headline">¶</a></h2>
+<p>By default, Jupyter Notebook shows columns at the beginning and end of the list of
+columns when displaying a DataFrame. To force more columns to be displayed, try this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_columns&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -80,7 +104,9 @@ After a few moments, your server should stop and the button should disappear.</l
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">FAQ</a><ul>
-<li><a class="reference internal" href="#restarting-your-server">Restarting your server</a></li>
+<li><a class="reference internal" href="#how-do-i-restart-my-feature-factory-server">How do I restart my Feature Factory server?</a></li>
+<li><a class="reference internal" href="#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li><a class="reference internal" href="#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
 </ul>
 </li>
 </ul>
@@ -127,7 +153,7 @@ After a few moments, your server should stop and the button should disappear.</l
         <li class="right" >
           <a href="user-guide.html" title="User Guide"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

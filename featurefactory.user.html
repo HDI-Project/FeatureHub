@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.user package &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.user package &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -61,17 +61,13 @@
 <p>Includes commands for discovering, testing, and registering new features.</p>
 <dl class="method">
 <dt id="featurefactory.user.session.Session.discover_features">
-<code class="descname">discover_features</code><span class="sig-paren">(</span><em>code_fragment=None</em>, <em>metric_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.discover_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.discover_features" title="Permalink to this definition">¶</a></dt>
+<code class="descname">discover_features</code><span class="sig-paren">(</span><em>code_fragment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.discover_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.discover_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print features written by other users.</p>
 <p>A code fragment can be used to filter search results. For each feature,
 prints feature id, feature description, metrics, and source code.</p>
 <dl class="docutils">
 <dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
 <dd>Source code fragment to filter for.</dd>
-<dt>metric_name <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
-<dd>Metric to report. One of &#8220;Accuracy&#8221;, &#8220;Precision&#8221;, &#8220;Recall&#8221;, and
-&#8220;ROC AUC&#8221; for classification problems, and &#8220;Mean Squared Error&#8221;
-and &#8220;R-squared&#8221; for regression problems.</dd>
 </dl>
 </dd></dl>
 
@@ -91,10 +87,25 @@ invalid, prints reason and returns empty dictionary.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="featurefactory.user.session.Session.get_entity_features">
+<code class="descname">get_entity_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.get_entity_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.get_entity_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads preprocessed entity-level features of problem training dataset.</p>
+<p>The entity-level features are the same length as the entity DataFrame
+and the target DataFrame.</p>
+<p>entity_features : pd.DataFrame or None</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="featurefactory.user.session.Session.get_sample_dataset">
 <code class="descname">get_sample_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.get_sample_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.get_sample_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads sample of problem training dataset.</p>
-<p>Returns a dict mapping table names to pandas DataFrames.</p>
+<p>Returns the dataset a dict mapping table names to pandas DataFrames.</p>
+<dl class="docutils">
+<dt>dataset <span class="classifier-delimiter">:</span> <span class="classifier">dict (str =&gt; pd.DataFrame)</span></dt>
+<dd>A dict mapping table names to pandas DataFrames.</dd>
+<dt>target <span class="classifier-delimiter">:</span> <span class="classifier">pd.DataFrame</span></dt>
+<dd>A DataFrame that holds a single column: the target variable (label).</dd>
+</dl>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">get_sample_dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;stores&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
@@ -104,23 +115,19 @@ invalid, prints reason and returns empty dictionary.</p>
 
 <dl class="method">
 <dt id="featurefactory.user.session.Session.print_my_features">
-<code class="descname">print_my_features</code><span class="sig-paren">(</span><em>code_fragment=None</em>, <em>metric_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.print_my_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.print_my_features" title="Permalink to this definition">¶</a></dt>
+<code class="descname">print_my_features</code><span class="sig-paren">(</span><em>code_fragment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.print_my_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.print_my_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print features written by me.</p>
 <p>A code fragment can be used to filter search results. For each feature,
 prints feature id, feature description, metrics, and source code.</p>
 <dl class="docutils">
 <dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
 <dd>Source code fragment to filter for.</dd>
-<dt>metric_name <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
-<dd>Metric to report. One of &#8220;Accuracy&#8221;, &#8220;Precision&#8221;, &#8220;Recall&#8221;, and
-&#8220;ROC AUC&#8221; for classification problems, and &#8220;Mean Squared Error&#8221;
-and &#8220;R-squared&#8221; for regression problems.</dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="featurefactory.user.session.Session.register_feature">
-<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.register_feature" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.user.session.Session.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/user/session.html#Session.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.user.session.Session.submit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Submit feature to server for evaluation on test data.</p>
 <p>If successful, registers feature in feature database and returns key
 performance metrics.</p>
@@ -190,7 +197,7 @@ metrics.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

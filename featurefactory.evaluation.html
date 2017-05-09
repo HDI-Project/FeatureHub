@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.evaluation package &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.evaluation package &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -55,7 +55,7 @@
 <span id="featurefactory-evaluation-client-module"></span><h2>featurefactory.evaluation.client module<a class="headerlink" href="#module-featurefactory.evaluation.client" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="featurefactory.evaluation.client.EvaluatorClient">
-<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorClient</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorClient</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em>, <em>target=None</em>, <em>entities_featurized=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="featurefactory.evaluation.client.EvaluatorClient.check_if_registered">
@@ -85,8 +85,8 @@ invalid, prints reason and returns empty dictionary.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="featurefactory.evaluation.client.EvaluatorClient.register_feature">
-<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient.register_feature" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.evaluation.client.EvaluatorClient.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorClient.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorClient.submit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Submit feature to server for evaluation on test data.</p>
 <p>If successful, registers feature in feature database and returns key
 performance metrics.</p>
@@ -106,7 +106,7 @@ metrics.</p>
 
 <dl class="class">
 <dt id="featurefactory.evaluation.client.EvaluatorServer">
-<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorServer</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.client.</code><code class="descname">EvaluatorServer</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#featurefactory.evaluation.client.EvaluatorClient" title="featurefactory.evaluation.client.EvaluatorClient"><code class="xref py py-class docutils literal"><span class="pre">featurefactory.evaluation.client.EvaluatorClient</span></code></a></p>
 <dl class="method">
 <dt id="featurefactory.evaluation.client.EvaluatorServer.check_if_registered">
@@ -134,8 +134,8 @@ invalid, re-raises the ValueError.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="featurefactory.evaluation.client.EvaluatorServer.register_feature">
-<code class="descname">register_feature</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer.register_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer.register_feature" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.evaluation.client.EvaluatorServer.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/client.html#EvaluatorServer.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.client.EvaluatorServer.submit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does nothing.</p>
 <p>This class is instantiated at the server, thus we are already
 registering the feature.</p>
@@ -186,7 +186,7 @@ The &#8216;name&#8217; field contains the user&#8217;s name.</dd>
 <span id="featurefactory-evaluation-response-module"></span><h2>featurefactory.evaluation.response module<a class="headerlink" href="#module-featurefactory.evaluation.response" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="featurefactory.evaluation.response.EvaluationResponse">
-<em class="property">class </em><code class="descclassname">featurefactory.evaluation.response.</code><code class="descname">EvaluationResponse</code><span class="sig-paren">(</span><em>status_code='okay'</em>, <em>metrics=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/response.html#EvaluationResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">featurefactory.evaluation.response.</code><code class="descname">EvaluationResponse</code><span class="sig-paren">(</span><em>status_code='okay'</em>, <em>metrics=None</em>, <em>topic_url=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/evaluation/response.html#EvaluationResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">flask.wrappers.Response</span></code></p>
 <p>Wrapper class for response from evaluation server.</p>
 <dl class="docutils">
@@ -196,6 +196,7 @@ The &#8216;name&#8217; field contains the user&#8217;s name.</dd>
 <dd>List of Metric objects, which each encode metric name, metric scoring
 method, and value.</dd>
 </dl>
+<p>topic_url : str</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EvaluationResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">EvaluationResponse</span><span class="o">.</span><span class="n">STATUS_CODE_SERVER_ERROR</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -245,11 +246,6 @@ web connection.</p>
 <dd>Json-dumped string encoding the response.</dd>
 </dl>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="featurefactory.evaluation.response.EvaluationResponse.try_again">
-<code class="descname">try_again</code><em class="property"> = 'Please try again later or contact administrator.'</em><a class="headerlink" href="#featurefactory.evaluation.response.EvaluationResponse.try_again" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -311,7 +307,7 @@ web connection.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

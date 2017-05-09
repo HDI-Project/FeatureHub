@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Deployment &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>Deployment &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="faq.html" title="FAQ"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -95,8 +95,14 @@
 <li><code class="docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
 <li><code class="docutils literal"><span class="pre">EVAL_API_TOKEN</span></code>: API token for eval server. You should generate a valid API token by
 executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">API_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You generate a valid API
-token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You should generate a valid
+API token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_DOMAIN_NAME</span></code> :</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_USERNAME</span></code> : Username for Discourse admin, to use with Discourse API
+client. You must use the same username when setting up the Discourse instance.</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_TOKEN</span></code> : API token for Discourse API client. You should generate a
+valid API token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>. You must use the same token when
+setting up the Discourse instance.</li>
 </ul>
 <p>You can usually leave these variables at their default values:</p>
 <ul class="simple">
@@ -126,6 +132,13 @@ purposes, can use <code class="docutils literal"><span class="pre">openssl</span
 container, this will be the exact name.</li>
 <li><code class="docutils literal"><span class="pre">EVAL_CONTAINER_PORT</span></code> : port for eval server to listen on</li>
 <li><code class="docutils literal"><span class="pre">EVAL_FLASK_DEBUG</span></code> : whether eval server Flask app should be started with DEBUG flag</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_FEATURE_GROUP_NAME</span></code> : Group for new users to be added to on Discourse. This
+group will control the visibility of the feature category.</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_FEATURE_CATEGORY_NAME</span></code> : Category for new features to be posted to on
+Discourse. Posts to this category will only be visible by members of the feature group
+(above) and administrators.</li>
+<li><code class="docutils literal"><span class="pre">USE_DISCOURSE</span></code>: flag to use Discourse integration (<code class="docutils literal"><span class="pre">&quot;yes&quot;</span></code>). If Discourse integration is
+enabled, then forum posts are created for each feature that is successfully added.</li>
 </ul>
 </div>
 <div class="section" id="userlist">
@@ -160,13 +173,14 @@ know what you&#8217;re doing to not break things.</p>
 </div>
 <div class="section" id="user-and-data-management">
 <span id="user-and-data-management"></span><h2>User and data management<a class="headerlink" href="#user-and-data-management" title="Permalink to this headline">¶</a></h2>
-<p>Users can be added or deleted using <code class="docutils literal"><span class="pre">deploy/add_user.sh</span></code> and <code class="docutils literal"><span class="pre">deploy/delete_user.sh</span></code>. These
-commands create user accounts on the hub container, setup notebooks templates, and setup
-authentication for each user with the DB.</p>
+<p>Users can be added or deleted using <code class="docutils literal"><span class="pre">deploy/users.py</span></code>. This utility creates user accounts on
+the hub container, sets up notebooks templates, sets up authentication for each user with
+the DB, and optionally sets up user accounts on the Discourse forum.</p>
 <p>Most files are stored directly on the host machine and mounted in the Hub and User
 containers:</p>
 <ul class="simple">
-<li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data</span></code></li>
+<li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/train</span></code> and <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/test</span></code></li>
+<li>Problem definitions: <code class="docutils literal"><span class="pre">FF_DATA_DIR/problems</span></code></li>
 <li>Notebooks and other user-created files: <code class="docutils literal"><span class="pre">FF_DATA_DIR/users</span></code></li>
 <li>Configuration files for FeatureFactory and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
 <li>Log files for Hub and eval server: <code class="docutils literal"><span class="pre">FF_DATA_DIR/log</span></code></li>
@@ -181,13 +195,12 @@ containers:</p>
 <p>Admins can perform administrative tasks with respect to the Feature Factory app as well as
 the Feature Factory data science experiment. Admin users can manage and organize an
 experiment without needing access to the host machine.</p>
-<p>Create an admin user using <code class="docutils literal"><span class="pre">add_user.sh</span> <span class="pre">-a</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
+<p>Create an admin user using <code class="docutils literal"><span class="pre">users.py</span> <span class="pre">add</span> <span class="pre">--admin=True</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
 <p>App admin</p>
 <ul class="simple">
 <li>Can log into JupyterHub via the admin web interface and add/remove users, restart/shutdown
 notebooks, and more.</li>
-<li>Can also create/remove users from the host machine command line using <code class="docutils literal"><span class="pre">add_user.sh</span></code> and
-<code class="docutils literal"><span class="pre">delete_user.sh</span></code>.</li>
+<li>Can also create/remove users from the host machine command line using <code class="docutils literal"><span class="pre">users.py</span></code>.</li>
 <li>Can modify the experiment database.</li>
 </ul>
 <p>Experiment admin</p>
@@ -201,18 +214,18 @@ experiment data, and configure experiment parameters.</li>
 <div class="section" id="hub-api-client">
 <span id="hub-api-client"></span><h3>Hub API client<a class="headerlink" href="#hub-api-client" title="Permalink to this headline">¶</a></h3>
 <p>Admins can also use a command line API client to interact with the Hub&#8217;s REST API. To use
-this, you must set an API key for the client to use in the <code class="docutils literal"><span class="pre">API_CLIENT_API_TOKEN</span></code>
+this, you must set an API key for the client to use in the <code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code>
 environment variable. See <a class="reference external" href="#app-deployment">App Deployment</a> above.</p>
 <p>See the available commands:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span> <span class="o">--</span><span class="n">help</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span> <span class="o">--</span><span class="n">help</span>
 </pre></div>
 </div>
 <p>List all users:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="nb">list</span><span class="o">-</span><span class="n">users</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="nb">list</span><span class="o">-</span><span class="n">users</span>
 </pre></div>
 </div>
 <p>Start the server of a user that already exists:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">api_client</span><span class="o">.</span><span class="n">py</span> <span class="n">start</span><span class="o">-</span><span class="n">server</span> <span class="n">username</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="n">start</span><span class="o">-</span><span class="n">server</span> <span class="n">username</span>
 </pre></div>
 </div>
 </div>
@@ -326,7 +339,7 @@ internal network is shut down.</p>
         <li class="right" >
           <a href="faq.html" title="FAQ"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

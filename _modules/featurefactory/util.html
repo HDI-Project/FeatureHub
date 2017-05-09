@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.util &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.util &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,17 +51,21 @@
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">dill</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Pool</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">textwrap</span> <span class="k">import</span> <span class="n">dedent</span>
-<span class="kn">import</span> <span class="nn">xxhash</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">importlib.util</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Pool</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="k">import</span> <span class="n">dedent</span>
+<span class="kn">from</span> <span class="nn">xxhash</span> <span class="k">import</span> <span class="n">xxh64</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">ModuleType</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">concat</span>
 
 <span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">1754</span>
+
+<span class="n">TRY_AGAIN_LATER</span> <span class="o">=</span> <span class="s2">&quot;Please try again later or contact administrator.&quot;</span>
+<span class="n">TRY_AGAIN</span> <span class="o">=</span> <span class="s2">&quot;Please contact administrator.&quot;</span>
 
 <span class="k">def</span> <span class="nf">_get_function_and_execute</span><span class="p">(</span><span class="n">f_dill</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f_dill</span><span class="p">)</span>
@@ -69,7 +73,7 @@
 
 <div class="viewcode-block" id="run_isolated"><a class="viewcode-back" href="../../featurefactory.html#featurefactory.util.run_isolated">[docs]</a><span class="k">def</span> <span class="nf">run_isolated</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Execute `f(args)` in an isolated environment.</span>
-<span class="sd">    </span>
+
 <span class="sd">    First, uses dill to serialize the function. Unfortunately, pickle is unable</span>
 <span class="sd">    to serialize some functions, so we must serialize and deserialize the</span>
 <span class="sd">    function ourselves.</span>
@@ -96,22 +100,19 @@
     <span class="c1"># Use nested function to allow us to ultimately encode as utf-8 string.</span>
     <span class="k">def</span> <span class="nf">_get_source</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Python 2</span>
-            <span class="c1"># TODO __code__ and __globals__ should even work in Python 2</span>
-            <span class="n">func_code</span><span class="p">,</span> <span class="n">func_globals</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">func_code</span><span class="p">,</span> <span class="n">function</span><span class="o">.</span><span class="n">func_globals</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="c1"># Python 3</span>
-            <span class="n">func_code</span><span class="p">,</span> <span class="n">func_globals</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">__code__</span><span class="p">,</span> <span class="n">function</span><span class="o">.</span><span class="n">__globals__</span>
+        <span class="n">func_code</span>    <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">__code__</span>
+        <span class="n">func_globals</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">__globals__</span>
+        <span class="n">func_name</span>    <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">__name__</span>
 
         <span class="c1"># known limitation: cannot use from stdin</span>
         <span class="k">if</span> <span class="n">func_code</span><span class="o">.</span><span class="n">co_filename</span> <span class="o">==</span> <span class="s1">&#39;&lt;stdin&gt;&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot use `get_source` on function defined interactively.&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">func_code</span><span class="o">.</span><span class="n">co_names</span><span class="p">:</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">func_globals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">obj</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_source</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="n">func_name</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">func_globals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">obj</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_source</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
 
         <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">function</span><span class="p">))</span>
 
@@ -160,7 +161,7 @@
 
 <div class="viewcode-block" id="get_top_level_function_name"><a class="viewcode-back" href="../../featurefactory.html#featurefactory.util.get_top_level_function_name">[docs]</a><span class="k">def</span> <span class="nf">get_top_level_function_name</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="n">remove_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;__builtins__&quot;</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;Figure out which is the top-level function in a namespace.</span>
-<span class="sd">    </span>
+
 <span class="sd">    The top-level function is defined as the function that is not a name in any</span>
 <span class="sd">    other functions.  co_names is a tuple of local names.  We could make more</span>
 <span class="sd">    efficient, using constant lookups of names, stopping when there is only name</span>
@@ -230,7 +231,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="c1"># first, write source to a file</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
         <span class="n">module_name</span> <span class="o">=</span> <span class="s2">&quot;temp&quot;</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">module_name</span> <span class="o">+</span> <span class="s2">&quot;.py&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -240,7 +241,6 @@
         <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
         <span class="n">top_level_name</span> <span class="o">=</span> <span class="n">get_top_level_function_name</span><span class="p">(</span><span class="n">module</span><span class="p">,</span>
                 <span class="n">remove_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;__builtins__&quot;</span><span class="p">,</span> <span class="s2">&quot;__cached__&quot;</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">,</span>
                               <span class="s2">&quot;__file__&quot;</span><span class="p">,</span> <span class="s2">&quot;__loader__&quot;</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span>
@@ -257,7 +257,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    dataset : dict mapping str to pd.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">()</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">xxh64</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
         <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">to_msgpack</span><span class="p">())</span>
 
@@ -269,7 +269,7 @@
         <span class="n">obj_enc</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">obj_enc</span> <span class="o">=</span> <span class="n">obj</span>
-    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">obj_enc</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">obj_enc</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 <span class="nd">@contextmanager</span>
 <div class="viewcode-block" id="possibly_talking_action"><a class="viewcode-back" href="../../featurefactory.html#featurefactory.util.possibly_talking_action">[docs]</a><span class="k">def</span> <span class="nf">possibly_talking_action</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -277,7 +277,7 @@
 
 <span class="sd">    Simply prints action before executing statement, without a trailing</span>
 <span class="sd">    newline, and prints &#39;done&#39; afterwards.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    action : str</span>
@@ -300,8 +300,17 @@
     <span class="n">vprint</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">yield</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">vprint</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span></div>
+        <span class="n">vprint</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">vprint</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="is_positive_env"><a class="viewcode-back" href="../../featurefactory.html#featurefactory.util.is_positive_env">[docs]</a><span class="k">def</span> <span class="nf">is_positive_env</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;Yes&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;totally&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
 </pre></div>
 
           </div>
@@ -332,7 +341,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.modeling.model &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.modeling.model &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -81,11 +81,11 @@
         <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ROC AUC&quot;</span>   <span class="p">,</span> <span class="s2">&quot;scoring&quot;</span> <span class="p">:</span> <span class="s2">&quot;roc_auc&quot;</span> <span class="p">},</span>
     <span class="p">]</span>
     <span class="n">REGRESSION_SCORING</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Mean Squared Error&quot;</span> <span class="p">,</span> <span class="s2">&quot;scoring&quot;</span> <span class="p">:</span> <span class="s2">&quot;mean_squared_error&quot;</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Root Mean Squared Error&quot;</span> <span class="p">,</span> <span class="s2">&quot;scoring&quot;</span> <span class="p">:</span> <span class="s2">&quot;root_mean_squared_error&quot;</span> <span class="p">},</span>
         <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;R-squared&quot;</span>          <span class="p">,</span> <span class="s2">&quot;scoring&quot;</span> <span class="p">:</span> <span class="s2">&quot;r2&quot;</span> <span class="p">},</span>
     <span class="p">]</span>
 
-    <span class="n">BINARY_METRIC_AGGREGATION</span> <span class="o">=</span> <span class="s2">&quot;average&quot;</span>
+    <span class="n">BINARY_METRIC_AGGREGATION</span> <span class="o">=</span> <span class="s2">&quot;micro&quot;</span>
     <span class="n">MULTICLASS_METRIC_AGGREGATION</span> <span class="o">=</span> <span class="s2">&quot;micro&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_type</span><span class="p">):</span>
@@ -97,6 +97,83 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<div class="viewcode-block" id="Model.compute_metrics"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.compute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kind</span><span class="o">==</span><span class="s2">&quot;cv&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics_cv</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kind</span><span class="o">==</span><span class="s2">&quot;train_test&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics_train_test</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad kind: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kind</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Model.compute_metrics_cv"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.compute_metrics_cv">[docs]</a>    <span class="k">def</span> <span class="nf">compute_metrics_cv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute cross-validated metrics.</span>
+
+<span class="sd">        Trains this model on data X with labels Y.</span>
+
+<span class="sd">        Returns a MetricList with the name, scoring type, and value for each</span>
+<span class="sd">        Metric. Note that these values may be numpy floating points, and should</span>
+<span class="sd">        be converted prior to insertion in a database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy array-like or pd.DataFrame</span>
+<span class="sd">            data</span>
+<span class="sd">        Y : numpy array-like or pd.DataFrame or pd.DataSeries</span>
+<span class="sd">            labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">scorings</span><span class="p">,</span> <span class="n">scorings_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_scorings</span><span class="p">()</span>
+
+        <span class="c1"># compute scores</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_score_mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">scorings_</span><span class="p">)</span>
+
+        <span class="c1"># unpack into MetricList</span>
+        <span class="n">metric_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores_to_metriclist</span><span class="p">(</span><span class="n">scorings</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metric_list</span></div>
+
+<div class="viewcode-block" id="Model.compute_metrics_train_test"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.compute_metrics_train_test">[docs]</a>    <span class="k">def</span> <span class="nf">compute_metrics_train_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute metrics on test set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_matrices</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">Y</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">n</span><span class="p">:],</span> <span class="n">Y</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+        <span class="n">scorings</span><span class="p">,</span> <span class="n">scorings_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_scorings</span><span class="p">()</span>
+
+        <span class="c1"># Determine binary/multiclass classification</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_params</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
+
+        <span class="c1"># fit model on entire training set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">scoring</span> <span class="ow">in</span> <span class="n">scorings_</span><span class="p">:</span>
+            <span class="n">scores</span><span class="p">[</span><span class="n">scoring</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_scoring</span><span class="p">(</span><span class="n">scoring</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>
+
+        <span class="n">metric_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores_to_metriclist</span><span class="p">(</span><span class="n">scorings</span><span class="p">,</span> <span class="n">scores</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metric_list</span></div>
+
+    <span class="k">def</span> <span class="nf">_do_scoring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scoring</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span>
+            <span class="n">failure_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Make and evaluate predictions. Note that ROC AUC may raise</span>
+        <span class="c1"># exception if somehow we only have examples from one class in</span>
+        <span class="c1"># a given fold.</span>
+        <span class="n">Y_test_transformed</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">scoring</span><span class="p">][</span><span class="s2">&quot;pred_transformer&quot;</span><span class="p">](</span><span class="n">Y_test</span><span class="p">)</span>
+        <span class="n">Y_test_pred</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">scoring</span><span class="p">][</span><span class="s2">&quot;predictor&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">scoring</span><span class="p">][</span><span class="s2">&quot;scorer&quot;</span><span class="p">](</span><span class="n">Y_test_transformed</span><span class="p">,</span> <span class="n">Y_test_pred</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">failure_value</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span>
+
+        <span class="k">return</span> <span class="n">score</span>
 
 <div class="viewcode-block" id="Model.cv_score_mean"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.cv_score_mean">[docs]</a>    <span class="k">def</span> <span class="nf">cv_score_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">scorings</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute mean score across cross validation folds.</span>
@@ -115,61 +192,14 @@
 <span class="sd">        scorings : list of str</span>
 <span class="sd">            scoring types</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># 1d arrays are deprecated by sklearn 0.17 (?)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_matrices</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 
         <span class="n">scorings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scorings</span><span class="p">)</span>
 
         <span class="c1"># Determine binary/multiclass classification</span>
-        <span class="n">n_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">n_classes</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">metric_aggregation</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">MULTICLASS_METRIC_AGGREGATION</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">metric_aggregation</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">BINARY_METRIC_AGGREGATION</span>
-
-        <span class="c1"># Determine predictor (labels, label probabilities, or values) and</span>
-        <span class="c1"># scoring function.</span>
-        <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">predict_prob_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">roc_auc_scorer</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
-            <span class="n">y_true</span> <span class="o">=</span> <span class="n">label_binarize</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                <span class="nb">range</span><span class="p">(</span><span class="n">n_classes</span><span class="p">)])</span>
-            <span class="k">return</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
-                    <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">)</span>
-
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;accuracy&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;precision&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_score</span><span class="p">(</span>
-                        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">),</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;recall&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_score</span><span class="p">(</span>
-                        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">),</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;roc_auc&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_prob_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">roc_auc_scorer</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;mean_squared_error&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;r2&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict_fn</span><span class="p">,</span>
-                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span>
-            <span class="p">},</span>
-        <span class="p">}</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_params</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_classification</span><span class="p">():</span>
             <span class="n">kf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="o">+</span><span class="mi">3</span><span class="p">)</span>
@@ -186,15 +216,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">scoring</span> <span class="ow">in</span> <span class="n">scorings</span><span class="p">:</span>
-                <span class="c1"># Make and evaluate predictions. Note that ROC AUC may raise</span>
-                <span class="c1"># exception if somehow we only have examples from one class in</span>
-                <span class="c1"># a given fold.</span>
-                <span class="n">Y_test_pred</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">scoring</span><span class="p">][</span><span class="s2">&quot;predictor&quot;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">score</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">scoring</span><span class="p">][</span><span class="s2">&quot;scorer&quot;</span><span class="p">](</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_test_pred</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_scoring</span><span class="p">(</span><span class="n">scoring</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span>
+                        <span class="n">Y_test</span><span class="p">,</span> <span class="n">failure_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                 <span class="n">scoring_outputs</span><span class="p">[</span><span class="n">scoring</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">scoring</span> <span class="ow">in</span> <span class="n">scoring_outputs</span><span class="p">:</span>
@@ -205,44 +228,9 @@
 
         <span class="k">return</span> <span class="n">scoring_outputs</span></div>
 
-<div class="viewcode-block" id="Model.compute_metrics"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.compute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compute cross-validated metrics.</span>
-<span class="sd">        </span>
-<span class="sd">        Trains this model on data X with labels Y.</span>
-
-<span class="sd">        Returns a MetricList with the name, scoring type, and value for each</span>
-<span class="sd">        Metric. Note that these values may be numpy floating points, and should</span>
-<span class="sd">        be converted prior to insertion in a database.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : numpy array-like or pd.DataFrame</span>
-<span class="sd">            data</span>
-<span class="sd">        Y : numpy array-like or pd.DataFrame or pd.DataSeries</span>
-<span class="sd">            labels</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># just ensure that we np for everything</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
-
-        <span class="c1"># scoring_types maps user-readable name to `scoring`, as argument to</span>
-        <span class="c1"># cross_val_score</span>
-        <span class="c1"># See also http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_classification</span><span class="p">():</span>
-            <span class="n">scoring_list</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">CLASSIFICATION_SCORING</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_regression</span><span class="p">():</span>
-            <span class="n">scoring_list</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">REGRESSION_SCORING</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-        <span class="c1"># compute scores</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_score_mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">scorings</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;scoring&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span>
-            <span class="n">scoring_list</span><span class="p">])</span>
-
-        <span class="c1"># unpack into MetricList</span>
+<div class="viewcode-block" id="Model.scores_to_metriclist"><a class="viewcode-back" href="../../../featurefactory.modeling.html#featurefactory.modeling.model.Model.scores_to_metriclist">[docs]</a>    <span class="k">def</span> <span class="nf">scores_to_metriclist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scorings</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
         <span class="n">metric_list</span> <span class="o">=</span> <span class="n">MetricList</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">scoring_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">scorings</span><span class="p">:</span>
             <span class="n">name</span>    <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
             <span class="n">scoring</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;scoring&quot;</span><span class="p">]</span>
 
@@ -259,7 +247,115 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_type</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span>
 
     <span class="k">def</span> <span class="nf">_is_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_type</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_type</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classes</span><span class="p">):</span>
+        <span class="n">n_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
+        <span class="n">is_binary</span> <span class="o">=</span> <span class="n">n_classes</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">is_binary</span><span class="p">:</span>
+            <span class="n">metric_aggregation</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">BINARY_METRIC_AGGREGATION</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metric_aggregation</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">MULTICLASS_METRIC_AGGREGATION</span>
+
+        <span class="c1"># Determine predictor (labels, label probabilities, or values) and</span>
+        <span class="c1"># scoring function.</span>
+
+        <span class="c1"># predictors</span>
+        <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">predict_prob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+        <span class="c1"># transformers</span>
+        <span class="k">def</span> <span class="nf">noop</span><span class="p">(</span><span class="n">y_true</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">y_true</span>
+        <span class="k">def</span> <span class="nf">transformer_binarize</span><span class="p">(</span><span class="n">y_true</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">label_binarize</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+
+        <span class="c1"># scorers</span>
+        <span class="c1"># nothing here</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;accuracy&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;precision&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_score</span><span class="p">(</span>
+                        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;recall&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_score</span><span class="p">(</span>
+                        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;roc_auc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span> <span class="k">if</span> <span class="n">is_binary</span> <span class="k">else</span> <span class="n">predict_prob</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span> <span class="k">if</span> <span class="n">is_binary</span> <span class="k">else</span> <span class="n">transformer_binarize</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">roc_auc_score</span><span class="p">(</span>
+                    <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="n">metric_aggregation</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;root_mean_squared_error&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span>
+                        <span class="n">y_pred</span><span class="p">)),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;r2&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;predictor&quot;</span> <span class="p">:</span> <span class="n">predict</span><span class="p">,</span>
+                <span class="s2">&quot;pred_transformer&quot;</span> <span class="p">:</span> <span class="n">noop</span><span class="p">,</span>
+                <span class="s2">&quot;scorer&quot;</span> <span class="p">:</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">params</span>
+
+    <span class="k">def</span> <span class="nf">_get_scorings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get scorings for this problem type.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scorings : list of dict</span>
+<span class="sd">            Information on metric name and associated &quot;scoring&quot; as defined in</span>
+<span class="sd">            sklearn.metrics</span>
+<span class="sd">        scorings_ : list</span>
+<span class="sd">            List of &quot;scoring&quot; as defined in sklearn.metrics. This is a &quot;utility</span>
+<span class="sd">            variable&quot; that can be used where we just need the names of the</span>
+<span class="sd">            scoring functions and not the more complete information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># scoring_types maps user-readable name to `scoring`, as argument to</span>
+        <span class="c1"># cross_val_score</span>
+        <span class="c1"># See also http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_classification</span><span class="p">():</span>
+            <span class="n">scorings</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">CLASSIFICATION_SCORING</span>
+            <span class="n">scorings_</span><span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;scoring&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scorings</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_regression</span><span class="p">():</span>
+            <span class="n">scorings</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">REGRESSION_SCORING</span>
+            <span class="n">scorings_</span><span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;scoring&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scorings</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">return</span> <span class="n">scorings</span><span class="p">,</span> <span class="n">scorings_</span>
+
+    <span class="k">def</span> <span class="nf">_format_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+
+        <span class="c1"># ensure that we use np for everything</span>
+        <span class="c1"># *don&#39;t* use 1d array for X</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># *do* use 1d array for Y</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Target matrix has too many columns: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span></div>
 </pre></div>
 
           </div>
@@ -290,7 +386,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

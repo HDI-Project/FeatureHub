@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.modeling package &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.modeling package &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -163,7 +163,7 @@ performance metrics.</p>
 </dl>
 <dl class="attribute">
 <dt id="featurefactory.modeling.model.Model.BINARY_METRIC_AGGREGATION">
-<code class="descname">BINARY_METRIC_AGGREGATION</code><em class="property"> = 'average'</em><a class="headerlink" href="#featurefactory.modeling.model.Model.BINARY_METRIC_AGGREGATION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">BINARY_METRIC_AGGREGATION</code><em class="property"> = 'micro'</em><a class="headerlink" href="#featurefactory.modeling.model.Model.BINARY_METRIC_AGGREGATION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -173,7 +173,7 @@ performance metrics.</p>
 
 <dl class="attribute">
 <dt id="featurefactory.modeling.model.Model.CLASSIFICATION_SCORING">
-<code class="descname">CLASSIFICATION_SCORING</code><em class="property"> = [{'scoring': 'accuracy', 'name': 'Accuracy'}, {'scoring': 'precision', 'name': 'Precision'}, {'scoring': 'recall', 'name': 'Recall'}, {'scoring': 'roc_auc', 'name': 'ROC AUC'}]</em><a class="headerlink" href="#featurefactory.modeling.model.Model.CLASSIFICATION_SCORING" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CLASSIFICATION_SCORING</code><em class="property"> = [{'name': 'Accuracy', 'scoring': 'accuracy'}, {'name': 'Precision', 'scoring': 'precision'}, {'name': 'Recall', 'scoring': 'recall'}, {'name': 'ROC AUC', 'scoring': 'roc_auc'}]</em><a class="headerlink" href="#featurefactory.modeling.model.Model.CLASSIFICATION_SCORING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -188,12 +188,17 @@ performance metrics.</p>
 
 <dl class="attribute">
 <dt id="featurefactory.modeling.model.Model.REGRESSION_SCORING">
-<code class="descname">REGRESSION_SCORING</code><em class="property"> = [{'scoring': 'mean_squared_error', 'name': 'Mean Squared Error'}, {'scoring': 'r2', 'name': 'R-squared'}]</em><a class="headerlink" href="#featurefactory.modeling.model.Model.REGRESSION_SCORING" title="Permalink to this definition">¶</a></dt>
+<code class="descname">REGRESSION_SCORING</code><em class="property"> = [{'name': 'Root Mean Squared Error', 'scoring': 'root_mean_squared_error'}, {'name': 'R-squared', 'scoring': 'r2'}]</em><a class="headerlink" href="#featurefactory.modeling.model.Model.REGRESSION_SCORING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="featurefactory.modeling.model.Model.compute_metrics">
-<code class="descname">compute_metrics</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/modeling/model.html#Model.compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.modeling.model.Model.compute_metrics" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compute_metrics</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>kind='cv'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/modeling/model.html#Model.compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.modeling.model.Model.compute_metrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.modeling.model.Model.compute_metrics_cv">
+<code class="descname">compute_metrics_cv</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/modeling/model.html#Model.compute_metrics_cv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.modeling.model.Model.compute_metrics_cv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute cross-validated metrics.</p>
 <p>Trains this model on data X with labels Y.</p>
 <p>Returns a MetricList with the name, scoring type, and value for each
@@ -205,6 +210,12 @@ be converted prior to insertion in a database.</p>
 <dt>Y <span class="classifier-delimiter">:</span> <span class="classifier">numpy array-like or pd.DataFrame or pd.DataSeries</span></dt>
 <dd>labels</dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.modeling.model.Model.compute_metrics_train_test">
+<code class="descname">compute_metrics_train_test</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/modeling/model.html#Model.compute_metrics_train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.modeling.model.Model.compute_metrics_train_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute metrics on test set.</p>
 </dd></dl>
 
 <dl class="method">
@@ -224,6 +235,11 @@ scoring to score.</p>
 <dd>scoring types</dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="featurefactory.modeling.model.Model.scores_to_metriclist">
+<code class="descname">scores_to_metriclist</code><span class="sig-paren">(</span><em>scorings</em>, <em>scores</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/modeling/model.html#Model.scores_to_metriclist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.modeling.model.Model.scores_to_metriclist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -280,7 +296,7 @@ scoring to score.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

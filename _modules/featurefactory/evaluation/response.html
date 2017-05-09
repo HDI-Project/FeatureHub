@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.evaluation.response &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.evaluation.response &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,6 +51,7 @@
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Response</span>
 <span class="kn">from</span> <span class="nn">featurefactory.modeling</span> <span class="k">import</span> <span class="n">MetricList</span>
+<span class="kn">from</span> <span class="nn">featurefactory.util</span> <span class="k">import</span> <span class="n">TRY_AGAIN_LATER</span>
 
 <div class="viewcode-block" id="EvaluationResponse"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.response.EvaluationResponse">[docs]</a><span class="k">class</span> <span class="nc">EvaluationResponse</span><span class="p">(</span><span class="n">Response</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Wrapper class for response from evaluation server.</span>
@@ -62,6 +63,7 @@
 <span class="sd">    metrics : list of Metric, optional (default=None)</span>
 <span class="sd">        List of Metric objects, which each encode metric name, metric scoring</span>
 <span class="sd">        method, and value.</span>
+<span class="sd">    topic_url : str</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -76,15 +78,15 @@
     <span class="n">STATUS_CODE_SERVER_ERROR</span>      <span class="o">=</span> <span class="s2">&quot;server_error&quot;</span>
     <span class="n">STATUS_CODE_DB_ERROR</span>          <span class="o">=</span> <span class="s2">&quot;db_error&quot;</span>
 
-    <span class="n">try_again</span> <span class="o">=</span> <span class="s2">&quot;Please try again later or contact administrator.&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">STATUS_CODE_OKAY</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">STATUS_CODE_OKAY</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">topic_url</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricList</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
 
         <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;status_code&quot;</span> <span class="p">:</span> <span class="n">status_code</span><span class="p">,</span>
             <span class="s2">&quot;metrics&quot;</span>     <span class="p">:</span> <span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;topic_url&quot;</span>   <span class="p">:</span> <span class="n">topic_url</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">mimetype</span> <span class="o">=</span> <span class="s2">&quot;application/json&quot;</span>
@@ -93,6 +95,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">=</span> <span class="n">status_code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic_url</span> <span class="o">=</span> <span class="n">topic_url</span>
+
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="EvaluationResponse.from_string"><a class="viewcode-back" href="../../../featurefactory.evaluation.html#featurefactory.evaluation.response.EvaluationResponse.from_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
@@ -111,8 +115,9 @@
 
         <span class="n">status_code</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;status_code&quot;</span><span class="p">]</span>
         <span class="n">metrics</span>     <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span>
+        <span class="n">topic_url</span>   <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;topic_url&quot;</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">topic_url</span><span class="o">=</span><span class="n">topic_url</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_explanation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return an explanation of the response status code.&quot;&quot;&quot;</span>
@@ -120,25 +125,31 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_OKAY</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;Feature registered successfully.&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_BAD_REQUEST</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Oops -- failed to communicate with server. &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">try_again</span>
+            <span class="k">return</span> <span class="s2">&quot;Oops -- failed to communicate with server. &quot;</span> \
+                <span class="o">+</span> <span class="n">TRY_AGAIN_LATER</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_BAD_AUTH</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Oops -- couldn&#39;t verify your identity. &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">try_again</span>
+            <span class="k">return</span> <span class="s2">&quot;Oops -- couldn&#39;t verify your identity. &quot;</span> \
+                <span class="o">+</span> <span class="n">TRY_AGAIN_LATER</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_BAD_FEATURE</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Feature is invalid and not registered. Try cross &quot;</span> <span class="o">+</span> \
-                    <span class="s2">&quot;validating it locally to see your problems.&quot;</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Feature is invalid and not registered. Try evaluating&quot;</span>
+                    <span class="s2">&quot; it locally to see your problems.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_DUPLICATE_FEATURE</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;Feature is already registered.&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_SERVER_ERROR</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Oops -- server failed to evaluate your feature. &quot;</span> <span class="o">+</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">try_again</span>
+            <span class="k">return</span> <span class="s2">&quot;Oops -- server failed to evaluate your feature. &quot;</span> \
+                <span class="o">+</span> <span class="n">TRY_AGAIN_LATER</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS_CODE_DB_ERROR</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Oops -- failed to register feature with database. &quot;</span> <span class="o">+</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">try_again</span> 
+            <span class="k">return</span> <span class="s2">&quot;Oops -- failed to register feature with database. &quot;</span> \
+                <span class="o">+</span> <span class="n">TRY_AGAIN_LATER</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_get_metrics_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MetricList</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_topic_url_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">topic_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topic_url</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">topic_url</span> <span class="k">else</span> <span class="s2">&quot;&lt;not available&gt;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;Feature posted to forum =&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">topic_url</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return string representation of response.</span>
@@ -148,7 +159,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">explanation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_explanation</span><span class="p">()</span>
         <span class="n">metrics_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metrics_str</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">explanation</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">metrics_str</span></div>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">explanation</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">metrics_str</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">topic_url</span><span class="p">:</span>
+            <span class="n">topic_url_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_topic_url_str</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">topic_url_str</span>
+        <span class="k">return</span> <span class="n">result</span></div>
 </pre></div>
 
           </div>
@@ -179,7 +194,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Feature Factory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>featurefactory.admin package &#8212; Feature Factory 0.2.0 documentation</title>
+    <title>featurefactory.admin package &#8212; Feature Factory 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -51,65 +51,52 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-featurefactory.admin.admin">
-<span id="featurefactory-admin-admin-module"></span><h2>featurefactory.admin.admin module<a class="headerlink" href="#module-featurefactory.admin.admin" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="featurefactory.admin.admin.Commands">
-<em class="property">class </em><code class="descclassname">featurefactory.admin.admin.</code><code class="descname">Commands</code><span class="sig-paren">(</span><em>problem=None</em>, <em>database='featurefactory'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Admin interface for the database.</p>
-<p>Create the schema, add or remove problems, and view problems, users, and
-features.</p>
-<dl class="method">
-<dt id="featurefactory.admin.admin.Commands.create_problem">
-<code class="descname">create_problem</code><span class="sig-paren">(</span><em>name</em>, <em>problem_type</em>, <em>data_path</em>, <em>files</em>, <em>table_names</em>, <em>target_table_name</em>, <em>y_column</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.create_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.create_problem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new problem entry in database.</p>
-<p>name : str
-problem_type : str
-data_path : str</p>
-<blockquote>
-<div>Absolute path of containing directory of data files.</div></blockquote>
-<dl class="docutils">
-<dt>files <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
-<dd>List of file paths relative to data_path</dd>
-<dt>table_names <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
-<dd>List of table names, corresponding exactly to files</dd>
-<dt>target_table_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Name of table that contains the target variable (label). Must be
-found in table_names.</dd>
-<dt>y_column <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Name of column in target_table_name that identifies the target
-variable.</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.admin.admin.Commands.get_features">
-<code class="descname">get_features</code><span class="sig-paren">(</span><em>user_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.get_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.get_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a DataFrame with the details about all registered features.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.admin.admin.Commands.get_problems">
-<code class="descname">get_problems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.get_problems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.get_problems" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of problems in the database.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.admin.admin.Commands.set_up">
-<code class="descname">set_up</code><span class="sig-paren">(</span><em>drop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/admin.html#Commands.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.admin.Commands.set_up" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new DB and create the initial scheme.</p>
-<dl class="docutils">
-<dt>drop <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
-<dd>Drop database if it already exists.</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="featurefactory-admin-admin-module">
+<h2>featurefactory.admin.admin module<a class="headerlink" href="#featurefactory-admin-admin-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-featurefactory.admin.sqlalchemy_declarative">
 <span id="featurefactory-admin-sqlalchemy-declarative-module"></span><h2>featurefactory.admin.sqlalchemy_declarative module<a class="headerlink" href="#module-featurefactory.admin.sqlalchemy_declarative" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt">
+<em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">EvaluationAttempt</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#EvaluationAttempt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.code">
+<code class="descname">code</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.created_at">
+<code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.id">
+<code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.problem">
+<code class="descname">problem</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.problem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.problem_id">
+<code class="descname">problem_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.problem_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.user">
+<code class="descname">user</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.user_id">
+<code class="descname">user_id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.EvaluationAttempt.user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Feature">
 <em class="property">class </em><code class="descclassname">featurefactory.admin.sqlalchemy_declarative.</code><code class="descname">Feature</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature" title="Permalink to this definition">¶</a></dt>
@@ -130,6 +117,11 @@ variable.</dd>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.feature_dill_quoted">
+<code class="descname">feature_dill_quoted</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.feature_dill_quoted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Feature.id">
 <code class="descname">id</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -137,6 +129,11 @@ variable.</dd>
 <dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Feature.md5">
 <code class="descname">md5</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.md5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Feature.metrics">
+<code class="descname">metrics</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Feature.metrics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -212,8 +209,33 @@ variable.</dd>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.data_path">
-<code class="descname">data_path</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.data_path" title="Permalink to this definition">¶</a></dt>
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.data_dir_test">
+<code class="descname">data_dir_test</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.data_dir_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.data_dir_train">
+<code class="descname">data_dir_train</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.data_dir_train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.entities_featurized_table_name">
+<code class="descname">entities_featurized_table_name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.entities_featurized_table_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.entities_table_name">
+<code class="descname">entities_table_name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.entities_table_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.evaluationattempts">
+<code class="descname">evaluationattempts</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.evaluationattempts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.features">
+<code class="descname">features</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -237,6 +259,11 @@ variable.</dd>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.problem_type_details">
+<code class="descname">problem_type_details</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.problem_type_details" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Problem.table_names">
 <code class="descname">table_names</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.table_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -244,16 +271,6 @@ variable.</dd>
 <dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.Problem.target_table_name">
 <code class="descname">target_table_name</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.target_table_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.urlencode">
-<code class="descname">urlencode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurefactory/admin/sqlalchemy_declarative.html#Problem.urlencode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.urlencode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="featurefactory.admin.sqlalchemy_declarative.Problem.y_column">
-<code class="descname">y_column</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.Problem.y_column" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -265,6 +282,16 @@ variable.</dd>
 <dl class="attribute">
 <dt id="featurefactory.admin.sqlalchemy_declarative.User.created_at">
 <code class="descname">created_at</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User.evaluationattempts">
+<code class="descname">evaluationattempts</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.evaluationattempts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurefactory.admin.sqlalchemy_declarative.User.features">
+<code class="descname">features</code><a class="headerlink" href="#featurefactory.admin.sqlalchemy_declarative.User.features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -323,7 +350,7 @@ user with admin permissions.</dd>
   <ul>
 <li><a class="reference internal" href="#">featurefactory.admin package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-featurefactory.admin.admin">featurefactory.admin.admin module</a></li>
+<li><a class="reference internal" href="#featurefactory-admin-admin-module">featurefactory.admin.admin module</a></li>
 <li><a class="reference internal" href="#module-featurefactory.admin.sqlalchemy_declarative">featurefactory.admin.sqlalchemy_declarative module</a></li>
 <li><a class="reference internal" href="#module-featurefactory.admin.sqlalchemy_main">featurefactory.admin.sqlalchemy_main module</a></li>
 <li><a class="reference internal" href="#module-featurefactory.admin">Module contents</a></li>
@@ -361,7 +388,7 @@ user with admin permissions.</dd>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
