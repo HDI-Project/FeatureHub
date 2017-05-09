@@ -70,12 +70,19 @@
 <li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
 </li>
 <li><p class="first">Download the FeatureFactory repository.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">HDI</span><span class="o">-</span><span class="n">Project</span><span class="o">/</span><span class="n">FeatureFactory</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureFactory.git
+</pre></div>
+</div>
+</li>
+<li><p class="first">Ensure Python 3 is installed. On Amazon AMI:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>yum update -y
+yum install -y python35 python35-pip
+pip-3.5 install --upgrade pip
 </pre></div>
 </div>
 </li>
 <li><p class="first">Install Python requirements for the host.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">deploy</span><span class="o">/</span><span class="n">requirements</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="n">txt</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install -r deploy/requirements-host.txt
 </pre></div>
 </div>
 </li>
@@ -97,7 +104,7 @@
 executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
 <li><code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You should generate a valid
 API token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_DOMAIN_NAME</span></code> :</li>
+<li><code class="docutils literal"><span class="pre">DISCOURSE_DOMAIN_NAME</span></code> : domain name of the Discourse forum</li>
 <li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_USERNAME</span></code> : Username for Discourse admin, to use with Discourse API
 client. You must use the same username when setting up the Discourse instance.</li>
 <li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_TOKEN</span></code> : API token for Discourse API client. You should generate a

@@ -15,12 +15,19 @@ A variety of resources facilitate easy deployment of Feature Factory:
 1. Install [Docker Engine](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) on your system.
 
 2. Download the FeatureFactory repository.
-    ```
+    ```bash
     git clone https://github.com/HDI-Project/FeatureFactory.git
     ```
 
-3. Install Python requirements for the host.
+3. Ensure Python 3 is installed. On Amazon AMI:
+    ```bash
+    yum update -y
+    yum install -y python35 python35-pip
+    pip-3.5 install --upgrade pip
     ```
+
+3. Install Python requirements for the host.
+    ```bash
     pip install -r deploy/requirements-host.txt
     ```
 
@@ -44,7 +51,7 @@ Definitely override values for these variables:
     executing `openssl rand -hex 32`.
 - `HUB_CLIENT_API_TOKEN` : API token for Hub API client script. You should generate a valid
     API token by executing `openssl rand -hex 32`.
-- `DISCOURSE_DOMAIN_NAME` :
+- `DISCOURSE_DOMAIN_NAME` : domain name of the Discourse forum
 - `DISCOURSE_CLIENT_API_USERNAME` : Username for Discourse admin, to use with Discourse API
     client. You must use the same username when setting up the Discourse instance.
 - `DISCOURSE_CLIENT_API_TOKEN` : API token for Discourse API client. You should generate a
