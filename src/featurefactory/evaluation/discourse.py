@@ -38,6 +38,7 @@ _template = \
 * _Problem name_: {problem_name}
 * _Feature description_: {feature_description}
 * _Feature code_:
+
 {feature_code}
 
 * _Feature metrics_:
