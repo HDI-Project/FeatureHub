@@ -118,9 +118,9 @@ make up
 
 ## User and data management
 
-Users can be added or deleted using `deploy/add_user.sh` and `deploy/delete_user.sh`. These
-commands create user accounts on the hub container, setup notebooks templates, and setup
-authentication for each user with the DB.
+Users can be added or deleted using `deploy/users.py`. This utility creates user accounts on
+the hub container, sets up notebooks templates, sets up authentication for each user with
+the DB, and optionally sets up user accounts on the Discourse forum.
 
 Most files are stored directly on the host machine and mounted in the Hub and User
 containers:
@@ -141,14 +141,13 @@ Admins can perform administrative tasks with respect to the Feature Factory app 
 the Feature Factory data science experiment. Admin users can manage and organize an
 experiment without needing access to the host machine.
 
-Create an admin user using `add_user.sh -a admin_username admin_password`.
+Create an admin user using `users.py add --admin=True admin_username admin_password`.
 
 App admin
 
 - Can log into JupyterHub via the admin web interface and add/remove users, restart/shutdown
     notebooks, and more.
-- Can also create/remove users from the host machine command line using `add_user.sh` and
-    `delete_user.sh`.
+- Can also create/remove users from the host machine command line using `users.py`.
 - Can modify the experiment database.
 
 Experiment admin

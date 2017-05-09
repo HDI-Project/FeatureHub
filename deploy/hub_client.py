@@ -4,40 +4,19 @@ import os
 from jupyterhub_client import JupyterHubClient
 import fire
 
-class HubClient(object):
-    def __init__(self):
-        self.load_config()
+from deploy_util import get_config
 
-        hub_api_token = self.c["HUB_CLIENT_API_TOKEN"]
-        hub_api_url = "http://{}:{}/hub/api".format(
-            "127.0.0.1",
-            self.c["HUB_API_PORT"]
-        )
-        self.hub = JupyterHubClient(token=hub_api_token, url=hub_api_url)
+def _create_hub_client():
+    c = get_config()
 
-    def load_config(self):
-        # load config vars
-        self.c = {}
-        script_dir = os.path.dirname(__file__)
-        self.c.update(self._read_config(os.path.join(script_dir,".env")))
-        self.c.update(self._read_config(os.path.join(script_dir,".env.local")))
+    hub_api_token = c["HUB_CLIENT_API_TOKEN"]
+    hub_api_url = "http://{}:{}/hub/api".format(
+        "127.0.0.1",
+        c["HUB_API_PORT"]
+    )
+    return JupyterHubClient(token=hub_api_token, url=hub_api_url)
 
-    @staticmethod
-    def _read_config(filename):
-        """
-        Read config file into `c`. Variables in config file are formatted
-        as `KEY=VALUE`.
-        """
-
-        c = {}
-        with open(filename, "r") as f:
-            for line in f:
-                key, val = line.split("=")
-                key = key.strip()
-                val = val.strip()
-                c[key] = val
-        return c
+hub_client = _create_hub_client()
 
 if __name__ == "__main__":
-    client = HubClient()
-    fire.Fire(client.hub)
+    fire.Fire(hub_client)

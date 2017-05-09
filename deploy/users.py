@@ -7,38 +7,19 @@ import shutil
 import subprocess
 import binascii
 import docker
-from pydiscourse import DiscourseClient
 from pydiscourse.exceptions import DiscourseClientError
 import fire
 
-from hub_client import HubClient
+from hub_client import hub_client
+from discourse_client import discourse_client
+from deploy_util import get_config
 
 MINIMUM_DOCKER_VERSION = (0,0,0)
 DISCOURSE_MIN_PASSWORD_LENGTH = 10
-c = None
-docker_client = None
-discourse_client = None
 
-def load_config():
-    # load config vars
+c = get_config()
 
-    def _read_config(filename):
-        c = {}
-        with open(filename, "r") as f:
-            for line in f:
-                key, val = line.split("=")
-                key = key.strip()
-                val = val.strip()
-                c[key] = val
-        return c
-
-    c = {}
-    script_dir = os.path.dirname(__file__)
-    c.update(_read_config(os.path.join(script_dir,".env")))
-    c.update(_read_config(os.path.join(script_dir,".env.local")))
-
-    return c
-
+docker_client    = None
 
 def add_user(username, password, admin=False, discourse=False, email=""):
     if discourse:
@@ -106,15 +87,9 @@ EOM
             "user={0}\n"
             "password={1}\n".format(username, password_mysql))
 
-    client = HubClient()
-    client.hub.create_user(name=username, admin=admin)
+    hub_client.create_user(name=username, admin=admin)
 
     if discourse:
-        discourse_client = DiscourseClient(
-            host="https://{}".format(c["DISCOURSE_DOMAIN_NAME"]),
-            api_username=c["DISCOURSE_CLIENT_API_USERNAME"],
-            api_key=c["DISCOURSE_CLIENT_API_TOKEN"])
-
         user = discourse_client.create_user(
             name = "",
             username = username,
@@ -122,12 +97,12 @@ EOM
             password = password,
             active = "true")
 
+        userid=user["user_id"]
         if not has_email:
             try:
-                userid = user["user_id"]
                 discourse_client._put("/admin/users/{0}/activate".format(userid))
             except DiscourseClientError:
-                print("Failed to activate user {}".format(user["username"]),
+                print("Failed to activate user {}".format(username),
                         file=sys.stderr)
 
         if c["DISCOURSE_FEATURE_GROUP_NAME"]:
@@ -145,9 +120,47 @@ EOM
             else:
                 print("Couldn't add to group (name not found).")
 
+def delete_user(username, discourse=False):
+
+    subprocess.call(\
+"""
+docker exec -i {hub_container_name} \
+    userdel -f {username}
+""".format(hub_container_name=c["HUB_CONTAINER_NAME"], username=username),
+        shell=True)
+
+    hub_client.delete_user(username)
+
+    subprocess.call(
+        "sudo rm -rf {ff_data_dir}/users/{username}".format(
+            ff_data_dir=c["FF_DATA_DIR"], username=username),
+        shell=True)
+
+
+    subprocess.call(\
+"""
+docker exec -i {mysql_container_name} \
+    mysql \
+        --user={mysql_root_username} \
+        --password={mysql_root_password} <<EOF
+DROP USER IF EXISTS '{username}'@'%';
+EOF
+""".format(mysql_container_name=c["MYSQL_CONTAINER_NAME"],
+           mysql_root_username=c["MYSQL_ROOT_USERNAME"],
+           mysql_root_password=c["MYSQL_ROOT_PASSWORD"],
+           username=username),
+        shell=True)
+
+    if discourse:
+        user = discourse_client.user(username)
+        userid = user["id"]
+        discourse_client.delete_user(userid)
+
 if __name__ == "__main__":
     assert docker.version_info >= MINIMUM_DOCKER_VERSION
     docker_client = docker.from_env(version="auto")
 
-    c = load_config()
-    fire.Fire(add_user)
+    fire.Fire({
+        "add": add_user,
+        "delete": delete_user,
+    })

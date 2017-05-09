@@ -20,10 +20,10 @@ make up
 sleep 15 # wait to complete
 
 # create users
-./add_user.py ${ADMIN_USERNAME} ${ADMIN_PASSWORD} --admin=True
-./add_user.py ${USER1_USERNAME} ${USER1_PASSWORD}
-./add_user.py ${USER2_USERNAME} ${USER2_PASSWORD}
-./add_user.py ${USER3_USERNAME} ${USER3_PASSWORD}
+./users.py add ${ADMIN_USERNAME} ${ADMIN_PASSWORD} --admin=True
+./users.py add ${USER1_USERNAME} ${USER1_PASSWORD}
+./users.py add ${USER2_USERNAME} ${USER2_PASSWORD}
+./users.py add ${USER3_USERNAME} ${USER3_PASSWORD}
 
 # start all containers
 ./hub_client.py start-server ${ADMIN_USERNAME}
