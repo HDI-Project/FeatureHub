@@ -315,7 +315,7 @@ if __name__ == "__main__":
     # run app
     host  = "0.0.0.0"
     port  = int(os.environ.get("EVAL_CONTAINER_PORT", 5000))
-    debug = bool(os.environ.get("EVAL_FLASK_DEBUG", False))
+    debug = is_positive_env(os.environ.get("EVAL_FLASK_DEBUG", False))
     app.run(
         host  = host,
         port  = port,

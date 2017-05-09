@@ -257,7 +257,7 @@ def possibly_talking_action(action, verbose=True):
 
 def is_positive_env(value):
     if value is not None:
-        return value in ["yes", "Yes", "y", "Y", "true", "True", 1, "1",
-        "totally"]
+        return value in ["yes", "Yes", "y", "Y", "true", "True", True, 1, "1",
+            "totally"]
 
     return False
