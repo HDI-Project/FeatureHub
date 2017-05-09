@@ -32,10 +32,10 @@ teardown_files:
 	sudo rm -rf $(FF_DATA_DIR)/{users,config,log}
 
 .PHONY: clean_all
-clean_all: clean kill_images kill_network
+clean_all: clean kill_images kill_network kill_secrets_volume
 
 .PHONY: clean
-clean: kill_containers teardown_files kill_volumes
+clean: kill_containers teardown_files kill_db_volumes
 
 .PHONY: kill_containers
 kill_containers:
@@ -59,9 +59,12 @@ volumes:
 	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(MYSQL_DATA_VOLUME_NAME)
 	@docker volume inspect $(SECRETS_VOLUME_NAME) >/dev/null 2>&1 || docker volume create --name $(SECRETS_VOLUME_NAME)
 
-.PHONY: kill_volumes
-kill_volumes:
+.PHONY: kill_db_volumes
+kill_db_volumes:
 	@docker volume inspect $(MYSQL_DATA_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(MYSQL_DATA_VOLUME_NAME) || echo "No volumes found."
+
+.PHONY: kill_secrets_volume
+kill_secrets_volume:
 	@docker volume inspect $(SECRETS_VOLUME_NAME) >/dev/null 2>&1 && docker volume rm $(SECRETS_VOLUME_NAME) || echo "No volumes found."
 
 .PHONY: build

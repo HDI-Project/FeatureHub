@@ -11,7 +11,12 @@ if [ ! -d "$archive_dir/$archive_name" ]; then
     mkdir -p $archive_dir/$archive_name
 fi
 
-sudo cp -r $FF_DATA_DIR/{config,data,users,problems,notebooks,log} $archive_dir/$archive_name
+for d in config data users problems notebooks log;
+do
+    if [ -d "$FF_DATA_DIR/$d" ]; then
+        sudo cp -r $FF_DATA_DIR/$d $archive_dir/$archive_name
+    fi
+done
 docker run --rm -it \
     -v ${MYSQL_DATA_VOLUME_NAME}:/var/lib/mysql \
     -v $archive_dir/$archive_name/db:/db \
