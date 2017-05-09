@@ -22,10 +22,15 @@ def test_get_source():
         g(1)
         c+d
 
+    def zeros(dataset):
+        import numpy as np
+        return np.zeros(len(dataset["users"]))
+
     # should throw no errors
-    code_f = featurefactory.util.get_source(f)
-    code_g = featurefactory.util.get_source(g)
-    code_h = featurefactory.util.get_source(h)
+    code_f     = featurefactory.util.get_source(f)
+    code_g     = featurefactory.util.get_source(g)
+    code_h     = featurefactory.util.get_source(h)
+    code_zeros = featurefactory.util.get_source(zeros)
 
 # ------------------------------------------------------------------------------ 
 # Test get_function()
