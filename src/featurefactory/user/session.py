@@ -141,7 +141,7 @@ class Session(object):
             entity_features = None
         return entity_features
 
-    def discover_features(self, code_fragment=None, metric_name=None):
+    def discover_features(self, code_fragment=None):
         """Print features written by other users.
 
         A code fragment can be used to filter search results. For each feature,
@@ -151,14 +151,10 @@ class Session(object):
         ----------
         code_fragment : string, default=None
             Source code fragment to filter for.
-        metric_name : string, default=None
-            Metric to report. One of "Accuracy", "Precision", "Recall", and
-            "ROC AUC" for classification problems, and "Mean Squared Error"
-            and "R-squared" for regression problems.
         """
-        self._print_some_features(code_fragment, metric_name, User.name != self.__username)
+        self._print_some_features(code_fragment, User.name != self.__username)
 
-    def print_my_features(self, code_fragment=None, metric_name=None):
+    def print_my_features(self, code_fragment=None):
         """Print features written by me.
 
         A code fragment can be used to filter search results. For each feature,
@@ -168,19 +164,11 @@ class Session(object):
         ----------
         code_fragment : string, default=None
             Source code fragment to filter for.
-        metric_name : string, default=None
-            Metric to report. One of "Accuracy", "Precision", "Recall", and
-            "ROC AUC" for classification problems, and "Mean Squared Error"
-            and "R-squared" for regression problems.
         """
-        self._print_some_features(code_fragment, metric_name, User.name == self.__username)
+        self._print_some_features(code_fragment, User.name == self.__username)
 
-    def _print_some_features(self, code_fragment, metric_name, predicate):
+    def _print_some_features(self, code_fragment, predicate):
         """Driver function for discover_features and print_my_features."""
-        metric_name_default = "Accuracy"
-        if not metric_name:
-            metric_name = metric_name_default
-
         with self.__orm.session_scope() as session:
             query = self._filter_features(session, code_fragment)
 
