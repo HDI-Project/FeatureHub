@@ -48,7 +48,7 @@ What do you think? What do you like about this feature? How could it be improved
 
 ----------
 
-(submitted by user _{user_name}_)
+(submitted by user <em>{user_name}</em>)
 """
 
 def _render_feature_post_template(problem_name, feature_description,
@@ -71,7 +71,7 @@ def _render_feature_post_template(problem_name, feature_description,
         tmp.append(bullet + "{}: {}".format(d["name"], d["value"]))
     feature_metrics = "\n".join(tmp)
 
-    user_name = _escape_user_name(user_name)
+    # user_name = _escape_user_name(user_name)
 
     # render template
     return _template.format(problem_name=problem_name,
