@@ -1,4 +1,4 @@
-dill
+dill==0.2.5
 docker>=2.0.0
 flask>=0.12
 jupyter
