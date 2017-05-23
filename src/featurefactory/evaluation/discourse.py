@@ -80,21 +80,17 @@ class DiscourseFeatureTopic(object):
             self.feature.description,
             self.format_code(),
             self.format_metrics(),
-            feature.user.name,
+            self.feature.user.name,
         ]
         return params
-
-    def _escape_user_name(name):
-        """Replace `_` in name with `&lowbar;`."""
-        return name.replace("_", "&lowbar;")
 
     def post_feature(self):
         params = self.get_params()
         content = DiscourseFeatureTopicTemplate().render(*params)
         try:
-            post = client.create_post(
+            post = self.client.create_post(
                     category=os.environ.get("DISCOURSE_FEATURE_CATEGORY_NAME"),
-                    title=format(feature.description),
+                    title=format(self.feature.description),
                     content=content)
 
             # return the url of the new post
@@ -108,16 +104,6 @@ class DiscourseFeatureTopic(object):
 
         return url
 
-def _render_feature_post_template(problem_name, feature_description,
-        code, metrics, user_name):
-
-
-
-    # user_name = _escape_user_name(user_name)
-
-    # render template
-    return _template.format(problem_name=problem_name,
-            feature_description=feature_description,
-            feature_code=feature_code,
-            feature_metrics=feature_metrics,
-            user_name=user_name)
+def _escape_user_name(name):
+    """Replace `_` in name with `&lowbar;`."""
+    return name.replace("_", "&lowbar;")
