@@ -25,6 +25,8 @@ sys.path.insert(0, os.path.abspath('../../src/featurefactory'))
 sys.path.insert(0, os.path.abspath('../../src/featurefactory/user'))
 sys.path.insert(0, os.path.abspath('../../src/featurefactory/admin'))
 sys.path.insert(0, os.path.abspath('../../src/featurefactory/problems'))
+sys.path.insert(0, os.path.abspath('../../src/featurefactory/evaluation'))
+sys.path.insert(0, os.path.abspath('../../src/featurefactory/modeling'))
 
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
@@ -43,6 +45,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.coverage',
     'sphinx.ext.githubpages',
+    'sphinx.ext.mathjax',
+    'nbsphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -93,7 +97,12 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [
+    '_build',
+    'Thumbs.db',
+    '.DS_Store',
+    '**.ipynb_checkpoints',
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -177,3 +186,7 @@ texinfo_documents = [
      author, 'FeatureFactory', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+# -- Options for nbsphinx -------------------------------------------------
+
+nbsphinx_execute = 'never'

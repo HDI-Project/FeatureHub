@@ -2,8 +2,7 @@
 
 .DEFAULT_TARGET: help
 
-# You can set these variables from the command line.
-SPHINXOPTS    =
+# You can set these variables from the command line.  SPHINXOPTS    = -c ./
 SPHINXAPIDOC  = sphinx-apidoc
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = FeatureFactory
@@ -33,6 +32,14 @@ clean:
 .PHONY: apidoc
 apidoc:
 	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" "$(PROJDIR)" "$(PROJDIR)/tests"
+
+.PHONY: devserver
+htmlserver:
+	@./devserver.sh "$(BUILDDIR)/html"
+
+.PHONY: stopserver
+stopserver:
+	@cat server.pid | xargs kill
 
 .PHONY: publish
 publish: html
