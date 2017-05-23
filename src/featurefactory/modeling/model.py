@@ -9,6 +9,11 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurefactory.modeling.metrics import Metric, MetricList
 from featurefactory.util import RANDOM_STATE
 
+# automl
+import autosklearn.classification
+import autosklearn.regression
+from featurefactory.modeling.metrics import rmsle_scorer, ndcg_scorer
+
 class Model(object):
     """Versatile modeling object.
 
@@ -41,9 +46,9 @@ class Model(object):
     def __init__(self, problem_type):
         self.problem_type = problem_type
 
-        if self.problem_type == Model.CLASSIFICATION:
+        if self._is_classification():
             self.model = DecisionTreeClassifier(random_state=RANDOM_STATE+1)
-        elif self.problem_type == Model.REGRESSION:
+        elif self._is_regression():
             self.model = DecisionTreeRegressor(random_state=RANDOM_STATE+2)
         else:
             raise NotImplementedError
@@ -306,3 +311,35 @@ class Model(object):
                     .format(Y.shape[1]))
         Y = Y.ravel()
         return X, Y
+
+class AutoModel(Model):
+    TIME_LEFT_FOR_THIS_TASK=90
+    PER_RUN_TIME_LIMIT=10
+
+    def __init__(self, problem_type, metric):
+        super().__init__(problem_type)
+
+        # set custom scorers. really, we should include this in the database
+        # hack
+        if self._is_classification():
+            self.scorer = ndcg_scorer
+        elif self._is_regression():
+            self.scorer = rmsle_scorer
+        else:
+            raise NotImplementedError
+
+        if self._is_classification():
+            self.model = autosklearn.classification.AutoSklearnClassifier(
+                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
+                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
+                seed=RANDOM_STATE+1)
+        elif self._is_regression():
+            self.model = autosklearn.regression.AutoSklearnRegressor(
+                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
+                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
+                seed=RANDOM_STATE+2)
+        else:
+            raise NotImplementedError
+
+    def fit(self, X_train, Y_train):
+        self.model.fit(X_train, Y_train, metric=self.scorer)

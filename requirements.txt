@@ -9,6 +9,7 @@ mysqlclient
 mysql-connector-python-rf
 pandas
 pydiscourse
+pyyaml
 scikit-learn>=0.18.1
 scipy
 sqlalchemy
