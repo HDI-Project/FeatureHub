@@ -3,9 +3,20 @@ FROM jupyterhub/systemuser:0.6.0
 # Clean up from existing systemuser setup
 RUN rm -rf /home/jovyan
 
+# Upgrade package managers
+RUN apt-get update
+RUN /opt/conda/bin/pip install --upgrade pip
+
 # Install mysql-related packages
-RUN apt-get update && apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
 RUN /opt/conda/bin/pip install --egg mysql-connector-python-rf
+
+# Install autosklearn
+RUN apt-get install -y build-essential gcc
+RUN /opt/conda/bin/conda install -y swig libgcc
+#RUN /opt/conda/bin/pip install --no-cache-dir -v xgboost==0.4a30
+RUN wget -q -O- https://raw.githubusercontent.com/automl/auto-sklearn/v.0.2.0/requirements.txt | xargs -n 1 -L 1 /opt/conda/bin/pip install
+RUN /opt/conda/bin/pip install auto-sklearn==0.2.0
 
 # Install featurefactory into site-packages
 # TODO make this not python3.5 hardcoded
