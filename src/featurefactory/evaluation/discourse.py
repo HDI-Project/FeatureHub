@@ -94,14 +94,18 @@ class DiscourseFeatureTopic(object):
         try:
             post = client.create_post(
                     category=os.environ.get("DISCOURSE_FEATURE_CATEGORY_NAME"),
-                    title=.format(feature.description),
+                    title=format(feature.description),
                     content=content)
-        except Discourse:
 
-        # return the url of the new post
-        url = "https://{}/t/{}".format(
-                os.environ.get("DISCOURSE_DOMAIN_NAME"),
-                post["topic_slug"])
+            # return the url of the new post
+            url = "https://{}/t/{}".format(
+                    os.environ.get("DISCOURSE_DOMAIN_NAME"),
+                    post["topic_slug"])
+        except Exception as err:
+            # TODO
+            url = ""
+            raise err
+
         return url
 
 def _render_feature_post_template(problem_name, feature_description,
