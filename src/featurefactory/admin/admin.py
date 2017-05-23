@@ -224,3 +224,36 @@ class Commands(object):
         query = query.filter(Feature.problem_id == self.__problemid)
 
         return query
+
+    def load_dataset(self, problem_name="", split="train"):
+        """Load dataset for given problem with given split.
+
+        Parameters
+        ----------
+        problem_name : str
+        split : str
+            Valid options include "train", "test", "both" (concatenated)
+        """
+
+        orm = self.__orm
+        username = orm.user
+
+        if not problem_name:
+            with orm.session_scope() as session:
+                problem_name = session.query(Problem.name)\
+                        .filter(Problem.name != "demo").first()
+
+        with orm.session_scope() as session:
+            problem_id = session.query(Problem.id).filter(Problem.name == problem_name).scalar()
+
+        evaluator = EvaluatorServer(problem_id, username, orm)
+        evaluator._load_dataset()
+
+        if split != "both":
+            suffix = "_" + split
+
+        dataset = getattr(evaluator, "dataset" + suffix)
+        entities_featurized = getattr(evaluator, "entities_featurized" + suffix)
+        target = getattr(evaluator, "target" + suffix)
+
+        return dataset, entities_featurized, target
