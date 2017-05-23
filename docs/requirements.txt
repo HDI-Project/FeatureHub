@@ -1,3 +1,6 @@
 ghp-import>=0.5.5
 recommonmark>=0.4.0
 Sphinx>=1.5.3
+nbsphinx
+IPython
+ipykernel

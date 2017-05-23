@@ -24,11 +24,10 @@ features, and data- and user-management tools.
    :caption: Table of Contents
 
    intro.md
-   tutorial.md
    user-guide.md
+   Tutorial.ipynb
    faq.md
    deployment.md
-
 
 Indices and tables
 ==================

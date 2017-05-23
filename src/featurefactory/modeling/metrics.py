@@ -1,6 +1,9 @@
 from collections import MutableSequence
 import featurefactory.modeling.model
 
+import numpy as np
+from sklearn.metrics import mean_squared_error
+
 class Metric(object):
     """Metric"""
 
@@ -231,3 +234,76 @@ class MetricList(MutableSequence):
             return result
         else:
             return cls()
+
+# Normalized Discounted Cumulative Gain metric
+# Source: https://gist.github.com/mblondel/7337391
+def _dcg_score(y_true, y_score, k=5, gains="exponential"):
+    """Discounted cumulative gain (DCG) at rank k
+
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+
+    y_score : array-like, shape = [n_samples]
+        Predicted scores.
+
+    k : int
+        Rank.
+
+    gains : str
+        Whether gains should be "exponential" (default) or "linear".
+
+    Returns
+    -------
+    DCG @k : float
+    """
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+
+    if gains == "exponential":
+        gains = 2 ** y_true - 1
+    elif gains == "linear":
+        gains = y_true
+    else:
+        raise ValueError("Invalid gains option.")
+
+    # highest rank is 1 so +2 instead of +1
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gains / discounts)
+
+def _ndcg_score(y_true, y_score, k=5, gains="exponential"):
+    """Normalized discounted cumulative gain (NDCG) at rank k
+
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+
+    y_score : array-like, shape = [n_samples]
+        Predicted scores.
+
+    k : int
+        Rank.
+
+    gains : str
+        Whether gains should be "exponential" (default) or "linear".
+
+    Returns
+    -------
+    NDCG @k : float
+    """
+    best = _dcg_score(y_true, y_true, k, gains)
+    actual = _dcg_score(y_true, y_score, k, gains)
+    return actual / best
+
+_needs_proba=False
+ndcg_scorer = sklearn.metrics.make_scorer("ndcg", _ndcg_score,
+    greater_is_better=True, needs_proba=_needs_proba)
+
+# RMSLE
+def _root_mean_squared_log_error(y_true, y_pred, **kwargs):
+    return np.sqrt(mean_squared_error(np.log(y_true + 1),
+        np.log(y_pred + 1), **kwargs))
+
+rmsle_scorer = sklearn.metrics.make_scorer("rmsle", _root_mean_squared_log_error,
