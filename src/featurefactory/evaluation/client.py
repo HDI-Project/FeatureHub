@@ -458,8 +458,12 @@ class EvaluatorServer(EvaluatorClient):
                 self.dataset_test, self.entities_featurized_test,
                 self.target_test, compute_hash=False)
 
+        # make a copy of the dataset
+        self.dataset = {}
+        for key in self.dataset_train:
+            self.dataset[key] = self.dataset_train[key].copy()
+
         # concatenate as applicable
-        self.dataset = self.dataset_train
         with self.orm.session_scope() as session:
             problem = session.query(Problem)\
                     .filter(Problem.id == self.problem_id).one()
