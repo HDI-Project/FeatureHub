@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Feature Factory documentation build configuration file, created by
-# sphinx-quickstart on Sat Mar 25 19:59:43 2017.
-#
+# Feature Factory documentation build configuration file, created by sphinx-quickstart on Sat Mar 25 19:59:43 2017.  
 # This file is execfile()d with the current directory set to its
 # containing dir.
 #
@@ -62,10 +60,10 @@ source_parsers = {
 }
 
 # app setup hook
-github_doc_root = "https://github.com/HDI-Project/FeatureFactory"
+github_root = "https://github.com/HDI-Project/FeatureFactory"
 def setup(app):
     app.add_config_value('recommonmark_config', {
-            'url_resolver': lambda url: github_doc_root + url,
+            'url_resolver': lambda url: github_root + url,
             'auto_toc_tree_section': 'Contents',
             }, True)
     app.add_transform(AutoStructify)
