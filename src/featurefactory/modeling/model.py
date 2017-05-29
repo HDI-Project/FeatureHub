@@ -1,18 +1,21 @@
+import os
 import traceback
 import sys
 import numpy as np
 import sklearn.metrics
 from collections import defaultdict
-from sklearn.preprocessing import label_binarize
+from sklearn.preprocessing import label_binarize, LabelEncoder
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.externals import joblib
+
 from featurefactory.modeling.metrics import Metric, MetricList
 from featurefactory.util import RANDOM_STATE
 
 # automl
-import autosklearn.classification
-import autosklearn.regression
-from featurefactory.modeling.metrics import rmsle_scorer, ndcg_scorer
+from autosklearn.classification import AutoSklearnClassifier
+from autosklearn.regression import AutoSklearnRegressor
+from featurefactory.modeling.scorers import rmsle_autoscorer, ndcg_autoscorer
 
 class Model(object):
     """Versatile modeling object.
@@ -91,7 +94,7 @@ class Model(object):
         """Compute metrics on test set.
         """
 
-        X, Y = self._format_matrices(X, Y)
+        X, Y = Model._format_matrices(X, Y)
 
         X_train, Y_train = X[:n], Y[:n]
         X_test, Y_test = X[n:], Y[n:]
@@ -148,7 +151,7 @@ class Model(object):
             scoring types
         """
 
-        X, Y = self._format_matrices(X, Y)
+        X, Y = Model._format_matrices(X, Y)
 
         scorings = list(scorings)
 
@@ -297,49 +300,140 @@ class Model(object):
 
         return scorings, scorings_
 
-    def _format_matrices(self, X, Y):
+    @staticmethod
+    def _format_matrices(X, Y):
+        X = Model._formatX(X)
+        Y = Model._formatY(Y)
+        return X, Y
 
+    @staticmethod
+    def _formatX(X):
         # ensure that we use np for everything
+        # use np.float64 for all elements
         # *don't* use 1d array for X
-        X = np.array(X)
+        X = np.asfarray(X)
         if X.ndim == 1:
             X = X.reshape(-1,1)
+
+        return X
+
+    @staticmethod
+    def _formatY(Y):
+        # TODO: detect if we need to use a LabelEncoder for Y
+        # ensure that we use np for everything
+        # use np.float64 for all elements
         # *do* use 1d array for Y
-        Y = np.array(Y)
+        Y = np.asfarray(Y)
         if Y.ndim > 1 and Y.shape[1] > 1:
             raise ValueError("Target matrix has too many columns: {}"
                     .format(Y.shape[1]))
         Y = Y.ravel()
-        return X, Y
+        return Y
 
 class AutoModel(Model):
     TIME_LEFT_FOR_THIS_TASK=90
     PER_RUN_TIME_LIMIT=10
+    INITIAL_CONFIGURATIONS_VIA_METALEARNING=0
 
-    def __init__(self, problem_type, metric):
+    def __init__(self, problem_type, metric, **kwargs):
         super().__init__(problem_type)
 
+        if "time_left_for_this_task" in kwargs:
+            self.time_left_for_this_task = kwargs["time_left_for_this_task"]
+        else:
+            self.time_left_for_this_task = AutoModel.TIME_LEFT_FOR_THIS_TASK
+
+        if "per_run_time_limit" in kwargs:
+            self.per_run_time_limit = kwargs["per_run_time_limit"]
+        else:
+            self.per_run_time_limit = AutoModel.PER_RUN_TIME_LIMIT
+
+        if "initial_configurations_via_metalearning" in kwargs:
+            self.initial_configurations_via_metalearning= \
+                kwargs["initial_configurations_via_metalearning"]
+        else:
+            self.initial_configurations_via_metalearning= \
+                AutoModel.INITIAL_CONFIGURATIONS_VIA_METALEARNING
+
+        # ~hack~
         # set custom scorers. really, we should include this in the database
-        # hack
         if self._is_classification():
-            self.scorer = ndcg_scorer
+            self.scorer = ndcg_autoscorer
         elif self._is_regression():
-            self.scorer = rmsle_scorer
+            self.scorer = rmsle_autoscorer
         else:
             raise NotImplementedError
 
         if self._is_classification():
-            self.model = autosklearn.classification.AutoSklearnClassifier(
-                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
-                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
-                seed=RANDOM_STATE+1)
+            self.model = AutoSklearnClassifier(
+                time_left_for_this_task =
+                    self.time_left_for_this_task,
+                per_run_time_limit =
+                    self.per_run_time_limit,
+                initial_configurations_via_metalearning =
+                    self.initial_configurations_via_metalearning,
+                seed = RANDOM_STATE+1)
         elif self._is_regression():
-            self.model = autosklearn.regression.AutoSklearnRegressor(
-                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
-                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
-                seed=RANDOM_STATE+2)
+            self.model = AutoSklearnRegressor(
+                time_left_for_this_task =
+                    self.time_left_for_this_task,
+                per_run_time_limit =
+                    self.per_run_time_limit,
+                initial_configurations_via_metalearning =
+                    self.initial_configurations_via_metalearning,
+                seed = RANDOM_STATE+2)
         else:
             raise NotImplementedError
 
-    def fit(self, X_train, Y_train):
-        self.model.fit(X_train, Y_train, metric=self.scorer)
+    def fit(self, X_train, Y_train, **kwargs):
+        X_train = Model._formatX(X_train)
+        
+        if self._is_classification() and \
+            np.unique(Y_train) > 2:
+            self.le = LabelEncoder()
+            self.le.fit(Y_train)
+            Y_train = self.le.transform(Y_train)
+        Y_train = Model._formatY(Y_train)
+
+        self.model.fit(X_train, Y_train, metric=self.scorer, **kwargs)
+
+    def predict(self, X_test):
+        X_test = Model._formatX(X_test)
+        Y_test_pred = self.model.predict(X_test)
+        if self._is_classification() and \
+            np.unique(Y_test_pred) > 2:
+            # TODO this fails if <=2 classes are actually predicted. Should
+            # store whether it is multiclass classification as class member.
+            return self.le.inverse_transform(Y_test_pred)
+        else:
+            return Y_test_pred
+
+    def predict_proba(self, X_test):
+        X_test = Model._formatX(X_test)
+        Y_test_pred_proba = self.model.predict_proba(X_test)
+        return Y_test_pred_proba
+
+    def score(self, X_test, Y_test):
+        X_test = Model._formatX(X_test)
+        Y_test = Model._formatY(Y_test)
+        Y_test_pred = self.predict(X_test)
+        score = self.scorer(Y_test, Y_test_pred)
+        return score
+
+    def dump(self, problem_name, split, group_id):
+        name = "automl_{}_{}_{}.pkl".format(problem_name, split, group_id)
+        dirname = os.path.join(os.path.expanduser("~"), "notebooks", "output")
+        if not os.path.exists(dirname) and os.path.isdir(dirname):
+            os.makedirs(dirname, exist_ok=True)
+        absname = os.path.join(dirname, name)
+        joblib.dump(self.model, absname)
+        print("Model dumped to {}".format(absname))
+
+    def load(self, problem_name, split, group_id):
+        name = "automl_{}_{}_{}.pkl".format(problem_name, split, group_id)
+        dirname = os.path.join(os.path.expanduser("~"), "notebooks", "output")
+        absname = os.path.join(dirname, name)
+        if not os.path.exists(absname):
+            raise ValueError("Couldn't find model at {}".format(absname))
+        self.model = joblib.load(absname)
+        print("Model loaded successfully.")

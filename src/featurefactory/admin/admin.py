@@ -10,8 +10,14 @@ from featurefactory.admin.sqlalchemy_declarative import (
     Base, Feature, Problem, User, Metric, EvaluationAttempt
 )
 from featurefactory.admin.sqlalchemy_main import ORMManager
+from featurefactory.admin.postprocessing import (
+    build_and_save_all_features,
+    extract_and_save_all_tables,
+    load_feature_matrix
+)
+from featurefactory.evaluation.client import EvaluatorServer
+from featurefactory.modeling.model import AutoModel
 from featurefactory.util import possibly_talking_action
-
 
 class Commands(object):
     """Admin interface for the database.
@@ -20,15 +26,11 @@ class Commands(object):
     features.
     """
 
-    def __init__(self, problem=None, database="featurefactory"):
+    def __init__(self, database="featurefactory"):
         """Create the ORMManager and connect to DB.
-
-        If problem name is given, load it.
 
         Parameters
         ----------
-        problem : str, optional (default=None)
-            Name of problem
         database : str, optional (default="featurefactory")
             Name of database within DBMS.
         """
@@ -36,18 +38,10 @@ class Commands(object):
         self.__orm = ORMManager(database)
 
         if not database_exists(self.__orm.engine.url):
-            print("database {} does not seem to exist.".format(database))
-            print("You might want to create it by calling set_up method")
-        elif  problem:
-            try:
-                with self.__orm.session_scope() as session:
-                    problem = session.query(Problem)\
-                                     .filter(Problem.name == problem).one()
-                    self.__problemid = problem.id
-            except NoResultFound:
-                print("WARNING: Problem {} does not exist!".format(problem))
-                print("You might want to create it by calling create_problem"
-                      " method")
+            print("Database {} does not exist.".format(database),
+                    file=sys.stderr)
+            print("You might want to create it by calling set_up method",
+                    file=sys.stderr)
 
     def set_up(self, drop=False):
         """Create a new DB and create the initial scheme.
@@ -147,7 +141,6 @@ class Commands(object):
         with self.__orm.session_scope() as session:
             try:
                 problem = session.query(Problem).filter(Problem.name == name).one()
-                self.__problemid = problem.id
                 print("Problem {} already exists".format(name))
                 return
             except NoResultFound:
@@ -166,7 +159,6 @@ class Commands(object):
                 target_table_name              = target_table_name,
             )
             session.add(problem)
-            self.__problemid = problem.id
             print("Problem {} successfully created".format(name))
 
     def get_problems(self):
@@ -179,10 +171,10 @@ class Commands(object):
             except NoResultFound:
                 return []
 
-    def get_features(self, user_name=None):
+    def get_features(self, problem_name=None, user_name=None):
         """Get a DataFrame with the details about all registered features."""
         with self.__orm.session_scope() as session:
-            results = self._get_features(session, user_name).all()
+            results = self._get_features(session, problem_name, user_name).all()
             feature_dicts = []
             for feature, user_name in results:
                 d = {
@@ -205,12 +197,14 @@ class Commands(object):
             else:
                 return pd.DataFrame(feature_dicts)
 
-    def _get_features(self, session, user_name=None):
+    def _get_features(self, session, problem_name="", user_name=""):
         """Return a query filtering a given user for the current problem.
 
         Parameters
         ----------
-        user_name : str, optional(default=None)
+        problem_name : str, optional
+            If no problem name provided, returns features for all problems.
+        user_name : str, optional
             If no user name provided, returns features for all users.
         """
 
@@ -221,7 +215,8 @@ class Commands(object):
         if user_name:
             query = query.filter(User.name == user_name)
 
-        query = query.filter(Feature.problem_id == self.__problemid)
+        if problem_name:
+            query = query.filter(Feature.problem.name == problem_name)
 
         return query
 
@@ -230,30 +225,65 @@ class Commands(object):
 
         Parameters
         ----------
-        problem_name : str
+        problem_name : str, optional
+            If no problem name provided, returns dataset for *first problem in
+            database*.
         split : str
             Valid options include "train", "test", "both" (concatenated)
         """
 
         orm = self.__orm
-        username = orm.user
-
-        if not problem_name:
-            with orm.session_scope() as session:
-                problem_name = session.query(Problem.name)\
-                        .filter(Problem.name != "demo").first()
+        username = "admin" # should be unused (unless submit new feature to db)
 
         with orm.session_scope() as session:
-            problem_id = session.query(Problem.id).filter(Problem.name == problem_name).scalar()
+            #TODO can combine this into one query for each case.
+            if not problem_name:
+                problem_name = session.query(Problem.name)\
+                        .filter(Problem.name != "demo").scalar()
+            problem_id = session.query(Problem.id)\
+                    .filter(Problem.name == problem_name).scalar()
 
         evaluator = EvaluatorServer(problem_id, username, orm)
         evaluator._load_dataset()
 
         if split != "both":
             suffix = "_" + split
+        else:
+            suffix = ""
 
-        dataset = getattr(evaluator, "dataset" + suffix)
+        dataset             = getattr(evaluator, "dataset" + suffix)
         entities_featurized = getattr(evaluator, "entities_featurized" + suffix)
-        target = getattr(evaluator, "target" + suffix)
+        target              = getattr(evaluator, "target" + suffix)
 
-        return dataset, entities_featurized, target
+        return problem_name, dataset, entities_featurized, target
+
+    def _extract_everything(self, suffix):
+        with self.__orm.session_scope() as session:
+            build_and_save_all_features(self, session, suffix)
+            extract_and_save_all_tables(session, suffix)
+
+    def _get_final_model_X_Y(self, problem_name, split, suffix):
+        feature_matrix = load_feature_matrix(problem_name, split, suffix)
+        _, _, entities_featurized, target = self.load_dataset(
+                problem_name=problem_name, split=split)
+        X = pd.concat([entities_featurized, feature_matrix], axis=1)
+        Y = target
+        return X, Y
+
+    def _train_final_model(self, problem_name, split, suffix):
+        with self.__orm.session_scope() as session:
+            result = session.query(Problem)\
+                        .filter(Problem.name == problem_name).one()
+            problem_type = result.problem_type
+        X_train, Y_train = self._get_final_model_X_Y(problem_name, split,
+                suffix)
+        automl = AutoModel(problem_type, None) # TODO increase time
+        automl.fit(X_train, Y_train, dataset_name=problem_name)
+        automl.dump(problem_name, split, suffix)
+        return automl
+
+    def _do_final_model(self, problem_name, suffix):
+        automl = self._train_final_model(problem_name, "train", suffix)
+        X_test, Y_test = self._get_final_model_X_Y(problem_name, "test", suffix)
+        Y_test_pred = automl.predict_proba(X_test)
+        return Y_test, Y_test_pred
