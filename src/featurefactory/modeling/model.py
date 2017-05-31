@@ -420,19 +420,11 @@ class AutoModel(Model):
         score = self.scorer(Y_test, Y_test_pred)
         return score
 
-    def dump(self, problem_name, split, group_id):
-        name = "automl_{}_{}_{}.pkl".format(problem_name, split, group_id)
-        dirname = os.path.join(os.path.expanduser("~"), "notebooks", "output")
-        if not os.path.exists(dirname) and os.path.isdir(dirname):
-            os.makedirs(dirname, exist_ok=True)
-        absname = os.path.join(dirname, name)
+    def dump(self, absname):
         joblib.dump(self.model, absname)
         print("Model dumped to {}".format(absname))
 
-    def load(self, problem_name, split, group_id):
-        name = "automl_{}_{}_{}.pkl".format(problem_name, split, group_id)
-        dirname = os.path.join(os.path.expanduser("~"), "notebooks", "output")
-        absname = os.path.join(dirname, name)
+    def load(self, absname):
         if not os.path.exists(absname):
             raise ValueError("Couldn't find model at {}".format(absname))
         self.model = joblib.load(absname)

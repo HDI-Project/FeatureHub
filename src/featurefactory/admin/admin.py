@@ -13,7 +13,8 @@ from featurefactory.admin.sqlalchemy_main import ORMManager
 from featurefactory.admin.postprocessing import (
     build_and_save_all_features,
     extract_and_save_all_tables,
-    load_feature_matrix
+    load_feature_matrix,
+    prepare_automl_file_name,
 )
 from featurefactory.evaluation.client import EvaluatorServer
 from featurefactory.modeling.model import AutoModel
@@ -270,20 +271,23 @@ class Commands(object):
         Y = target
         return X, Y
 
-    def _train_final_model(self, problem_name, split, suffix):
+    def _train_model(self, problem_name, split, suffix, **kwargs):
         with self.__orm.session_scope() as session:
             result = session.query(Problem)\
                         .filter(Problem.name == problem_name).one()
             problem_type = result.problem_type
         X_train, Y_train = self._get_final_model_X_Y(problem_name, split,
                 suffix)
-        automl = AutoModel(problem_type, None) # TODO increase time
+        automl = AutoModel(problem_type, None, **kwargs) # TODO increase time
         automl.fit(X_train, Y_train, dataset_name=problem_name)
-        automl.dump(problem_name, split, suffix)
+        absname = prepare_automl_file_name(problem_name, split, suffix)
+        automl.dump(absname)
         return automl
 
-    def _do_final_model(self, problem_name, suffix):
-        automl = self._train_final_model(problem_name, "train", suffix)
+    def _do_final_model(self, problem_name, suffix, **kwargs):
+        """
+        """
+        automl = self._train_model(problem_name, "train", suffix, **kwargs)
         X_test, Y_test = self._get_final_model_X_Y(problem_name, "test", suffix)
         Y_test_pred = automl.predict_proba(X_test)
-        return Y_test, Y_test_pred
+        return automl, Y_test, Y_test_pred

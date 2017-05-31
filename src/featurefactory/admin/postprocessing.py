@@ -97,3 +97,10 @@ def load_table1(name, suffix):
 def load_table(name):
     fullname = os.path.join(os.path.expanduser("~"), "notebooks", name)
     return pd.read_pickle(fullname)
+
+def prepare_automl_file_name(problem_name, split, suffix):
+    name = "automl_{}_{}_{}.pkl".format(problem_name, split, suffix)
+    dirname = os.path.join(os.path.expanduser("~"), "notebooks", "output")
+    if not os.path.exists(dirname):
+        os.makedirs(dirname, exist_ok=True)
+    return os.path.join(dirname, name)
