@@ -389,7 +389,7 @@ class AutoModel(Model):
         X_train = Model._formatX(X_train)
         
         if self._is_classification() and \
-            np.unique(Y_train) > 2:
+            len(np.unique(Y_train)) > 2:
             self.le = LabelEncoder()
             self.le.fit(Y_train)
             Y_train = self.le.transform(Y_train)
@@ -401,7 +401,7 @@ class AutoModel(Model):
         X_test = Model._formatX(X_test)
         Y_test_pred = self.model.predict(X_test)
         if self._is_classification() and \
-            np.unique(Y_test_pred) > 2:
+            len(np.unique(Y_test_pred)) > 2:
             # TODO this fails if <=2 classes are actually predicted. Should
             # store whether it is multiclass classification as class member.
             return self.le.inverse_transform(Y_test_pred)
