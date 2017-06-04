@@ -331,61 +331,48 @@ class Model(object):
         return Y
 
 class AutoModel(Model):
+    SEED = RANDOM_STATE+1
     TIME_LEFT_FOR_THIS_TASK=90
     PER_RUN_TIME_LIMIT=10
+    ML_MEMORY_LIMIT=7900
     INITIAL_CONFIGURATIONS_VIA_METALEARNING=0
 
-    def __init__(self, problem_type, metric, **kwargs):
+    def __init__(self, problem_type, **kwargs):
         super().__init__(problem_type)
 
-        if "time_left_for_this_task" in kwargs:
-            self.time_left_for_this_task = kwargs["time_left_for_this_task"]
+        if self._is_classification():
+            AutoSklearnModel = AutoSklearnClassifier
+        elif self._is_regression():
+            AutoSklearnModel = AutoSklearnRegressor
         else:
-            self.time_left_for_this_task = AutoModel.TIME_LEFT_FOR_THIS_TASK
-
-        if "per_run_time_limit" in kwargs:
-            self.per_run_time_limit = kwargs["per_run_time_limit"]
-        else:
-            self.per_run_time_limit = AutoModel.PER_RUN_TIME_LIMIT
-
-        if "initial_configurations_via_metalearning" in kwargs:
-            self.initial_configurations_via_metalearning= \
-                kwargs["initial_configurations_via_metalearning"]
-        else:
-            self.initial_configurations_via_metalearning= \
-                AutoModel.INITIAL_CONFIGURATIONS_VIA_METALEARNING
+            raise NotImplementedError
 
         # ~hack~
         # set custom scorers. really, we should include this in the database
-        if self._is_classification():
-            self.scorer = ndcg_autoscorer
-        elif self._is_regression():
-            self.scorer = rmsle_autoscorer
+        if "metric" in kwargs:
+            self.metric = kwargs["metric"]
         else:
-            raise NotImplementedError
+            if self._is_classification():
+                self.metric = ndcg_autoscorer
+            elif self._is_regression():
+                self.metric = rmsle_autoscorer
+            else:
+                raise NotImplementedError
 
-        if self._is_classification():
-            self.model = AutoSklearnClassifier(
-                time_left_for_this_task =
-                    self.time_left_for_this_task,
-                per_run_time_limit =
-                    self.per_run_time_limit,
-                initial_configurations_via_metalearning =
-                    self.initial_configurations_via_metalearning,
-                seed = RANDOM_STATE+1)
-        elif self._is_regression():
-            self.model = AutoSklearnRegressor(
-                time_left_for_this_task =
-                    self.time_left_for_this_task,
-                per_run_time_limit =
-                    self.per_run_time_limit,
-                initial_configurations_via_metalearning =
-                    self.initial_configurations_via_metalearning,
-                seed = RANDOM_STATE+2)
-        else:
-            raise NotImplementedError
+        automl_param_names = AutoSklearnModel._get_param_names()
+        params = {}
+        for param in automl_param_names:
+            if param in kwargs:
+                params[param] = kwargs.pop(param)
+            elif hasattr(self, param.upper()):
+                params[param] = getattr(self, param.upper())
+
+        self.model = AutoSklearnModel(**params)
 
     def fit(self, X_train, Y_train, **kwargs):
+        if "metric" in kwargs:
+            self.metric = kwargs.pop("metric")
+
         X_train = Model._formatX(X_train)
         
         if self._is_classification() and \
@@ -395,7 +382,7 @@ class AutoModel(Model):
             Y_train = self.le.transform(Y_train)
         Y_train = Model._formatY(Y_train)
 
-        self.model.fit(X_train, Y_train, metric=self.scorer, **kwargs)
+        self.model.fit(X_train, Y_train, metric=self.metric, **kwargs)
 
     def predict(self, X_test):
         X_test = Model._formatX(X_test)
@@ -414,10 +401,12 @@ class AutoModel(Model):
         return Y_test_pred_proba
 
     def score(self, X_test, Y_test):
+        # todo not nearly robust enough
         X_test = Model._formatX(X_test)
+
         Y_test = Model._formatY(Y_test)
         Y_test_pred = self.predict(X_test)
-        score = self.scorer(Y_test, Y_test_pred)
+        score = self.metric(Y_test, Y_test_pred)
         return score
 
     def dump(self, absname):

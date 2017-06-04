@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import yaml
@@ -15,6 +16,7 @@ from featurefactory.admin.postprocessing import (
     extract_and_save_all_tables,
     load_feature_matrix,
     prepare_automl_file_name,
+    load_dataset_from_dir,
 )
 from featurefactory.evaluation.client import EvaluatorServer
 from featurefactory.modeling.model import AutoModel
@@ -23,8 +25,7 @@ from featurefactory.util import possibly_talking_action
 class Commands(object):
     """Admin interface for the database.
 
-    Create the schema, add or remove problems, and view problems, users, and
-    features.
+    Create the schema, add or remove problems, and view problems, users, and features.
     """
 
     def __init__(self, database="featurefactory"):
@@ -237,24 +238,17 @@ class Commands(object):
         username = "admin" # should be unused (unless submit new feature to db)
 
         with orm.session_scope() as session:
-            #TODO can combine this into one query for each case.
             if not problem_name:
                 problem_name = session.query(Problem.name)\
                         .filter(Problem.name != "demo").scalar()
             problem_id = session.query(Problem.id)\
                     .filter(Problem.name == problem_name).scalar()
 
-        evaluator = EvaluatorServer(problem_id, username, orm)
-        evaluator._load_dataset()
+            data_dir = os.path.join("/data", split)
+            dataset, entities_featurized, target = load_dataset_from_dir(
+                    session, data_dir, problem_name)
 
-        if split != "both":
-            suffix = "_" + split
-        else:
-            suffix = ""
-
-        dataset             = getattr(evaluator, "dataset" + suffix)
-        entities_featurized = getattr(evaluator, "entities_featurized" + suffix)
-        target              = getattr(evaluator, "target" + suffix)
+        suffix = "_" + split
 
         return problem_name, dataset, entities_featurized, target
 
@@ -278,16 +272,22 @@ class Commands(object):
             problem_type = result.problem_type
         X_train, Y_train = self._get_final_model_X_Y(problem_name, split,
                 suffix)
-        automl = AutoModel(problem_type, None, **kwargs) # TODO increase time
+        automl = AutoModel(problem_type, **kwargs) # TODO increase time
         automl.fit(X_train, Y_train, dataset_name=problem_name)
         absname = prepare_automl_file_name(problem_name, split, suffix)
         automl.dump(absname)
-        return automl
+        return automl, X_train, Y_train
 
-    def _do_final_model(self, problem_name, suffix, **kwargs):
+    def _do_final_model(self, problem_name, suffix, split_train="train",
+            split_test="test", **kwargs):
         """
         """
-        automl = self._train_model(problem_name, "train", suffix, **kwargs)
-        X_test, Y_test = self._get_final_model_X_Y(problem_name, "test", suffix)
-        Y_test_pred = automl.predict_proba(X_test)
-        return automl, Y_test, Y_test_pred
+        automl, X_train, Y_train = self._train_model(problem_name, split_train,
+                suffix, **kwargs)
+        X_test, Y_test = self._get_final_model_X_Y(problem_name, split_test,
+                suffix)
+        if automl._is_classification():
+            Y_test_pred = automl.predict_proba(X_test)
+        else:
+            Y_test_pred = automl.predict(X_test)
+        return automl, X_train, Y_train, X_test, Y_test, Y_test_pred
