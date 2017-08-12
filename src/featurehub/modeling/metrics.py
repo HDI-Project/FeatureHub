@@ -2,6 +2,7 @@ from collections import MutableSequence
 import featurehub.modeling.model
 
 import numpy as np
+import sklearn.metrics
 from sklearn.metrics import mean_squared_error
 
 class Metric(object):
@@ -298,7 +299,7 @@ def _ndcg_score(y_true, y_score, k=5, gains="exponential"):
     return actual / best
 
 _needs_proba=False
-ndcg_scorer = sklearn.metrics.make_scorer("ndcg", _ndcg_score,
+ndcg_scorer = sklearn.metrics.make_scorer(_ndcg_score,
     greater_is_better=True, needs_proba=_needs_proba)
 
 # RMSLE
@@ -306,4 +307,5 @@ def _root_mean_squared_log_error(y_true, y_pred, **kwargs):
     return np.sqrt(mean_squared_error(np.log(y_true + 1),
         np.log(y_pred + 1), **kwargs))
 
-rmsle_scorer = sklearn.metrics.make_scorer("rmsle", _root_mean_squared_log_error,
+rmsle_scorer = sklearn.metrics.make_scorer(_root_mean_squared_log_error,
+    greater_is_better=False, needs_proba=False)
