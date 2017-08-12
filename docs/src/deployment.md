@@ -1,6 +1,6 @@
 # Deployment
 
-A variety of resources facilitate easy deployment of Feature Factory:
+A variety of resources facilitate easy deployment of FeatureHub:
 
 - `Makefile` to manage all resources
 - `docker`
@@ -14,9 +14,9 @@ A variety of resources facilitate easy deployment of Feature Factory:
 
 1. Install [Docker Engine](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) on your system.
 
-2. Download the FeatureFactory repository.
+2. Download the FeatureHub repository.
     ```bash
-    git clone https://github.com/HDI-Project/FeatureFactory.git
+    git clone https://github.com/HDI-Project/FeatureHub.git
     ```
 
 3. Ensure Python 3 is installed. On Amazon AMI:
@@ -33,7 +33,7 @@ A variety of resources facilitate easy deployment of Feature Factory:
 
 ## Configuration
 
-Feature Factory allows configuration in several places.
+FeatureHub allows configuration in several places.
 
 ### App Deployment
 
@@ -135,7 +135,7 @@ containers:
 - Experiment data: `FF_DATA_DIR/data/train` and `FF_DATA_DIR/data/test`
 - Problem definitions: `FF_DATA_DIR/problems`
 - Notebooks and other user-created files: `FF_DATA_DIR/users`
-- Configuration files for FeatureFactory and JupyterHub: `FF_DATA_DIR/config`
+- Configuration files for FeatureHub and JupyterHub: `FF_DATA_DIR/config`
 - Log files for Hub and eval server: `FF_DATA_DIR/log`
 
 The MySQL database is mounted on a docker data volume:
@@ -144,8 +144,8 @@ The MySQL database is mounted on a docker data volume:
 
 ## App administration
 
-Admins can perform administrative tasks with respect to the Feature Factory app as well as
-the Feature Factory data science experiment. Admin users can manage and organize an
+Admins can perform administrative tasks with respect to the FeatureHub app as well as
+the FeatureHub data science experiment. Admin users can manage and organize an
 experiment without needing access to the host machine.
 
 Create an admin user using `users.py add --admin=True admin_username admin_password`.
@@ -196,7 +196,7 @@ make help
 ### Restarting the server
 
 You may want to restart the server to modify configuration of JupyterHub, update the
-Feature Factory code, or some other reason.
+FeatureHub code, or some other reason.
 
 Stop the app. This stops, but does *not* remove, the hub, user, and DB containers. Note that hub
 state files, user notebooks, and the database dump persist on the filesystem or in data
@@ -216,7 +216,7 @@ state files persist, user notebooks, and the database dump persist on the filesy
 make down
 ```
 
-*Optional*: Clean filesystem and containers. This stops and removes all Feature Factory
+*Optional*: Clean filesystem and containers. This stops and removes all FeatureHub
 containers, if not been already done. Additionally, user notebooks and config files are
 removed and data volumes are deleted. 
 ```
@@ -224,7 +224,7 @@ make clean
 ```
 
 *Optional*: In addition to the steps taken by `make clean`, cleans images, network, in
-addition to filesystem and containers.  This removes all trace of Feature Factory beside the
+addition to filesystem and containers.  This removes all trace of FeatureHub beside the
 source repository and the experiment data directory. Built images are removed and the docker
 internal network is shut down.
 ```

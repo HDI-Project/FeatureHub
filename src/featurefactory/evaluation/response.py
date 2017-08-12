@@ -105,7 +105,7 @@ class EvaluationResponse(Response):
         """ Return string representation of response.
 
         Return a descriptive representation of the response suitable for showing
-        Feature Factory users.
+        FeatureHub users.
         """
         explanation = self._get_explanation()
         metrics_str = self._get_metrics_str()

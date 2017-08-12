@@ -2,13 +2,13 @@
 
 # coding: utf-8
 
-# # Feature Factory Tutorial
+# # FeatureHub Tutorial
 # 
-# In this tutorial, we will go through the functionality offered by the Feature Factory library.
+# In this tutorial, we will go through the functionality offered by the FeatureHub library.
 
 # ## Prepare your session
 # 
-# We import `commands`, the Feature Factory client, into our workspace. We'll use this client to acquire data, evaluate our features, and register them with the Feature database.
+# We import `commands`, the FeatureHub client, into our workspace. We'll use this client to acquire data, evaluate our features, and register them with the Feature database.
 
 # In[ ]:
 
@@ -87,7 +87,7 @@ commands.discover_features(code_fragment="""fillna(""")
 
 # ## Write a new feature
 # 
-# Feature Factory asks you to observe some rudimentary scaffolding when you write a new feature.
+# FeatureHub asks you to observe some rudimentary scaffolding when you write a new feature.
 # 
 # Your feature is a function that should
 # 
@@ -137,7 +137,7 @@ commands.discover_features(code_fragment="""fillna(""")
 #         return None
 #         
 # 
-# Your feature will be evaluated by Feature Factory in an isolated namespace. This means that your feature cannot expect variables that you have defined at the global scope to exist. Similarly, *all module imports should be done within your function*.
+# Your feature will be evaluated by FeatureHub in an isolated namespace. This means that your feature cannot expect variables that you have defined at the global scope to exist. Similarly, *all module imports should be done within your function*.
 # 
 # The first feature below is *invalid*, because it uses a variable defined at the global scope:
 # 
@@ -187,7 +187,7 @@ hi_lo_age(dataset)
 # 5. Builds full feature matrix, by combining extracted feature values with pre-processed entity features.
 # 6. Fits model and computes metrics. Given the task (classification, regression, etc.), a model is chosen and fit given the full feature matrix. Then, appropriate metrics are computed via cross-validation and displayed.
 # 
-# In your workflow, you may run the `evaluate` function several times. At first, it may reveal bugs or syntax errors that you will fix. Next, it may reveal that your feature did not meet some of the Feature Factory requirements, such as returning a single column of values or using function-scope imports. Finally, you may find that your feature's performance, in terms of metrics like classification accuracy or mean squared error, are not as good as you hoped, and you may modify it or jettison it altogether.
+# In your workflow, you may run the `evaluate` function several times. At first, it may reveal bugs or syntax errors that you will fix. Next, it may reveal that your feature did not meet some of the FeatureHub requirements, such as returning a single column of values or using function-scope imports. Finally, you may find that your feature's performance, in terms of metrics like classification accuracy or mean squared error, are not as good as you hoped, and you may modify it or jettison it altogether.
 # 
 # The `evaluate` function takes a single argument: the candidate feature.
 

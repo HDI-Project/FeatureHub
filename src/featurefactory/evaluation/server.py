@@ -1,4 +1,4 @@
-"""Evaluation server for Feature Factory user notebooks."""
+"""Evaluation server for FeatureHub user notebooks."""
 
 # flask imports
 from functools import wraps
@@ -11,7 +11,7 @@ import logging
 # from jupyterhub.services.auth import HubAuth
 from featurefactory.evaluation.future import HubAuth
 
-# Feature Factory imports
+# FeatureHub imports
 import hashlib
 import dill
 from urllib.parse import unquote_to_bytes

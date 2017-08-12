@@ -5,7 +5,7 @@
 # You can set these variables from the command line.  SPHINXOPTS    = -c ./
 SPHINXAPIDOC  = sphinx-apidoc
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = FeatureFactory
+SPHINXPROJ    = FeatureHub
 SOURCEDIR     = src
 BUILDDIR      = _build
 PROJDIR       = ../src/featurefactory

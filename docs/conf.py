@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Feature Factory documentation build configuration file, created by
+# FeatureHub documentation build configuration file, created by
 # sphinx-quickstart on Sat Mar 25 19:59:43 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -62,7 +62,7 @@ source_parsers = {
 }
 
 # app setup hook
-github_doc_root = "https://github.com/HDI-Project/FeatureFactory"
+github_doc_root = "https://github.com/HDI-Project/FeatureHub"
 def setup(app):
     app.add_config_value('recommonmark_config', {
             'url_resolver': lambda url: github_doc_root + url,
@@ -74,7 +74,7 @@ def setup(app):
 master_doc = 'index'
 
 # General information about the project.
-project = 'Feature Factory'
+project = 'FeatureHub'
 copyright = '2017, Micah Smith'
 author = 'Micah Smith'
 
@@ -134,7 +134,7 @@ html_domain_indices = True
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'FeatureFactorydoc'
+htmlhelp_basename = 'FeatureHubdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -161,7 +161,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'FeatureFactory.tex', 'Feature Factory Documentation',
+    (master_doc, 'FeatureHub.tex', 'FeatureHub Documentation',
      'Micah Smith', 'manual'),
 ]
 
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'featurefactory', 'Feature Factory Documentation',
+    (master_doc, 'featurefactory', 'FeatureHub Documentation',
      [author], 1)
 ]
 
@@ -182,8 +182,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'FeatureFactory', 'Feature Factory Documentation',
-     author, 'FeatureFactory', 'One line description of project.',
+    (master_doc, 'FeatureHub', 'FeatureHub Documentation',
+     author, 'FeatureHub', 'One line description of project.',
      'Miscellaneous'),
 ]
 

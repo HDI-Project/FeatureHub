@@ -1,5 +1,5 @@
 """
-User-facing API for the Feature Factory collaborative platform.
+User-facing API for the FeatureHub collaborative platform.
 """
 
 import os
@@ -19,9 +19,9 @@ setup(
     author           = 'Micah Smith',
     author_email     = 'micahs@mit.edu',
     version          = __version__,
-    description      = 'Feature Factory',
+    description      = 'FeatureHub',
     long_description = '',
-    url              = 'https://github.com/HDI-Project/FeatureFactory',
+    url              = 'https://github.com/HDI-Project/FeatureHub',
     packages         = find_packages(exclude=["tests", "__pycache__"]),
     install_requires = [
         'dill',

@@ -15,7 +15,7 @@ from featurefactory.util import run_isolated, get_source, TRY_AGAIN_LATER
 from featurefactory.evaluation import EvaluatorClient
 
 class Session(object):
-    """Represents a user's session within Feature Factory.
+    """Represents a user's session within FeatureHub.
 
     Includes commands for discovering, testing, and registering new features.
     """
@@ -87,11 +87,11 @@ class Session(object):
                 if response.ok:
                     self.__username = name
                 else:
-                    raise ValueError("Couldn't log in to Feature Factory. " \
+                    raise ValueError("Couldn't log in to FeatureHub. " \
                                      + TRY_AGAIN_LATER) 
 
             except MultipleResultsFound as e:
-                raise ValueError("Unexpected error logging in to Feature Factory. " \
+                raise ValueError("Unexpected error logging in to FeatureHub. " \
                                  + TRY_AGAIN_LATER) 
 
     def get_sample_dataset(self):

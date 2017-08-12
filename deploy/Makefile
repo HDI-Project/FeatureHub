@@ -5,7 +5,7 @@ include .env
 
 .PHONY: help
 help:
-	@echo "Manage FeatureFactory deployment"
+	@echo "Manage FeatureHub deployment"
 	@echo ""
 	@echo "Options:"
 	@echo "    help: Display this help message."
