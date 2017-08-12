@@ -29,5 +29,7 @@ COPY src featurefactory
 WORKDIR featurefactory
 RUN /opt/conda/bin/python setup.py install
 
+RUN pip install xgboost
+
 # Same as jupyterhub/systemuser
 CMD ["sh", "/srv/singleuser/systemuser.sh"]

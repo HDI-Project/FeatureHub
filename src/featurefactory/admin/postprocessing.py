@@ -7,10 +7,11 @@ import urllib.parse
 import signal
 import json
 import traceback
+import numpy as np
 from contextlib import contextmanager
 from featurefactory.admin.sqlalchemy_declarative import *
 
-FEATURE_EXTRACTION_TIME_LIMIT = 60
+FEATURE_EXTRACTION_TIME_LIMIT = 40
 
 def load_features_df(session, problem_name):
 
@@ -51,7 +52,7 @@ def time_limit(seconds):
     finally:
         signal.alarm(0)
 
-def build_feature_matrix(features_df, dataset,
+def build_feature_matrix(features_df, dataset, group_id, group_feature_indices,
         feature_extraction_time_limit=FEATURE_EXTRACTION_TIME_LIMIT):
     """Build feature matrix from human-generated features."""
     feature_functions = features_df["feature_function"]
@@ -59,9 +60,9 @@ def build_feature_matrix(features_df, dataset,
 
     # extract feature values and names, giving a time limit on execution.
     features = []
-    for index, f in enumerate(feature_functions):
-        feature_name = f.__code__.co_name
-        frac = "{n}/{N}".format(n=index, N=num_features)
+    for index, (f, f_id) in enumerate(zip(feature_functions, group_feature_indices)):
+        feature_name = "{}_{:04d}".format(group_id, f_id)
+        frac = "{n}/{N}".format(n=index, N=num_features-1)
         print("Extracting feature {name:40.40} ({frac:>10.10})".format(
             name=feature_name, frac=frac), end='\r')
         try:
@@ -122,13 +123,11 @@ def build_and_save_all_features(commands, session, suffix, splits=[],
             build_and_save_all_features(commands, session, suffix)
     """
 
+    # assumes problem names/orderings constant across extractions
+    query = session.query(Problem).filter(Problem.name != "demo")
     if problem_names:
-        result = (session.query(Problem)
-                  .filter(Problem.name.in_(problem_names))
-                  .filter(Problem.name != "demo")
-                  .all())
-    else:
-        result = session.query(Problem).filter(Problem.name != "demo").all()
+        query = query.filter(Problem.name.in_(problem_names))
+    result = query.all()
     problem_names = [r.name for r in result]
     problem_ids   = [r.id for r in result]
 
@@ -139,15 +138,25 @@ def build_and_save_all_features(commands, session, suffix, splits=[],
         for split in splits:
             print("Processing features for problem {}, split {}"
                     .format(problem_name, split))
+
+            # load data
             _, dataset, entities_featurized, target = \
                 commands.load_dataset(problem_name=problem_name, split=split)
+
+            # extract features and indices
             if features_on_disk:
-                features_df = (load_table1("output/tables/features", suffix)
-                               .query("problem_id == @problem_id"))
+                tmp = load_table1("output/tables/features", suffix)
             else:
-                features_df = load_features_df(session, problem_name)
+                tmp = extract_table(session, Feature)
+            group_feature_indices = list(np.flatnonzero(tmp["problem_id"] == problem_id))
+            features_df = tmp.loc[group_feature_indices, :]
+    
+            # compute feature functions
             append_feature_functions(features_df, inplace=True)
-            feature_matrix = build_feature_matrix(features_df, dataset)
+            feature_matrix = build_feature_matrix(features_df, dataset,
+                    suffix, group_feature_indices)
+
+            # save results
             save_feature_matrix(feature_matrix, problem_name, split, suffix)
 
 def extract_and_save_all_tables(session, suffix):
@@ -190,7 +199,6 @@ def prepare_automl_file_name(problem_name, split, suffix):
     return os.path.join(dirname, name)
 
 def load_dataset_from_dir(session, data_dir, problem_name):
-
 
     # query db for import parameters to load files
     problem = session.query(Problem)\
@@ -239,3 +247,12 @@ def load_dataset_from_dir(session, data_dir, problem_name):
         target = None
 
     return dataset, entities_featurized, target
+
+def save_submission(df, problem_name, split_train, split_test, suffix):
+    underscore = "_" if suffix else ""
+    name1 = os.path.join("output", "submissions",
+            "submission_{}_{}_{}{}{}.csv".format(problem_name, split_train,
+                split_test, underscore, suffix))
+    fullname = os.path.join(os.path.expanduser("~"), "notebooks", name1)
+    df.to_csv(fullname, index=True, header=True)
+    print("Submission saved as {}".format(fullname))
