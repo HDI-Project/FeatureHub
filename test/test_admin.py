@@ -1,4 +1,4 @@
-from featurefactory.admin.admin import Commands
+from featurehub.admin.admin import Commands
 commands = Commands()
 commands.set_up()
 

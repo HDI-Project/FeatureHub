@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from featurefactory.admin.sqlalchemy_declarative import Base
+from featurehub.admin.sqlalchemy_declarative import Base
 from configparser import ConfigParser, NoSectionError
 import os
 from contextlib import contextmanager

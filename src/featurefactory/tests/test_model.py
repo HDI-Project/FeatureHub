@@ -1,13 +1,13 @@
 import sys
 import random
-import featurefactory.util
+import featurehub.util
 import numpy as np
 import pandas as pd
 import sklearn.datasets
 
-#from featurefactory.modeling.model_old import Model
-from featurefactory.modeling.model import Model
-from featurefactory.tests.util import EPSILON
+#from featurehub.modeling.model_old import Model
+from featurehub.modeling.model import Model
+from featurehub.tests.util import EPSILON
 
 # ------------------------------------------------------------------------------
 # Create fake data

@@ -9,7 +9,7 @@ from urllib.parse import quote
 from flask import Flask, redirect, request, Response
 import logging
 # from jupyterhub.services.auth import HubAuth
-from featurefactory.evaluation.future import HubAuth
+from featurehub.evaluation.future import HubAuth
 
 # FeatureHub imports
 import hashlib
@@ -17,12 +17,12 @@ import dill
 from urllib.parse import unquote_to_bytes
 from logging.handlers import RotatingFileHandler
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from featurefactory.evaluation                   import EvaluationResponse, EvaluatorServer
-from featurefactory.admin.sqlalchemy_main        import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import (
+from featurehub.evaluation                   import EvaluationResponse, EvaluatorServer
+from featurehub.admin.sqlalchemy_main        import ORMManager
+from featurehub.admin.sqlalchemy_declarative import (
     Feature, Problem, User, Metric, EvaluationAttempt)
-from featurefactory.evaluation.discourse         import post_feature
-from featurefactory.util                         import (
+from featurehub.evaluation.discourse         import post_feature
+from featurehub.util                         import (
     get_function, myhash, is_positive_env)
 
 # setup

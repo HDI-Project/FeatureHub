@@ -6,13 +6,13 @@ import requests
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from featurefactory.admin.sqlalchemy_main import ORMManager
-from featurefactory.admin.sqlalchemy_declarative import (
+from featurehub.admin.sqlalchemy_main import ORMManager
+from featurehub.admin.sqlalchemy_declarative import (
     Problem, Feature, User, Metric
 )
-from featurefactory.modeling import Model
-from featurefactory.util import run_isolated, get_source, TRY_AGAIN_LATER
-from featurefactory.evaluation import EvaluatorClient
+from featurehub.modeling import Model
+from featurehub.util import run_isolated, get_source, TRY_AGAIN_LATER
+from featurehub.evaluation import EvaluatorClient
 
 class Session(object):
     """Represents a user's session within FeatureHub.
@@ -20,7 +20,7 @@ class Session(object):
     Includes commands for discovering, testing, and registering new features.
     """
 
-    def __init__(self, problem, database = "featurefactory"):
+    def __init__(self, problem, database = "featurehub"):
         self.__database            = database
         self.__orm                 = ORMManager(database)
         self.__username            = None

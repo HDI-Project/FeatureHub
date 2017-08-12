@@ -1,6 +1,6 @@
 # Test of sberbank problem
 
-from featurefactory.problems.sberbank import commands
+from featurehub.problems.sberbank import commands
 dataset, target = commands.get_sample_dataset()
 
 def male_female_ratio(dataset):

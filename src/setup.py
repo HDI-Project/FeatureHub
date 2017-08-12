@@ -5,7 +5,7 @@ User-facing API for the FeatureHub collaborative platform.
 import os
 from setuptools import setup, find_packages
 
-name = "featurefactory"
+name = "featurehub"
 pkg_name = name       
 
 with open(os.path.join(pkg_name, '__init__.py')) as f:

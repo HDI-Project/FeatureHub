@@ -8,7 +8,7 @@ SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = FeatureHub
 SOURCEDIR     = src
 BUILDDIR      = _build
-PROJDIR       = ../src/featurefactory
+PROJDIR       = ../src/featurehub
 
 .PHONY: help
 help:

@@ -1,4 +1,4 @@
-from featurefactory.modeling import Metric, MetricList
+from featurehub.modeling import Metric, MetricList
 
 def test_metric():
     name    = "Accuracy"

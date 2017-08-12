@@ -1,5 +1,5 @@
-from featurefactory.user.session import Session
-from featurefactory.modeling import Metric, MetricList
+from featurehub.user.session import Session
+from featurehub.modeling import Metric, MetricList
 
 def test_print_one_feature():
     feature_description = "Age"

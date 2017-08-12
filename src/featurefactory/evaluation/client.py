@@ -8,13 +8,13 @@ import dill
 import traceback
 from urllib.parse import quote_from_bytes
 
-from featurefactory.util import (
+from featurehub.util import (
     compute_dataset_hash, run_isolated, get_source, possibly_talking_action,
     myhash
 )
-from featurefactory.admin.sqlalchemy_declarative import Problem, Feature
-from featurefactory.evaluation                   import EvaluationResponse
-from featurefactory.modeling                     import Model
+from featurehub.admin.sqlalchemy_declarative import Problem, Feature
+from featurehub.evaluation                   import EvaluationResponse
+from featurehub.modeling                     import Model
 
 class EvaluatorClient(object):
     def __init__(self, problem_id, username, orm, dataset={}, target=None,
@@ -82,7 +82,7 @@ class EvaluatorClient(object):
         description : str
             Feature description
         """
-        from featurefactory.user.session import Session
+        from featurehub.user.session import Session
         feature_dill = quote_from_bytes(dill.dumps(feature))
         code = get_source(feature)
         data = {
@@ -149,7 +149,7 @@ class EvaluatorClient(object):
         return metrics_user
 
     def _log_evaluation_attempt(self, feature):
-        from featurefactory.user.session import Session
+        from featurehub.user.session import Session
         code = get_source(feature)
         data = {
             "database"    : self.orm.database,

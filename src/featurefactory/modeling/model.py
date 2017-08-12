@@ -6,13 +6,13 @@ from collections import defaultdict
 from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from featurefactory.modeling.metrics import Metric, MetricList
-from featurefactory.util import RANDOM_STATE
+from featurehub.modeling.metrics import Metric, MetricList
+from featurehub.util import RANDOM_STATE
 
 # automl
 import autosklearn.classification
 import autosklearn.regression
-from featurefactory.modeling.metrics import rmsle_scorer, ndcg_scorer
+from featurehub.modeling.metrics import rmsle_scorer, ndcg_scorer
 
 class Model(object):
     """Versatile modeling object.

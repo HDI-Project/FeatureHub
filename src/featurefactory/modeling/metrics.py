@@ -1,5 +1,5 @@
 from collections import MutableSequence
-import featurefactory.modeling.model
+import featurehub.modeling.model
 
 import numpy as np
 from sklearn.metrics import mean_squared_error
@@ -98,10 +98,10 @@ class Metric(object):
                     return d["scoring"]
             return None
 
-        result = find_in_list(featurefactory.modeling.model.Model.CLASSIFICATION_SCORING)
+        result = find_in_list(featurehub.modeling.model.Model.CLASSIFICATION_SCORING)
         if result is not None:
             return result
-        result = find_in_list(featurefactory.modeling.model.Model.REGRESSION_SCORING)
+        result = find_in_list(featurehub.modeling.model.Model.REGRESSION_SCORING)
         if result is not None:
             return result
 

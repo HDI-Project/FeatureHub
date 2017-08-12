@@ -11,7 +11,7 @@ from collections import OrderedDict
 import docker
 
 # constants
-RESOURCES_DIRNAME = "/var/log/featurefactory/resources/"
+RESOURCES_DIRNAME = "/var/log/featurehub/resources/"
 STATS_TYPES = [
     "pids_stats",
     "memory_stats",

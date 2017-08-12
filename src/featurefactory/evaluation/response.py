@@ -1,7 +1,7 @@
 import json
 from flask import Response
-from featurefactory.modeling import MetricList
-from featurefactory.util import TRY_AGAIN_LATER
+from featurehub.modeling import MetricList
+from featurehub.util import TRY_AGAIN_LATER
 
 class EvaluationResponse(Response):
     """Wrapper class for response from evaluation server.

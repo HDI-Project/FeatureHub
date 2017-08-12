@@ -6,11 +6,11 @@ import pandas as pd
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import database_exists, create_database, drop_database
 
-from featurefactory.admin.sqlalchemy_declarative import (
+from featurehub.admin.sqlalchemy_declarative import (
     Base, Feature, Problem, User, Metric, EvaluationAttempt
 )
-from featurefactory.admin.sqlalchemy_main import ORMManager
-from featurefactory.util import possibly_talking_action
+from featurehub.admin.sqlalchemy_main import ORMManager
+from featurehub.util import possibly_talking_action
 
 
 class Commands(object):
@@ -20,7 +20,7 @@ class Commands(object):
     features.
     """
 
-    def __init__(self, problem=None, database="featurefactory"):
+    def __init__(self, problem=None, database="featurehub"):
         """Create the ORMManager and connect to DB.
 
         If problem name is given, load it.
@@ -29,7 +29,7 @@ class Commands(object):
         ----------
         problem : str, optional (default=None)
             Name of problem
-        database : str, optional (default="featurefactory")
+        database : str, optional (default="featurehub")
             Name of database within DBMS.
         """
 

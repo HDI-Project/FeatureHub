@@ -1,4 +1,4 @@
-from featurefactory.evaluation import EvaluationResponse
+from featurehub.evaluation import EvaluationResponse
 
 def test_response_status_code_only():
     all_status_codes = [

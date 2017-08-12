@@ -12,7 +12,7 @@
 
 # In[ ]:
 
-from featurefactory.problems.demo import commands
+from featurehub.problems.demo import commands
 
 
 # ## Acquire dataset

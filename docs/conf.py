@@ -21,12 +21,12 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../../src'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory/user'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory/admin'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory/problems'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory/evaluation'))
-sys.path.insert(0, os.path.abspath('../../src/featurefactory/modeling'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub/user'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub/admin'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub/problems'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub/evaluation'))
+sys.path.insert(0, os.path.abspath('../../src/featurehub/modeling'))
 
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'featurefactory', 'FeatureHub Documentation',
+    (master_doc, 'featurehub', 'FeatureHub Documentation',
      [author], 1)
 ]
 

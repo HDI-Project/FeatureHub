@@ -16,7 +16,7 @@ mysql_container_name       = os.environ["MYSQL_CONTAINER_NAME"]
 
 jupyterhub_config_dir      = os.path.join(ff_data_dir, "config", "jupyterhub")
 
-logo_file             = os.path.join(ff_data_dir, "config", "jupyterhub", "featurefactory.png")
+logo_file             = os.path.join(ff_data_dir, "config", "jupyterhub", "featurehub.png")
 cull_idle_filename    = os.path.join(jupyterhub_config_dir, "cull_idle_servers.py")
 if "FF_IDLE_SERVER_TIMEOUT" in os.environ:
     cull_idle_timeout = os.environ["FF_IDLE_SERVER_TIMEOUT"]
