@@ -100,7 +100,7 @@ class Monitor(object):
 
     def get_matching_containers(self):
         """
-        Return the ids of containers that are descended from the feature factory
+        Return the ids of containers that are descended from the FeatureHub 
         user image, or match the name of the JupyterHub or MySQL container, as
         set in the config variables.
         """

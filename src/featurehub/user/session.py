@@ -72,8 +72,8 @@ class Session(object):
     def _login(self):
         name = os.environ.get("USER")
         if not name:
-            raise ValueError("Missing environment variable 'USER'. Feature"
-                             " factory session not initialized.")
+            raise ValueError("Missing environment variable 'USER'. FeatureHub"
+                             " session not initialized.")
 
         with self.__orm.session_scope() as session:
             try:
