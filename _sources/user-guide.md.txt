@@ -1,12 +1,12 @@
 # User Guide
 
-## Accessing Feature Factory
+## Accessing FeatureHub
 
-You are a Feature Factory user as part of a data science experiment. First, an administrator
+You are a FeatureHub user as part of a data science experiment. First, an administrator
 will contact you with instructions on how to log in to the site. They will provide you with
 the site's domain name as well as your username and password.
 
-## Accessing Feature Factory Discourse forum
+## Accessing FeatureHub Discourse forum
 
 If the experiment is configured to integrate a Discourse forum for help and discussion, an
 administrator will contact you with instructions on how to log in to the site. They will

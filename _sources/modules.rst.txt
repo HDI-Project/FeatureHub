@@ -1,6 +1,7 @@
-featurefactory
-==============
+featurehub
+==========
 
-.. automodule:: featurefactory
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 4
+
+   featurehub

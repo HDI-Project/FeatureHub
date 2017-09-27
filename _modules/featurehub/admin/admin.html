@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>featurehub.admin.admin &mdash; FeatureHub 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="FeatureHub 0.3.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#build-the-app">Build the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#launch-the-app">Launch the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>featurehub.admin.admin</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/_modules/featurehub/admin/admin" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for featurehub.admin.admin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="k">import</span> <span class="n">NoResultFound</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy_utils</span> <span class="k">import</span> <span class="n">database_exists</span><span class="p">,</span> <span class="n">create_database</span><span class="p">,</span> <span class="n">drop_database</span>
+
+<span class="kn">from</span> <span class="nn">featurehub.admin.sqlalchemy_declarative</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">Base</span><span class="p">,</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">EvaluationAttempt</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">featurehub.admin.sqlalchemy_main</span> <span class="k">import</span> <span class="n">ORMManager</span>
+<span class="kn">from</span> <span class="nn">featurehub.util</span> <span class="k">import</span> <span class="n">possibly_talking_action</span>
+
+
+<div class="viewcode-block" id="Commands"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands">[docs]</a><span class="k">class</span> <span class="nc">Commands</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Admin interface for the database.</span>
+
+<span class="sd">    Create the schema, add or remove problems, and view problems, users, and</span>
+<span class="sd">    features.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s2">&quot;featurehub&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the ORMManager and connect to DB.</span>
+
+<span class="sd">        If problem name is given, load it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        problem : str, optional (default=None)</span>
+<span class="sd">            Name of problem</span>
+<span class="sd">        database : str, optional (default=&quot;featurehub&quot;)</span>
+<span class="sd">            Name of database within DBMS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span> <span class="o">=</span> <span class="n">ORMManager</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">database_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;database </span><span class="si">{}</span><span class="s2"> does not seem to exist.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You might want to create it by calling set_up method&quot;</span><span class="p">)</span>
+        <span class="k">elif</span>  <span class="n">problem</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                    <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>\
+                                     <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Problem </span><span class="si">{}</span><span class="s2"> does not exist!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You might want to create it by calling create_problem&quot;</span>
+                      <span class="s2">&quot; method&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Commands.set_up"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new DB and create the initial scheme.</span>
+
+<span class="sd">        If the database exists and drop=True, the existing database is dropped</span>
+<span class="sd">        and recreated. Regardless, any tables defined by the schema that do not</span>
+<span class="sd">        exist are created.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        drop : bool, optional (default=False)</span>
+<span class="sd">            Drop database if it already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># todo extract database name from engine url and report for brevity</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">engine</span>
+        <span class="k">if</span> <span class="n">database_exists</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database </span><span class="si">{}</span><span class="s2"> already exists.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dropping old database </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+                <span class="n">drop_database</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Re-creating database...&quot;</span><span class="p">):</span>
+                    <span class="n">create_database</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Creating database...&quot;</span><span class="p">):</span>
+                <span class="n">create_database</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Creating tables...&quot;</span><span class="p">):</span>
+            <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database </span><span class="si">{}</span><span class="s2"> created successfully&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Commands.bulk_create_problem_yml"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.bulk_create_problem_yml">[docs]</a>    <span class="k">def</span> <span class="nf">bulk_create_problem_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new problem entries in database from yml document stream.</span>
+
+<span class="sd">        Can create a yml file with individual problems delimited into documents</span>
+<span class="sd">        using the `---` ... `---` document stream syntax.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path: str or path-like</span>
+<span class="sd">            Path to yml file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">obj_all</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">obj_all</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_problem</span><span class="p">(</span><span class="o">**</span><span class="n">obj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Commands.create_problem_yml"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.create_problem_yml">[docs]</a>    <span class="k">def</span> <span class="nf">create_problem_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new problem entry in database from yml file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path: str or path-like</span>
+<span class="sd">            Path to yml file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_problem</span><span class="p">(</span><span class="o">**</span><span class="n">obj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Commands.create_problem"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.create_problem">[docs]</a>    <span class="k">def</span> <span class="nf">create_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">problem_type</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">problem_type_details</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">data_dir_train</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">data_dir_test</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">[],</span> <span class="n">table_names</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">entities_table_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">entities_featurized_table_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">target_table_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates new problem entry in database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">        problem_type : str</span>
+<span class="sd">            Classification or regression</span>
+<span class="sd">        problem_type_details : dict</span>
+<span class="sd">            Dict with additional details about problem.</span>
+<span class="sd">            For example, the dict may be {&quot;classification_type&quot; : &quot;multiclass&quot;}.</span>
+<span class="sd">        data_dir_train : str</span>
+<span class="sd">            Absolute path of containing directory of data files for training.</span>
+<span class="sd">        data_dir_test : str</span>
+<span class="sd">            Absolute path of containing directory of data files for testing</span>
+<span class="sd">        files : list of str</span>
+<span class="sd">            List of file paths relative to data_dir; files must be named</span>
+<span class="sd">            identically within both data_dir directories.</span>
+<span class="sd">        table_names : list of str</span>
+<span class="sd">            List of table names, corresponding exactly to `files`</span>
+<span class="sd">        entities_table_name : str</span>
+<span class="sd">            Name of table that contains the entity variables. Must be found in</span>
+<span class="sd">            `table_names`.</span>
+<span class="sd">        entities_featurized_table_name : str</span>
+<span class="sd">            Name of table that contains the pre-processed, featurized, entity</span>
+<span class="sd">            variables. Must be found in `table_names`.</span>
+<span class="sd">        target_table_name : str</span>
+<span class="sd">            Name of table that contains the target variable (label). Must be</span>
+<span class="sd">            found in table_names. Table must hold a single column with label</span>
+<span class="sd">            values only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> already exists&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
+                <span class="k">pass</span>    <span class="c1"># we will create it</span>
+
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+                <span class="n">name</span>                           <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
+                <span class="n">problem_type</span>                   <span class="o">=</span> <span class="n">problem_type</span><span class="p">,</span>
+                <span class="n">problem_type_details</span>           <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">problem_type_details</span><span class="p">),</span>
+                <span class="n">data_dir_train</span>                 <span class="o">=</span> <span class="n">data_dir_train</span><span class="p">,</span>
+                <span class="n">data_dir_test</span>                  <span class="o">=</span> <span class="n">data_dir_test</span><span class="p">,</span>
+                <span class="n">files</span>                          <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+                <span class="n">table_names</span>                    <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">table_names</span><span class="p">),</span>
+                <span class="n">entities_table_name</span>            <span class="o">=</span> <span class="n">entities_table_name</span><span class="p">,</span>
+                <span class="n">entities_featurized_table_name</span> <span class="o">=</span> <span class="n">entities_featurized_table_name</span><span class="p">,</span>
+                <span class="n">target_table_name</span>              <span class="o">=</span> <span class="n">target_table_name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">id</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Problem </span><span class="si">{}</span><span class="s2"> successfully created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Commands.get_problems"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.get_problems">[docs]</a>    <span class="k">def</span> <span class="nf">get_problems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of problems in the database.&quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">problems</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">]</span>
+            <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Commands.get_features"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.admin.Commands.get_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a DataFrame with the details about all registered features.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_features</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">user_name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">feature_dicts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">user_name</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;user&quot;</span>        <span class="p">:</span> <span class="n">user_name</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span> <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;md5&quot;</span>         <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">md5</span><span class="p">,</span>
+                    <span class="s2">&quot;created_at&quot;</span>  <span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">feature_metrics</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Metric</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">Metric</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Metric</span><span class="o">.</span><span class="n">feature_id</span> <span class="o">==</span>
+                                <span class="n">feature</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="c1"># feature_metrics = feature.metrics</span>
+                <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">feature_metrics</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">value</span>
+
+                <span class="n">feature_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">feature_dicts</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No features found&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">feature_dicts</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a query filtering a given user for the current problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        user_name : str, optional(default=None)</span>
+<span class="sd">            If no user name provided, returns features for all users.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#TODO pivot metrics tables</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Feature</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1">#query = session.query(Feature, User.name, Metric)</span>
+
+        <span class="k">if</span> <span class="n">user_name</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">user_name</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Feature</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__problemid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.3.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

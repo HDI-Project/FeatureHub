@@ -1,0 +1,533 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# FeatureHub Tutorial\n",
+    "\n",
+    "In this tutorial, we will go through the functionality offered by FeatureHub, a cloud platform for feature engineering.\n",
+    "\n",
+    "*What is feature engineering?* Feature engineering is the step in the data science pipeline in which raw variables are transformed to create features ready for inclusion in a machine learning model. This is a critical step in a typical data science pipeline and can be one of the most challenging aspects of a prediction task. Indeed, human intuition and domain expertise often play a key role in the generation of high-quality features.\n",
+    "\n",
+    "## Outline\n",
+    "\n",
+    "- [Getting started](#Prepare-your-session)\n",
+    "- [Write a new feature](#Write-a-new-feature)\n",
+    "- [Evaluate locally](#Evaluate-a-feature-on-training-data)\n",
+    "- [Submit to database](#Submit-a-feature-to-Feature-database)\n",
+    "- [More details on writing features](#More-feature-scaffolding)\n",
+    "- [Getting help](#Getting-help)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Prepare your session\n",
+    "\n",
+    "([back to top](#Outline))\n",
+    "\n",
+    "We import `commands`, the FeatureHub client, into our workspace. We'll use this client to acquire data, evaluate our features, and register them with the Feature database."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "from featurehub.problems.demo import commands"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Acquire dataset\n",
+    "\n",
+    "We use `get_sample_dataset` to load the training data into our workspace. The result is a tuple where the first element is `dataset`, a dictionary mapping table names to Pandas `DataFrame`s, and the second element is `target`, a Pandas `DataFrame` with one column. This one column is what we are trying to predict."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "dataset, target = commands.get_sample_dataset()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can explore our data inline in the Notebook."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "list(dataset.keys())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "dataset[\"users\"].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "dataset[\"groups\"].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "target.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Explore existing features\n",
+    "\n",
+    "We can use several methods to see what features have already been registered to the Feature database.\n",
+    "\n",
+    "The first method, `print_my_features`, prints the features that you have registered to the database."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "commands.print_my_features()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also pass additional parameters to `print_my_features` to filter by code fragments or to see a certain type of metric, if available."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "commands.print_my_features(code_fragment=\"\"\"dataset[\"users\"][\"name\"]\"\"\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To see detailed documentation, try using Jupyter Notebook's built-in documentation system by appending a `?` to the end of a method name."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "commands.print_my_features?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The second method, `discover_features`, prints features that other participants have registered to the Feature database. This allows you to discover code that has already been written, so you can either avoid duplicating work or come up with new ideas."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "commands.discover_features()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The same additional parameters, `code_fragment` and `metric_name`, are available."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "commands.discover_features(code_fragment=\"\"\"fillna(\"\"\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Write a new feature\n",
+    "\n",
+    "([back to top](#Outline))\n",
+    "\n",
+    "FeatureHub asks you to observe some rudimentary scaffolding when you write a new feature.\n",
+    "\n",
+    "Your feature is a function that should\n",
+    "\n",
+    "<ul style=\"list-style: none;\">\n",
+    "<li>✓ accept a single parameter, `dataset` </li>\n",
+    "<li>✓ return a *single column* of values\n",
+    "    <ul>\n",
+    "        <li> that has as many rows as there are entities in the dataset </li>\n",
+    "        <li> that is *ordered* in the same way as the entities (that is, don't sort your feature values!) </li>\n",
+    "        <li> that can be coerced to a `DataFrame` </li>\n",
+    "    </ul>\n",
+    "</li>\n",
+    "<li> ✓ be defined in the global scope </li>\n",
+    "<li> ✓ import all required modules that it requires within the function body </li>\n",
+    "</ul>\n",
+    "    \n",
+    "Your feature should *not*\n",
+    "<ul style=\"list-style: none;\">\n",
+    "<li> ✗ modify the underlying dataset </li>\n",
+    "<li> ✗ use other variables or external module members defined at the global scope (see below) </li>\n",
+    "</ul>\n",
+    "\n",
+    "[Skip below](#More-feature-scaffolding) to read more about good and bad features in FeatureHub.\n",
+    "\n",
+    "Here is one good example of a feature. You can execute the feature right away to see what it returns."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "def hi_lo_age(dataset):\n",
+    "    from sklearn.preprocessing import binarize\n",
+    "    cutoff = 30\n",
+    "    return binarize(dataset[\"users\"][\"age\"].values.reshape(-1,1), cutoff)\n",
+    "\n",
+    "hi_lo_age(dataset)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Evaluate a feature on training data\n",
+    "\n",
+    "([back to top](#Outline))\n",
+    "\n",
+    "Now that we have written a candidate feature, we can evaluate it on training data. The evaluation routine proceeds as follows.\n",
+    "\n",
+    "1. Obtains a valid dataset. That is, if the `dataset` has been modified, it is reloaded.\n",
+    "2. Extracts features. That is, your function is called with the dataset as its parameter, returning a column of values.\n",
+    "3. Verifies the integrity of the dataset, in that it was not changed by executing the feature.\n",
+    "4. Validates feature values, to ensure they meet the requirements listed above.\n",
+    "5. Builds full feature matrix, by combining extracted feature values with pre-processed entity features.\n",
+    "6. Fits model and computes metrics. Given the task (classification, regression, etc.), a model is chosen and fit given the full feature matrix. Then, appropriate metrics are computed via cross-validation and displayed.\n",
+    "\n",
+    "In your workflow, you may run the `evaluate` function several times. At first, it may reveal bugs or syntax errors that you will fix. Next, it may reveal that your feature did not meet some of the FeatureHub requirements, such as returning a single column of values or using function-scope imports. Finally, you may find that your feature's performance, in terms of metrics like classification accuracy or mean squared error, are not as good as you hoped, and you may modify it or jettison it altogether.\n",
+    "\n",
+    "The `evaluate` function takes a single argument: the candidate feature."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "commands.evaluate(hi_lo_age)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Submit a feature to Feature database\n",
+    "\n",
+    "([back to top](#Outline))\n",
+    "\n",
+    "Now that you have evaluated your feature locally on training data, and are happy with its performance, you can submit it to the Feature Evaluation Server. The evaluation server will essentially repeat the steps in `evaluate`, with some slight changes. For example, it fits the model on the training dataset and evaluates it on the *test dataset*, without performing cross-validation.\n",
+    "\n",
+    "During submission, you are asked to write a natural language description (in English) of your feature. Imagine that you are explaining your code to a non-technical colleague. This description should be \n",
+    "- *clear*\n",
+    "- *concise*\n",
+    "- *informative* to a domain expert who is not a data scientist\n",
+    "- *accurate* (in that your description matches what the code actually does)\n",
+    "\n",
+    "You will be prompted to type in a description to a textbox input. Alternately, you can pass a string using the keyword argument `description`.\n",
+    "\n",
+    "If there are no issues, the feature and its associated performance metrics are added to the Feature database (\"registered\").\n",
+    "\n",
+    "The feature may also be posted automatically to the FeatureHub forum (not applicable for this Tutorial). A link will be printed, and you can navigate directly to your post to join the conversation."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "commands.submit(hi_lo_age)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Final notes\n",
+    "\n",
+    "As briefly mentioned in the section on feature evaluation, FeatureHub may combine your feature values with preproccessed entity-level features, if applicable to the problem. Problem descriptions will describe the transformations done during preprocessing. You can also inspect the entity-level features directly."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "entity_features = commands.get_entity_features()\n",
+    "entity_features.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## More feature scaffolding\n",
+    "\n",
+    "([back to top](#Outline)) ([back to writing features](#Write-a-new-feature))\n",
+    "\n",
+    "Let's take a closer look at how good and bad features are written in FeatureHub. Here, we are just talking about the *scaffolding* of the feature, and not whether the feature has predictive power in a machine learning model or any semantic meaning.\n",
+    "\n",
+    "Here are some examples of good and bad features, with explanations:\n",
+    "\n",
+    "```python\n",
+    "# good - one parameter, imports numpy within function scope,\n",
+    "#        returns column of values of the right shape.\n",
+    "def all_zeros(dataset):\n",
+    "    from numpy import zeros\n",
+    "    n = len(dataset[\"users\"])\n",
+    "    return zeros((n,1))\n",
+    "\n",
+    "# bad - wrong number of parameters\n",
+    "def two_parameters(users, groups):\n",
+    "    return users[\"age\"]\n",
+    "\n",
+    "# bad - return value cannot be coerced to DataFrame\n",
+    "def scalar_zero(dataset):\n",
+    "    return 0\n",
+    "\n",
+    "# bad - return value is not correct shape\n",
+    "def row_of_zeros(dataset):\n",
+    "    from numpy import zeros\n",
+    "    return zeros((20,20))\n",
+    "\n",
+    "# bad - modifies underlying dataset!\n",
+    "def modify_dataset(dataset):\n",
+    "    dataset[\"users\"].iloc[0,0] += 1\n",
+    "    return None\n",
+    "```       "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Don't use global variables\n",
+    "\n",
+    "Your feature will be evaluated by FeatureHub in an isolated namespace. This means that your feature cannot expect variables or modules that you have defined at the global scope to exist. By \"global scope\", we mean variables or modules that are defined outside of your function definition.\n",
+    "\n",
+    "Similarly, *all module imports should be done within your function*. In the next section, we'll demonstrate an easy-to-use workflow that gets around this limitation.\n",
+    "\n",
+    "This feature is *invalid*, because it uses a variable, `cutoff`, defined at the global scope (outside of the function definition):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# bad\n",
+    "cutoff = 30\n",
+    "def hi_lo_age(dataset):\n",
+    "    from sklearn.preprocessing import binarize\n",
+    "    return binarize(dataset[\"users\"][\"age\"].values.reshape(-1,1), cutoff)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This feature is okay, because it moves the variable into the function definition:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# better\n",
+    "def hi_lo_age(dataset):\n",
+    "    from sklearn.preprocessing import binarize\n",
+    "    cutoff = 30\n",
+    "    return binarize(dataset[\"users\"][\"age\"].values.reshape(-1,1), cutoff)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "One exception to this requirement is that you can use helper *functions* that you define at the global scope:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "def first_name_is_longer(name):\n",
+    "    first, last = name.split(\" \")\n",
+    "    return len(first) > len(last)\n",
+    "\n",
+    "# okay\n",
+    "def long_first_name(dataset):\n",
+    "    return dataset[\"users\"][\"name\"].apply(first_name_is_longer)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Use a helper function for imports\n",
+    "\n",
+    "You might want to import the same set of modules in many different features without re-typing them. You can use a helper function to import them, while still avoiding using global variables.\n",
+    "\n",
+    "In the following example, we define a function `imports` that declares `pd` and `np` as global variables and then imports the corresponding libraries. This function can then be called in any feature to make those libraries available."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "def imports():\n",
+    "    global pd, np\n",
+    "    import pandas as pd\n",
+    "    import numpy as np\n",
+    "    \n",
+    "def age_with_random_noise(dataset):\n",
+    "    imports()\n",
+    "    \n",
+    "    n = len(dataset[\"users\"])\n",
+    "    noise = np.random.rand(n)\n",
+    "    return dataset[\"users\"] + noise"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Getting help\n",
+    "\n",
+    "([back to top](#Outline))\n",
+    "\n",
+    "If you need further help, there are several resources available.\n",
+    "\n",
+    "- Check out the FeatureHub [User Guide](https://hdi-project.github.io/FeatureHub/user-guide.html)\n",
+    "- Check out the FeatureHub [FAQ](https://hdi-project.github.io/FeatureHub/faq.html)\n",
+    "- Ask for help on the FeatureHub [forum](https://discourse.featurehub.net)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

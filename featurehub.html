@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>featurehub package &mdash; FeatureHub 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>featurehub package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/featurehub.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="featurehub-package">
+<h1>featurehub package<a class="headerlink" href="#featurehub-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="featurehub.admin.html">featurehub.admin package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.admin.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.admin.html#module-featurehub.admin.admin">featurehub.admin.admin module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.admin.html#module-featurehub.admin.sqlalchemy_declarative">featurehub.admin.sqlalchemy_declarative module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.admin.html#module-featurehub.admin.sqlalchemy_main">featurehub.admin.sqlalchemy_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.admin.html#module-featurehub.admin">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="featurehub.evaluation.html">featurehub.evaluation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#featurehub-evaluation-client-module">featurehub.evaluation.client module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#featurehub-evaluation-discourse-module">featurehub.evaluation.discourse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#featurehub-evaluation-future-module">featurehub.evaluation.future module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#featurehub-evaluation-response-module">featurehub.evaluation.response module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#featurehub-evaluation-server-module">featurehub.evaluation.server module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.evaluation.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="featurehub.modeling.html">featurehub.modeling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.modeling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.modeling.html#module-featurehub.modeling.metrics">featurehub.modeling.metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.modeling.html#featurehub-modeling-model-module">featurehub.modeling.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.modeling.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="featurehub.problems.html">featurehub.problems package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.problems.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="featurehub.user.html">featurehub.user package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.user.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.user.html#featurehub-user-session-module">featurehub.user.session module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="featurehub.user.html#module-featurehub.user">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurehub.util">
+<span id="featurehub-util-module"></span><h2>featurehub.util module<a class="headerlink" href="#module-featurehub.util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="featurehub.util.compute_dataset_hash">
+<code class="descclassname">featurehub.util.</code><code class="descname">compute_dataset_hash</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#compute_dataset_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.compute_dataset_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return hash value of dataset contents.</p>
+<p>Uses xxhash.xxh64 hash algorithm for performance, but this algorithm should
+not be considered cryptographically secure.</p>
+<p>dataset : dict mapping str to pd.DataFrame</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.get_function">
+<code class="descclassname">featurehub.util.</code><code class="descname">get_function</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#get_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.get_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a function from given source code.</p>
+<p>This function is usually called on source code that was in turn produced by
+get_source. Note that the source code produced by get_source includes the
+source for the top-level function as well as any other local functions it
+calls. Here, we return the top-level function directly.</p>
+<p>source : str or bytes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.get_function2">
+<code class="descclassname">featurehub.util.</code><code class="descname">get_function2</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#get_function2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.get_function2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a function from given source code.</p>
+<p>This function is usually called on source code that was in turn produced by
+get_source. This function differs from <a class="reference internal" href="#featurehub.util.get_function" title="featurehub.util.get_function"><code class="xref py py-obj docutils literal"><span class="pre">get_function</span></code></a> in the method used is
+to write the source code to a file and then import that file as a new
+module.</p>
+<p>Note that the source code produced by get_source includes the source for the
+top-level function as well as any other local functions it calls. Here, we
+return the top-level function directly.</p>
+<p>Caveat: This does not solve the problem of being able to re-extract source
+from the returned function. (Or, at least, as currently implemented.)</p>
+<p>source : str, bytes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.get_source">
+<code class="descclassname">featurehub.util.</code><code class="descname">get_source</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#get_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.get_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the source code from a given function.</p>
+<p>Recursively extracts the source code for all local functions called by given
+function. The resulting source code is encoded in utf-8.</p>
+<p>Limitations: Cannot use <a class="reference internal" href="#featurehub.util.get_source" title="featurehub.util.get_source"><code class="xref py py-obj docutils literal"><span class="pre">get_source</span></code></a> on function defined interactively in
+normal Python terminal. Functions defined interactively in IPython are still
+okay.</p>
+<p>function : function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.get_top_level_function_name">
+<code class="descclassname">featurehub.util.</code><code class="descname">get_top_level_function_name</code><span class="sig-paren">(</span><em>namespace, remove_names=['__builtins__']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#get_top_level_function_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.get_top_level_function_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Figure out which is the top-level function in a namespace.</p>
+<p>The top-level function is defined as the function that is not a name in any
+other functions.  co_names is a tuple of local names.  We could make more
+efficient, using constant lookups of names, stopping when there is only name
+left, and confirming this name is not called by anyone; but hard to
+anticipate a situation where user defines function chain that is long enough
+that this efficiency is required.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.is_positive_env">
+<code class="descclassname">featurehub.util.</code><code class="descname">is_positive_env</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#is_positive_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.is_positive_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.myhash">
+<code class="descclassname">featurehub.util.</code><code class="descname">myhash</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#myhash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.myhash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute md5 checksum of string-like object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.possibly_talking_action">
+<code class="descclassname">featurehub.util.</code><code class="descname">possibly_talking_action</code><span class="sig-paren">(</span><em>action</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#possibly_talking_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.possibly_talking_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap statements with description of their action.</p>
+<p>Simply prints action before executing statement, without a trailing
+newline, and prints ‘done’ afterwards.</p>
+<dl class="docutils">
+<dt>action <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>description of action</dd>
+<dt>verbose <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=True)</span></dt>
+<dd>whether to print anything at all</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">possibly_talking_action</span><span class="p">(</span><span class="s2">&quot;Calling foo...&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+<span class="go">        foo()</span>
+<span class="go">Calling foo...done</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.util.run_isolated">
+<code class="descclassname">featurehub.util.</code><code class="descname">run_isolated</code><span class="sig-paren">(</span><em>f</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/util.html#run_isolated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.util.run_isolated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute <code class="xref py py-obj docutils literal"><span class="pre">f(args)</span></code> in an isolated environment.</p>
+<p>First, uses dill to serialize the function. Unfortunately, pickle is unable
+to serialize some functions, so we must serialize and deserialize the
+function ourselves.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-featurehub">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurehub" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

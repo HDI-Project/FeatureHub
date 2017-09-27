@@ -1,58 +1,244 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Deployment &#8212; Feature Factory 0.3.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.3.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="FAQ" href="faq.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="faq.html" title="FAQ"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Deployment &mdash; FeatureHub 0.3.0 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/>
+        <link rel="prev" title="FAQ" href="faq.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
             
-  <div class="section" id="deployment">
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#build-the-app">Build the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#launch-the-app">Launch the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Deployment</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/deployment.md" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="deployment">
 <span id="deployment"></span><h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
-<p>A variety of resources facilitate easy deployment of Feature Factory:</p>
+<p>A variety of resources facilitate easy deployment of FeatureHub:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">Makefile</span></code> to manage all resources</li>
 <li><code class="docutils literal"><span class="pre">docker</span></code></li>
@@ -69,8 +255,8 @@
 <ol>
 <li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
 </li>
-<li><p class="first">Download the FeatureFactory repository.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureFactory.git
+<li><p class="first">Download the FeatureHub repository.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureHub.git
 </pre></div>
 </div>
 </li>
@@ -90,14 +276,14 @@ pip-3.5 install --upgrade pip
 </div>
 <div class="section" id="configuration">
 <span id="configuration"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>Feature Factory allows configuration in several places.</p>
+<p>FeatureHub allows configuration in several places.</p>
 <div class="section" id="app-deployment">
 <span id="app-deployment"></span><h3>App Deployment<a class="headerlink" href="#app-deployment" title="Permalink to this headline">¶</a></h3>
 <p>Default app configuration variables are provided in <code class="docutils literal"><span class="pre">deploy/.env</span></code>.</p>
 <p>To override any of these defaults, set these variables in a new file <code class="docutils literal"><span class="pre">deploy/.env.local</span></code>.</p>
 <p>Definitely override values for these variables:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let&#8217;s Encrypt.</li>
+<li><code class="docutils literal"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let's Encrypt.</li>
 <li><code class="docutils literal"><span class="pre">FF_DOMAIN_EMAIL</span></code>: email associated with domain name registration</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
 <li><code class="docutils literal"><span class="pre">EVAL_API_TOKEN</span></code>: API token for eval server. You should generate a valid API token by
@@ -126,7 +312,7 @@ setting up the Discourse instance.</li>
 server is idle for this amount of time, then it will be automatically stopped. Due to some
 JupyterHub defaults, this value should be set to at least 5m 30s (<code class="docutils literal"><span class="pre">330</span></code>).</li>
 <li><code class="docutils literal"><span class="pre">FF_CONTAINER_MEMLIMIT</span></code>: memory limit for user containers. The value can either be an
-integer (bytes) or a string with a &#8216;K&#8217;, &#8216;M&#8217;, &#8216;G&#8217; or &#8216;T&#8217; prefix.</li>
+integer (bytes) or a string with a 'K', 'M', 'G' or 'T' prefix.</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_CONTAINER_NAME</span></code>: name for docker DB container</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_ROOT_USERNAME</span></code>: username for DB root user</li>
 <li><code class="docutils literal"><span class="pre">MYSQL_DATABASE</span></code>: competition database name in DB</li>
@@ -161,7 +347,7 @@ it should be avoided entirely in favor of <a class="reference external" href="#u
 <div class="section" id="jupyterhub-and-jupyter-notebook">
 <span id="jupyterhub-and-jupyter-notebook"></span><h3>Jupyterhub and Jupyter Notebook<a class="headerlink" href="#jupyterhub-and-jupyter-notebook" title="Permalink to this headline">¶</a></h3>
 <p>You may want to modify the default <code class="docutils literal"><span class="pre">deploy/jupyterhub_config.py</span></code> file. However, you should
-know what you&#8217;re doing to not break things.</p>
+know what you're doing to not break things.</p>
 </div>
 </div>
 <div class="section" id="build-the-app">
@@ -189,7 +375,7 @@ containers:</p>
 <li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/train</span></code> and <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/test</span></code></li>
 <li>Problem definitions: <code class="docutils literal"><span class="pre">FF_DATA_DIR/problems</span></code></li>
 <li>Notebooks and other user-created files: <code class="docutils literal"><span class="pre">FF_DATA_DIR/users</span></code></li>
-<li>Configuration files for FeatureFactory and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
+<li>Configuration files for FeatureHub and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
 <li>Log files for Hub and eval server: <code class="docutils literal"><span class="pre">FF_DATA_DIR/log</span></code></li>
 </ul>
 <p>The MySQL database is mounted on a docker data volume:</p>
@@ -199,8 +385,8 @@ containers:</p>
 </div>
 <div class="section" id="app-administration">
 <span id="app-administration"></span><h2>App administration<a class="headerlink" href="#app-administration" title="Permalink to this headline">¶</a></h2>
-<p>Admins can perform administrative tasks with respect to the Feature Factory app as well as
-the Feature Factory data science experiment. Admin users can manage and organize an
+<p>Admins can perform administrative tasks with respect to the FeatureHub app as well as
+the FeatureHub data science experiment. Admin users can manage and organize an
 experiment without needing access to the host machine.</p>
 <p>Create an admin user using <code class="docutils literal"><span class="pre">users.py</span> <span class="pre">add</span> <span class="pre">--admin=True</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
 <p>App admin</p>
@@ -220,7 +406,7 @@ experiment data, and configure experiment parameters.</li>
 </ul>
 <div class="section" id="hub-api-client">
 <span id="hub-api-client"></span><h3>Hub API client<a class="headerlink" href="#hub-api-client" title="Permalink to this headline">¶</a></h3>
-<p>Admins can also use a command line API client to interact with the Hub&#8217;s REST API. To use
+<p>Admins can also use a command line API client to interact with the Hub's REST API. To use
 this, you must set an API key for the client to use in the <code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code>
 environment variable. See <a class="reference external" href="#app-deployment">App Deployment</a> above.</p>
 <p>See the available commands:</p>
@@ -246,7 +432,7 @@ environment variable. See <a class="reference external" href="#app-deployment">A
 <div class="section" id="restarting-the-server">
 <span id="restarting-the-server"></span><h3>Restarting the server<a class="headerlink" href="#restarting-the-server" title="Permalink to this headline">¶</a></h3>
 <p>You may want to restart the server to modify configuration of JupyterHub, update the
-Feature Factory code, or some other reason.</p>
+FeatureHub code, or some other reason.</p>
 <p>Stop the app. This stops, but does <em>not</em> remove, the hub, user, and DB containers. Note that hub
 state files, user notebooks, and the database dump persist on the filesystem or in data
 volumes.</p>
@@ -262,14 +448,14 @@ state files persist, user notebooks, and the database dump persist on the filesy
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">down</span>
 </pre></div>
 </div>
-<p><em>Optional</em>: Clean filesystem and containers. This stops and removes all Feature Factory
+<p><em>Optional</em>: Clean filesystem and containers. This stops and removes all FeatureHub
 containers, if not been already done. Additionally, user notebooks and config files are
 removed and data volumes are deleted.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
 </pre></div>
 </div>
 <p><em>Optional</em>: In addition to the steps taken by <code class="docutils literal"><span class="pre">make</span> <span class="pre">clean</span></code>, cleans images, network, in
-addition to filesystem and containers.  This removes all trace of Feature Factory beside the
+addition to filesystem and containers.  This removes all trace of FeatureHub beside the
 source repository and the experiment data directory. Built images are removed and the docker
 internal network is shut down.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean_all</span>
@@ -280,78 +466,74 @@ internal network is shut down.</p>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Deployment</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#configuration">Configuration</a><ul>
-<li><a class="reference internal" href="#app-deployment">App Deployment</a></li>
-<li><a class="reference internal" href="#userlist">Userlist</a></li>
-<li><a class="reference internal" href="#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#build-the-app">Build the app</a></li>
-<li><a class="reference internal" href="#launch-the-app">Launch the app</a></li>
-<li><a class="reference internal" href="#user-and-data-management">User and data management</a></li>
-<li><a class="reference internal" href="#app-administration">App administration</a><ul>
-<li><a class="reference internal" href="#hub-api-client">Hub API client</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#manage-app-lifecycle">Manage app lifecycle</a><ul>
-<li><a class="reference internal" href="#restarting-the-server">Restarting the server</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="faq.html" class="btn btn-neutral" title="FAQ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="faq.html"
-                        title="previous chapter">FAQ</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/deployment.md.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="faq.html" title="FAQ"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Feature Factory 0.3.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Micah Smith.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

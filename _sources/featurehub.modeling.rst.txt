@@ -1,0 +1,30 @@
+featurehub\.modeling package
+============================
+
+Submodules
+----------
+
+featurehub\.modeling\.metrics module
+------------------------------------
+
+.. automodule:: featurehub.modeling.metrics
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+featurehub\.modeling\.model module
+----------------------------------
+
+.. automodule:: featurehub.modeling.model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: featurehub.modeling
+    :members:
+    :undoc-members:
+    :show-inheritance:

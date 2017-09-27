@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>FeatureHub &mdash; FeatureHub 0.3.0 documentation</title>
+  <title>featurehub.evaluation package &mdash; FeatureHub 0.3.0 documentation</title>
   
 
   
@@ -37,8 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="#"/>
-        <link rel="next" title="Intro" href="intro.html"/> 
+    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -57,7 +56,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> FeatureHub
+            <a href="index.html" class="icon icon-home"> FeatureHub
           
 
           
@@ -151,7 +150,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">FeatureHub</a>
+          <a href="index.html">FeatureHub</a>
         
       </nav>
 
@@ -179,16 +178,16 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>FeatureHub</li>
+      <li>featurehub.evaluation package</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
             
-              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/index.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/featurehub.evaluation.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -236,67 +235,29 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="featurehub">
-<h1>FeatureHub<a class="headerlink" href="#featurehub" title="Permalink to this headline">¶</a></h1>
-<p><em>FeatureHub</em> is a web application built on top of JupyterHub and an accompanying Python
-package that together facilitate collaborative data science efforts as well as data collection
-experiments on those efforts.</p>
-<p>The FeatureHub Python package is used to administer a data science collaboration. It
-allows users to “register” features in a database backend and discover features written by
-other users. These features are automatically scored by the system so that users can see
-realtime feedback on the quality of their features.</p>
-<p>The FeatureHub app includes a JupyterHub server, containerized Jupyter notebooks for
-each user with the FeatureHub package installed, a database backend to store the
-features, and data- and user-management tools.</p>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Table of Contents</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user-guide.html">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">FeatureHub Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Outline">Outline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Prepare-your-session">Prepare your session</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Explore-existing-features">Explore existing features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Getting-help">Getting help</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#configuration">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a></li>
-</ul>
-</li>
-</ul>
+<div class="section" id="featurehub-evaluation-package">
+<h1>featurehub.evaluation package<a class="headerlink" href="#featurehub-evaluation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="featurehub-evaluation-client-module">
+<h2>featurehub.evaluation.client module<a class="headerlink" href="#featurehub-evaluation-client-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+<div class="section" id="featurehub-evaluation-discourse-module">
+<h2>featurehub.evaluation.discourse module<a class="headerlink" href="#featurehub-evaluation-discourse-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="featurehub-evaluation-future-module">
+<h2>featurehub.evaluation.future module<a class="headerlink" href="#featurehub-evaluation-future-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="featurehub-evaluation-response-module">
+<h2>featurehub.evaluation.response module<a class="headerlink" href="#featurehub-evaluation-response-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="featurehub-evaluation-server-module">
+<h2>featurehub.evaluation.server module<a class="headerlink" href="#featurehub-evaluation-server-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -306,13 +267,6 @@ features, and data- and user-management tools.</p>
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="intro.html" class="btn btn-neutral float-right" title="Intro" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>

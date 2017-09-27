@@ -1,6 +1,6 @@
 # FAQ
 
-## How do I restart my Feature Factory server?
+## How do I restart my FeatureHub server?
 
 You may want or be asked to restart your notebook server, possibly in order to access
 software udpates. If you follow these instructions, you will be able to do this without
@@ -15,13 +15,13 @@ loss of any data or work.
 ```eval_rst
 .. note::
 
-   Restarting your Feature Factory server is different than restarting the IPython kernel.
+   Restarting your FeatureHub server is different than restarting the IPython kernel.
 ```
 
 ## Why is my feature rejected by the submit function?
 
 You may try to submit a feature only to receive a message that it was invalid and was
-rejected. This can happen if any of the requirements Feature Factory imposes on your feature
+rejected. This can happen if any of the requirements FeatureHub imposes on your feature
 are not met. Try evaluating your feature locally to see more detailed debugging information.
 
 If your feature evaluates successfully locally but still is rejected by the server, make

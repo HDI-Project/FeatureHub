@@ -1,0 +1,33 @@
+featurehub package
+==================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    featurehub.admin
+    featurehub.evaluation
+    featurehub.modeling
+    featurehub.problems
+    featurehub.user
+
+Submodules
+----------
+
+featurehub\.util module
+-----------------------
+
+.. automodule:: featurehub.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: featurehub
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>featurehub.modeling package &mdash; FeatureHub 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>featurehub.modeling package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/featurehub.modeling.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="featurehub-modeling-package">
+<h1>featurehub.modeling package<a class="headerlink" href="#featurehub-modeling-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurehub.modeling.metrics">
+<span id="featurehub-modeling-metrics-module"></span><h2>featurehub.modeling.metrics module<a class="headerlink" href="#module-featurehub.modeling.metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.modeling.metrics.Metric">
+<em class="property">class </em><code class="descclassname">featurehub.modeling.metrics.</code><code class="descname">Metric</code><span class="sig-paren">(</span><em>name</em>, <em>scoring</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="featurehub.modeling.metrics.Metric.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to nice format for returning to user or inserting into db.</p>
+<p>Conversion to user format returns a dictinary with one element mapping
+metric name to metric value. Conversion to db format returns a
+dictionary with keys “name”, “scoring”, and “value” mapping to their
+respective values. Both formats convert np.floating values to Python
+floats.</p>
+<dl class="docutils">
+<dt>kind <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>One of “user” or “db”</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="featurehub.modeling.metrics.Metric.from_dict">
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>d</em>, <em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate Metric from user/db format.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="featurehub.modeling.metrics.Metric.name_to_scoring">
+<em class="property">static </em><code class="descname">name_to_scoring</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric.name_to_scoring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric.name_to_scoring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the scoring type associated with the metric name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.metrics.Metric.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric.to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to user/db format, then return string representation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurehub.modeling.metrics.MetricList">
+<em class="property">class </em><code class="descclassname">featurehub.modeling.metrics.</code><code class="descname">MetricList</code><span class="sig-paren">(</span><em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.abc.MutableSequence</span></code></p>
+<dl class="method">
+<dt id="featurehub.modeling.metrics.MetricList.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.metrics.MetricList.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert underlying metric objects.</p>
+<p>Conversion to user format returns a dictionary with each element mapping
+metric name to metric value. Conversion to db format returns a
+list of dictionaries, each with keys “name”, “scoring”, and “value”
+mapping to their respective values. Both formats convert np.floating
+values to Python floats.</p>
+<dl class="docutils">
+<dt>kind <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>One of “user” or “db”</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="featurehub.modeling.metrics.MetricList.from_dict_user">
+<em class="property">classmethod </em><code class="descname">from_dict_user</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.from_dict_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.from_dict_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="featurehub.modeling.metrics.MetricList.from_list_db">
+<em class="property">classmethod </em><code class="descname">from_list_db</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.from_list_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.from_list_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="featurehub.modeling.metrics.MetricList.from_object">
+<em class="property">classmethod </em><code class="descname">from_object</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.from_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.from_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate MetricList from supported format.</p>
+<p>Tries to detect the underlying format and deal with that appropriately.</p>
+<p>obj: MetricList, dict, list of dict, or list of Metric</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.metrics.MetricList.insert">
+<code class="descname">insert</code><span class="sig-paren">(</span><em>ii</em>, <em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.metrics.MetricList.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user-readable output.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="featurehub-modeling-model-module">
+<h2>featurehub.modeling.model module<a class="headerlink" href="#featurehub-modeling-model-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

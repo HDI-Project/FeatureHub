@@ -1,0 +1,10 @@
+featurehub\.problems package
+============================
+
+Module contents
+---------------
+
+.. automodule:: featurehub.problems
+    :members:
+    :undoc-members:
+    :show-inheritance:

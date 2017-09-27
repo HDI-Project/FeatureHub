@@ -1,0 +1,22 @@
+featurehub\.user package
+========================
+
+Submodules
+----------
+
+featurehub\.user\.session module
+--------------------------------
+
+.. automodule:: featurehub.user.session
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: featurehub.user
+    :members:
+    :undoc-members:
+    :show-inheritance:
