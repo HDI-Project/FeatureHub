@@ -19,6 +19,7 @@
 
 import os
 import sys
+import sphinx_rtd_theme # For read the docs theme
 
 sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath('../../src/featurehub'))
@@ -116,13 +117,33 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'nature'
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# Readthedocs additions
+html_context = {
+    'display_github': True,
+    'github_user': 'HDI-Project',
+    'github_repo': 'FeatureHub',
+    'github_version': 'master',
+    'conf_py_path': '/docs/src/',
+}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'collapse_navigation': False,
+    'display_version': False,
+}
+
+gettext_compact = False
+default_role = 'obj'
+
+def setup(app):
+    app.add_stylesheet('custom.css')
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
