@@ -13,12 +13,6 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from featurehub.modeling.metrics import Metric, MetricList
 from featurehub.util import RANDOM_STATE
 
-<<<<<<< HEAD:src/featurehub/modeling/model.py
-# automl
-import autosklearn.classification
-import autosklearn.regression
-from featurehub.modeling.metrics import rmsle_scorer, ndcg_scorer
-
 class Model(object):
     """Versatile modeling object.
 
