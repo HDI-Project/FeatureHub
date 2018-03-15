@@ -253,7 +253,7 @@ make clean_all
 
 ### Local installation
 
-In the [Installation](#installation) section above, the Feature Factory package is built
+In the [Installation](#installation) section above, the FeatureHub package is built
 into a Docker image. If you want to install it locally, for development and testing, there
 are several additional considerations.
 
