@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.metrics import mean_squared_error
 import sklearn.metrics
-import autosklearn.metrics
 
 #
 # Normalized Discounted Cumulative Gain metric
@@ -39,9 +38,6 @@ def ndcg_score(y_true, y_pred, k=5):
 ndcg_scorer = sklearn.metrics.make_scorer(ndcg_score,
     greater_is_better=True, needs_proba=True)
 
-ndcg_autoscorer = autosklearn.metrics.make_scorer("ndcg", ndcg_score,
-    greater_is_better=True, needs_proba=True)
-
 #
 # Root mean squared log error
 #
@@ -51,7 +47,4 @@ def rmsle_score(y_true, y_pred, **kwargs):
         **kwargs))
 
 rmsle_scorer = sklearn.metrics.make_scorer(rmsle_score,
-    greater_is_better=False, needs_proba=False)
-
-rmsle_autoscorer = autosklearn.metrics.make_scorer("rmsle", rmsle_score,
     greater_is_better=False, needs_proba=False)

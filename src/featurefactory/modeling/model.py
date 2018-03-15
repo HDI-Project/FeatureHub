@@ -1,21 +1,17 @@
+from collections import defaultdict
 import os
 import traceback
 import sys
-import numpy as np
 import sklearn.metrics
-from collections import defaultdict
-from sklearn.preprocessing import label_binarize, LabelEncoder
-from sklearn.model_selection import KFold, StratifiedKFold
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
+import numpy as np
 from sklearn.externals import joblib
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.preprocessing import label_binarize, LabelEncoder
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from featurefactory.modeling.metrics import Metric, MetricList
 from featurefactory.util import RANDOM_STATE
-
-# automl
-from autosklearn.classification import AutoSklearnClassifier
-from autosklearn.regression import AutoSklearnRegressor
-from featurefactory.modeling.scorers import rmsle_autoscorer, ndcg_autoscorer
 
 class Model(object):
     """Versatile modeling object.
@@ -50,9 +46,9 @@ class Model(object):
         self.problem_type = problem_type
 
         if self._is_classification():
-            self.model = DecisionTreeClassifier(random_state=RANDOM_STATE+1)
+            self.model = Model._get_default_classifier()
         elif self._is_regression():
-            self.model = DecisionTreeRegressor(random_state=RANDOM_STATE+2)
+            self.model = Model._get_default_regressor()
         else:
             raise NotImplementedError
 
@@ -330,91 +326,10 @@ class Model(object):
         Y = Y.ravel()
         return Y
 
-class AutoModel(Model):
-    SEED = RANDOM_STATE+1
-    TIME_LEFT_FOR_THIS_TASK=90
-    PER_RUN_TIME_LIMIT=10
-    ML_MEMORY_LIMIT=7900
-    INITIAL_CONFIGURATIONS_VIA_METALEARNING=0
+    @staticmethod
+    def _get_default_classifier():
+        return DecisionTreeClassifier(random_state=RANDOM_STATE+1)
 
-    def __init__(self, problem_type, **kwargs):
-        super().__init__(problem_type)
-
-        if self._is_classification():
-            AutoSklearnModel = AutoSklearnClassifier
-        elif self._is_regression():
-            AutoSklearnModel = AutoSklearnRegressor
-        else:
-            raise NotImplementedError
-
-        # ~hack~
-        # set custom scorers. really, we should include this in the database
-        if "metric" in kwargs:
-            self.metric = kwargs["metric"]
-        else:
-            if self._is_classification():
-                self.metric = ndcg_autoscorer
-            elif self._is_regression():
-                self.metric = rmsle_autoscorer
-            else:
-                raise NotImplementedError
-
-        automl_param_names = AutoSklearnModel._get_param_names()
-        params = {}
-        for param in automl_param_names:
-            if param in kwargs:
-                params[param] = kwargs.pop(param)
-            elif hasattr(self, param.upper()):
-                params[param] = getattr(self, param.upper())
-
-        self.model = AutoSklearnModel(**params)
-
-    def fit(self, X_train, Y_train, **kwargs):
-        if "metric" in kwargs:
-            self.metric = kwargs.pop("metric")
-
-        X_train = Model._formatX(X_train)
-        
-        if self._is_classification() and \
-            len(np.unique(Y_train)) > 2:
-            self.le = LabelEncoder()
-            self.le.fit(Y_train)
-            Y_train = self.le.transform(Y_train)
-        Y_train = Model._formatY(Y_train)
-
-        self.model.fit(X_train, Y_train, metric=self.metric, **kwargs)
-
-    def predict(self, X_test):
-        X_test = Model._formatX(X_test)
-        Y_test_pred = self.model.predict(X_test)
-        if self._is_classification() and \
-            len(np.unique(Y_test_pred)) > 2:
-            # TODO this fails if <=2 classes are actually predicted. Should
-            # store whether it is multiclass classification as class member.
-            return self.le.inverse_transform(Y_test_pred)
-        else:
-            return Y_test_pred
-
-    def predict_proba(self, X_test):
-        X_test = Model._formatX(X_test)
-        Y_test_pred_proba = self.model.predict_proba(X_test)
-        return Y_test_pred_proba
-
-    def score(self, X_test, Y_test):
-        # todo not nearly robust enough
-        X_test = Model._formatX(X_test)
-
-        Y_test = Model._formatY(Y_test)
-        Y_test_pred = self.predict(X_test)
-        score = self.metric(Y_test, Y_test_pred)
-        return score
-
-    def dump(self, absname):
-        joblib.dump(self.model, absname)
-        print("Model dumped to {}".format(absname))
-
-    def load(self, absname):
-        if not os.path.exists(absname):
-            raise ValueError("Couldn't find model at {}".format(absname))
-        self.model = joblib.load(absname)
-        print("Model loaded successfully.")
+    @staticmethod
+    def _get_default_regressor():
+        return DecisionTreeRegressor(random_state=RANDOM_STATE+2)

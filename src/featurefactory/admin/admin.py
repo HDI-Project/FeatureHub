@@ -19,7 +19,7 @@ from featurefactory.admin.postprocessing import (
     load_dataset_from_dir,
 )
 from featurefactory.evaluation.client import EvaluatorServer
-from featurefactory.modeling.model import AutoModel
+from featurefactory.modeling.automl import AutoModel
 from featurefactory.util import possibly_talking_action
 
 class Commands(object):
