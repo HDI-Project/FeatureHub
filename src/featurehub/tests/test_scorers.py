@@ -1,7 +1,8 @@
 from featurehub.tests.util import EPSILON
 from featurehub.modeling.scorers import ndcg_score, rmsle_score
 from featurehub.modeling.scorers import ndcg_scorer, rmsle_scorer
-from featurehub.modeling.scorers import ndcg_autoscorer, rmsle_autoscorer
+from featurehub.modeling.automl import ndcg_autoscorer, rmsle_autoscorer
+
 import numpy as np
 
 def test_ndcg():
