@@ -4,9 +4,9 @@ import os.path
 import numpy as np
 from sklearn.preprocessing import label_binarize, LabelEncoder
 
-from featurefactory.modeling.scorers import ndcg_score, rmsle_score
-from featurefactory.modeling.model import Model
-from featurefactory.util import RANDOM_STATE
+from featurehub.modeling.scorers import ndcg_score, rmsle_score
+from featurehub.modeling.model import Model
+from featurehub.util import RANDOM_STATE
 
 # automl
 try:

@@ -10,17 +10,17 @@ from sqlalchemy_utils import database_exists, create_database, drop_database
 from featurehub.admin.sqlalchemy_declarative import (
     Base, Feature, Problem, User, Metric, EvaluationAttempt
 )
-from featurefactory.admin.sqlalchemy_main import ORMManager
-from featurefactory.admin.postprocessing import (
+from featurehub.admin.sqlalchemy_main import ORMManager
+from featurehub.admin.postprocessing import (
     build_and_save_all_features,
     extract_and_save_all_tables,
     load_feature_matrix,
     prepare_automl_file_name,
     load_dataset_from_dir,
 )
-from featurefactory.evaluation.client import EvaluatorServer
-from featurefactory.modeling.automl import AutoModel
-from featurefactory.util import possibly_talking_action
+from featurehub.evaluation.client import EvaluatorServer
+from featurehub.modeling.automl import AutoModel
+from featurehub.util import possibly_talking_action
 
 class Commands(object):
     """Admin interface for the database.
@@ -28,12 +28,12 @@ class Commands(object):
     Create the schema, add or remove problems, and view problems, users, and features.
     """
 
-    def __init__(self, database="featurefactory"):
+    def __init__(self, database="featurehub"):
         """Create the ORMManager and connect to DB.
 
         Parameters
         ----------
-        database : str, optional (default="featurefactory")
+        database : str, optional (default="featurehub")
             Name of database within DBMS.
         """
 

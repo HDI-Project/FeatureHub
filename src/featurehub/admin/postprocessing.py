@@ -9,7 +9,7 @@ import json
 import traceback
 import numpy as np
 from contextlib import contextmanager
-from featurefactory.admin.sqlalchemy_declarative import *
+from featurehub.admin.sqlalchemy_declarative import *
 
 FEATURE_EXTRACTION_TIME_LIMIT = 40
 
