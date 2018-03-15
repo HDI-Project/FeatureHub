@@ -116,6 +116,24 @@ Build the necessary docker images.
 make build
 ```
 
+## Generate SSL certificate
+
+Generate SSL certificate. This either generates a self-signed certificate using openssl or
+generates a certificate using LetsEncrypt, based on the `USE_LETSENCRYPT_CERT` configuration
+variable. The resulting certificates are stored on a Docker data volume.
+
+```
+make ssl
+```
+
+```eval_rst
+.. note::
+
+    This Makefile target to generate certificates does not need to be re-executed unless you
+    remove the Docker data volume, the certificates expire, or your domain configuration
+    changes.
+```
+
 ## Launch the app
 
 Launch the app.
@@ -230,3 +248,28 @@ internal network is shut down.
 ```
 make clean_all
 ```
+
+## Other topics
+
+### Local installation
+
+In the [Installation](#installation) section above, the Feature Factory package is built
+into a Docker image. If you want to install it locally, for development and testing, there
+are several additional considerations.
+
+1. Follow the directions in above section to checkout the package and install Python 3.
+
+2. Install required MySQL and auto-sklearn libraries and dependencies. See
+     [Dockerfile-user](../deploy/Dockerfile-user) for an example on Ubuntu. See
+     [auto-sklearn Intallation](http://automl.github.io/auto-sklearn/stable/installation.html)
+     for details on installing auto-sklearn in your environment.
+
+3. Install other requirements.
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Install package.
+    ```bash
+    pip install -e src/
+    ```

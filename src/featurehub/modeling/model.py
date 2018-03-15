@@ -1,14 +1,19 @@
+from collections import defaultdict
+import os
 import traceback
 import sys
-import numpy as np
 import sklearn.metrics
-from collections import defaultdict
-from sklearn.preprocessing import label_binarize
+
+import numpy as np
+from sklearn.externals import joblib
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.preprocessing import label_binarize, LabelEncoder
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
 from featurehub.modeling.metrics import Metric, MetricList
 from featurehub.util import RANDOM_STATE
 
+<<<<<<< HEAD:src/featurehub/modeling/model.py
 # automl
 import autosklearn.classification
 import autosklearn.regression
@@ -47,9 +52,9 @@ class Model(object):
         self.problem_type = problem_type
 
         if self._is_classification():
-            self.model = DecisionTreeClassifier(random_state=RANDOM_STATE+1)
+            self.model = Model._get_default_classifier()
         elif self._is_regression():
-            self.model = DecisionTreeRegressor(random_state=RANDOM_STATE+2)
+            self.model = Model._get_default_regressor()
         else:
             raise NotImplementedError
 
@@ -91,7 +96,7 @@ class Model(object):
         """Compute metrics on test set.
         """
 
-        X, Y = self._format_matrices(X, Y)
+        X, Y = Model._format_matrices(X, Y)
 
         X_train, Y_train = X[:n], Y[:n]
         X_test, Y_test = X[n:], Y[n:]
@@ -148,7 +153,7 @@ class Model(object):
             scoring types
         """
 
-        X, Y = self._format_matrices(X, Y)
+        X, Y = Model._format_matrices(X, Y)
 
         scorings = list(scorings)
 
@@ -297,49 +302,40 @@ class Model(object):
 
         return scorings, scorings_
 
-    def _format_matrices(self, X, Y):
+    @staticmethod
+    def _format_matrices(X, Y):
+        X = Model._formatX(X)
+        Y = Model._formatY(Y)
+        return X, Y
 
+    @staticmethod
+    def _formatX(X):
         # ensure that we use np for everything
+        # use np.float64 for all elements
         # *don't* use 1d array for X
-        X = np.array(X)
+        X = np.asfarray(X)
         if X.ndim == 1:
             X = X.reshape(-1,1)
+
+        return X
+
+    @staticmethod
+    def _formatY(Y):
+        # TODO: detect if we need to use a LabelEncoder for Y
+        # ensure that we use np for everything
+        # use np.float64 for all elements
         # *do* use 1d array for Y
-        Y = np.array(Y)
+        Y = np.asfarray(Y)
         if Y.ndim > 1 and Y.shape[1] > 1:
             raise ValueError("Target matrix has too many columns: {}"
                     .format(Y.shape[1]))
         Y = Y.ravel()
-        return X, Y
+        return Y
 
-class AutoModel(Model):
-    TIME_LEFT_FOR_THIS_TASK=90
-    PER_RUN_TIME_LIMIT=10
+    @staticmethod
+    def _get_default_classifier():
+        return DecisionTreeClassifier(random_state=RANDOM_STATE+1)
 
-    def __init__(self, problem_type, metric):
-        super().__init__(problem_type)
-
-        # set custom scorers. really, we should include this in the database
-        # hack
-        if self._is_classification():
-            self.scorer = ndcg_scorer
-        elif self._is_regression():
-            self.scorer = rmsle_scorer
-        else:
-            raise NotImplementedError
-
-        if self._is_classification():
-            self.model = autosklearn.classification.AutoSklearnClassifier(
-                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
-                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
-                seed=RANDOM_STATE+1)
-        elif self._is_regression():
-            self.model = autosklearn.regression.AutoSklearnRegressor(
-                time_left_for_this_task=AutoModel.TIME_LEFT_FOR_THIS_TASK,
-                per_run_time_limit=AutoModel.PER_RUN_TIME_LIMIT,
-                seed=RANDOM_STATE+2)
-        else:
-            raise NotImplementedError
-
-    def fit(self, X_train, Y_train):
-        self.model.fit(X_train, Y_train, metric=self.scorer)
+    @staticmethod
+    def _get_default_regressor():
+        return DecisionTreeRegressor(random_state=RANDOM_STATE+2)

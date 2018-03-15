@@ -66,7 +66,7 @@ class EvaluatorClient(object):
 
     def submit(self, feature, description):
         """Submit feature to server for evaluation on test data.
-        
+
         If successful, registers feature in feature database and returns key
         performance metrics.
 
@@ -219,8 +219,13 @@ class EvaluatorClient(object):
 
         return self.target
 
-    def _load_dataset_split(self, split, dataset, entities_featurized, target,
-            dataset_hash=None, compute_hash=True):
+    def _load_dataset_split(self,
+                            split="train",
+                            dataset={},
+                            entities_featurized=None,
+                            target=None,
+                            dataset_hash=None,
+                            compute_hash=True):
         # query db for import parameters to load files
         is_present_dataset = bool(dataset)
         is_present_entities_featurized = not pd.DataFrame(entities_featurized).empty
@@ -281,23 +286,30 @@ class EvaluatorClient(object):
             cols = list(problem_table_names)
             ind_target = cols.index(problem_target_table_name)
             abs_filename = os.path.join(problem_data_dir,
-                    problem_files[ind_target]) 
-            target = pd.read_csv(abs_filename, low_memory=False, header=0)
+                    problem_files[ind_target])
+
+            # target might not exist if we are making predictions on unseen
+            # test data
+            if os.path.exists(abs_filename):
+                target = pd.read_csv(abs_filename, low_memory=False, header=0)
+            else:
+                target = None
 
         return dataset, entities_featurized, target, dataset_hash
 
     def _load_dataset(self):
         """Load dataset if not present.
-        
+
         Also computes/re-computes dataset hash.
         """
 
         # TODO check for dtypes file, facilitating lower memory usage
 
         self.dataset, self.entities_featurized, self.target, \
-            self.__dataset_hash = self._load_dataset_split("train",
-            self.dataset, self.entities_featurized, self.target,
-            self.__dataset_hash)
+            self.__dataset_hash = self._load_dataset_split(
+                    split="train", dataset=self.dataset,
+                    entities_featurized=self.entities_featurized,
+                    target=self.target, dataset_hash=self.__dataset_hash)
 
     def _reload_dataset(self):
         """Force reload of dataset.
@@ -371,7 +383,7 @@ class EvaluatorClient(object):
     def _build_feature_matrix(self, feature_values):
         values_df = pd.DataFrame(feature_values)
         if not pd.DataFrame(self.entities_featurized).empty:
-            X = pd.concat([self.entities_featurized, values_df], axis=1) 
+            X = pd.concat([self.entities_featurized, values_df], axis=1)
         else:
             X = values_df
         return X
@@ -448,26 +460,38 @@ class EvaluatorServer(EvaluatorClient):
     def _load_dataset(self):
         # load dataset for train data
         self.dataset_train, self.entities_featurized_train, \
-                self.target_train, _ = self._load_dataset_split("train",
-                self.dataset_train, self.entities_featurized_train,
-                self.target_train, compute_hash=False)
+                self.target_train, _ = self._load_dataset_split(
+                        split="train", dataset=self.dataset_train,
+                        entities_featurized=self.entities_featurized_train,
+                        target=self.target_train, compute_hash=False)
 
         # load dataset for test data
         self.dataset_test, self.entities_featurized_test, \
-                self.target_test, _ = self._load_dataset_split("test",
-                self.dataset_test, self.entities_featurized_test,
-                self.target_test, compute_hash=False)
+                self.target_test, _ = self._load_dataset_split(
+                        split="test", dataset=self.dataset_test,
+                        entities_featurized=self.entities_featurized_test,
+                        target=self.target_test, compute_hash=False)
+
+        # make a copy of the dataset
+        self.dataset = {}
+        for key in self.dataset_train:
+            self.dataset[key] = self.dataset_train[key].copy()
 
         # concatenate as applicable
-        self.dataset = self.dataset_train
         with self.orm.session_scope() as session:
             problem = session.query(Problem)\
                     .filter(Problem.id == self.problem_id).one()
-            x = problem.entities_table_name
-        self.dataset[x] = pd.concat([self.dataset_train[x],
-            self.dataset_test[x]], axis=0)
+            problem_entities_table_name = problem.entities_table_name
+        self.dataset[problem_entities_table_name] = \
+            pd.concat([self.dataset_train[problem_entities_table_name],
+            self.dataset_test[problem_entities_table_name]], axis=0)
 
-        self.target = pd.concat([self.target_train, self.target_test], axis=0)
+        try:
+            self.target = pd.concat([self.target_train, self.target_test],
+                    axis=0)
+        except Exception:
+            # todo
+            self.target = self.target_train
 
         try:
             self.entities_featurized = pd.concat([self.entities_featurized_train,
@@ -479,7 +503,7 @@ class EvaluatorServer(EvaluatorClient):
 
         # Reset indices. Otherwise, since we did a vertical concatenation, we
         # have duplicate values in our indices.
-        self.dataset[x].reset_index(drop=True, inplace=True)
+        self.dataset[problem_entities_table_name].reset_index(drop=True, inplace=True)
         self.target.reset_index(drop=True, inplace=True)
         if self.entities_featurized is not None:
             self.entities_featurized.reset_index(drop=True, inplace=True)

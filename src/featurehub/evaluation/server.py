@@ -21,7 +21,7 @@ from featurehub.evaluation                   import EvaluationResponse, Evaluato
 from featurehub.admin.sqlalchemy_main        import ORMManager
 from featurehub.admin.sqlalchemy_declarative import (
     Feature, Problem, User, Metric, EvaluationAttempt)
-from featurehub.evaluation.discourse         import post_feature
+from featurehub.evaluation.discourse         import DiscourseFeatureTopic
 from featurehub.util                         import (
     get_function, myhash, is_positive_env)
 
@@ -280,7 +280,8 @@ def submit(user):
         if is_positive_env(os.environ.get("USE_DISCOURSE")) and \
             problem_name != DEMO_PROBLEM_NAME:
             try:
-                topic_url = post_feature(feature_obj, metrics)
+                topic_obj = DiscourseFeatureTopic(feature_obj, metrics)
+                topic_url = topic_obj.post_feature()
                 app.logger.debug("Posted to forum")
             except Exception:
                 topic_url = ""
