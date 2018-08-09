@@ -5,7 +5,7 @@ RUN rm -rf /home/jovyan
 
 # Upgrade package managers
 RUN apt-get update
-RUN /opt/conda/bin/pip install --upgrade pip
+RUN /opt/conda/bin/pip install --force-reinstall pip==9.0.3
 
 # Install mysql-related packages
 RUN apt-get install -y libmysqlclient-dev
@@ -22,14 +22,12 @@ RUN rm -rf /var/lib/apt/lists/*
 
 # Install featurehub into site-packages
 # TODO make this not python3.5 hardcoded
-WORKDIR /opt/conda/lib/python3.5/site-packages
-COPY requirements.txt requirements.txt
-RUN /opt/conda/bin/pip install -r requirements.txt
-COPY src featurehub
-WORKDIR featurehub
-RUN /opt/conda/bin/python setup.py install
+COPY requirements.txt /tmp/featurehub/requirements.txt
+COPY src /tmp/featurehub/src
+RUN /opt/conda/bin/pip install -r /tmp/featurehub/requirements.txt
+RUN cd /tmp/featurehub/src && /opt/conda/bin/python setup.py install
 
-RUN pip install xgboost
+RUN /opt/conda/bin/pip install xgboost
 
 # Same as jupyterhub/systemuser
 CMD ["sh", "/srv/singleuser/systemuser.sh"]
