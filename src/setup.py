@@ -10,6 +10,8 @@ pkg_name = name
 
 requirements = ['dill',
                 'flask',
+                'ipython<=6.5.0',
+                'jupyter-console==5.2.0',
                 'jupyter',
                 'jupyterhub',
                 'matplotlib',
