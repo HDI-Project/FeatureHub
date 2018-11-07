@@ -1,0 +1,17 @@
+dill==0.2.5
+docker==3.5.1
+Flask==1.0.2
+jupyterhub==0.9.4
+matplotlib==1.5.1
+mysqlclient==1.3.13
+mysql-connector-python-rf==2.2.2
+notebook==4.3.1
+numpy==1.10.4
+pandas==0.19.2
+pydiscourse==0.8.0
+PyYAML==3.11
+scikit-learn==0.18.1
+scipy==1.1.0
+SQLAlchemy==1.2.13
+SQLAlchemy-Utils==0.33.6
+xxhash==1.3.0

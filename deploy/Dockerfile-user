@@ -13,21 +13,13 @@ RUN apt-get install -y libmysqlclient-dev
 # Install autosklearn
 RUN apt-get install -y build-essential gcc
 RUN /opt/conda/bin/conda install -y swig libgcc
-#RUN /opt/conda/bin/pip install --no-cache-dir -v xgboost==0.4a30
-RUN wget -q -O- https://raw.githubusercontent.com/automl/auto-sklearn/v.0.2.0/requirements.txt | xargs -n 1 -L 1 /opt/conda/bin/pip install
-RUN /opt/conda/bin/pip install auto-sklearn==0.2.0
 
 # Reduce size of final image
 RUN rm -rf /var/lib/apt/lists/*
 
 # Install featurehub into site-packages
-# TODO make this not python3.5 hardcoded
-COPY requirements.txt /tmp/featurehub/requirements.txt
 COPY src /tmp/featurehub/src
-RUN /opt/conda/bin/pip install -r /tmp/featurehub/requirements.txt
-RUN cd /tmp/featurehub/src && /opt/conda/bin/python setup.py install
-
-RUN /opt/conda/bin/pip install xgboost
+RUN cd /tmp/featurehub/src && /opt/conda/bin/pip install .[all]
 
 # Same as jupyterhub/systemuser
 CMD ["sh", "/srv/singleuser/systemuser.sh"]

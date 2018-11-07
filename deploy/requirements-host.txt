@@ -1,4 +1,4 @@
 git+https://github.com/minrk/jupyterhub-client.git@99b856e81925690d5546fd8457a6e333fb709513#egg=jupyterhub_client-0.2.0
-pydiscourse
-docker
-fire
+pydiscourse==0.8.0
+docker==3.5.1
+fire==0.1.3

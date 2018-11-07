@@ -8,28 +8,17 @@ from setuptools import setup, find_packages
 name = "featurehub"
 pkg_name = name       
 
-requirements = ['dill',
-                'flask',
-                'ipython<=6.5.0',
-                'jupyter-console==5.2.0',
-                'jupyter',
-                'jupyterhub',
-                'matplotlib',
-                'numpy',
-                'mysqlclient',
-                'mysql-connector-python-rf',
-                'pandas',
-                'scikit-learn',
-                'scipy',
-                'sqlalchemy',
-                'sqlalchemy_utils',
-                'xxhash',
-               ]
+with open('./requirements.txt', 'r') as f:
+    requirements = f.readlines()
+
+requirements_autosklearn = ['auto-sklearn==0.2.0']
+requirements_xgboost = ['xgboost==0.81']
 
 extras_require = {
-    'AutoSklearn': ['auto-sklearn==0.2.0'],
+    'autosklearn': requirements_autosklearn,
+    'xgboost': requirements_xgboost,
+    'all': requirements_autosklearn + requirements_xgboost,
 }
-  
 
 setup_requirements = ['pytest-runner', ]
 
@@ -51,8 +40,8 @@ setup(
     url              = 'https://github.com/HDI-Project/FeatureHub',
     packages         = find_packages(exclude=["tests", "__pycache__"]),
     install_requires = requirements,
-    setup_requires=setup_requirements,
-    test_suite='tests',
-    tests_require=test_requirements,
+    setup_requires   = setup_requirements,
+    test_suite       = 'tests',
+    tests_require    = test_requirements,
     extras_require   = extras_require,
  )
