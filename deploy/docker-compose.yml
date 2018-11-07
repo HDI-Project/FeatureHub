@@ -25,8 +25,9 @@ services:
             - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
             - secrets:/etc/letsencrypt
         ports:
-            - 443:443
-            - ${HUB_API_PORT}:${HUB_API_PORT}
+            - "443:443"
+            - "${HUB_API_PORT}:${HUB_API_PORT}"
+            - "127.0.0.1:8000:8000"
         environment:
             DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
             FF_DATA_DIR: ${FF_DATA_DIR}
@@ -40,8 +41,8 @@ services:
             EVAL_CONTAINER_NAME: ${EVAL_CONTAINER_NAME}
             EVAL_CONTAINER_PORT: ${EVAL_CONTAINER_PORT}
             EVAL_API_TOKEN: ${EVAL_API_TOKEN}
-            SSL_KEY: "/etc/letsencrypt/privkey.pem"
-            SSL_CERT: "/etc/letsencrypt/cert.pem"
+            SSL_KEY: /etc/letsencrypt/privkey.pem
+            SSL_CERT: /etc/letsencrypt/cert.pem
             HUB_CLIENT_API_TOKEN: ${HUB_CLIENT_API_TOKEN}
         command: >
             jupyterhub -f ${FF_DATA_DIR}/config/jupyterhub/jupyterhub_config.py
@@ -49,7 +50,7 @@ services:
         image: mysql:5.7
         container_name: ${MYSQL_CONTAINER_NAME}
         ports:
-            - 3306:3306
+            - "3306:3306"
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -65,7 +66,7 @@ services:
             - ${FF_DATA_DIR}:${FF_DATA_DIR}:rw
             - ${FF_DATA_DIR}/data:/data:ro
         ports:
-            - ${EVAL_CONTAINER_PORT}:${EVAL_CONTAINER_PORT}
+            - "${EVAL_CONTAINER_PORT}:${EVAL_CONTAINER_PORT}"
         environment:
             FF_DATA_DIR: ${FF_DATA_DIR}
             HUB_CONTAINER_NAME: ${HUB_CONTAINER_NAME}
