@@ -26,7 +26,7 @@ services:
             - secrets:/etc/letsencrypt
         ports:
             - "443:443"
-            - "${HUB_API_PORT}:${HUB_API_PORT}"
+            - "127.0.0.1:${HUB_API_PORT}:${HUB_API_PORT}"
             - "127.0.0.1:8000:8000"
         environment:
             DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
