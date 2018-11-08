@@ -1,0 +1,15 @@
+name: demo
+problem_type: classification
+data_dir_train: /data/train/demo
+data_dir_test: /data/test/demo
+files:
+    - users.csv
+    - groups.csv
+    - target.csv
+table_names:
+    - users
+    - groups
+    - target
+entities_table_name: users
+entities_featurized_table_name:
+target_table_name: target
