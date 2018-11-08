@@ -26,6 +26,7 @@ setup_files:
 	sudo cp ./userlist $(FF_DATA_DIR)/config/jupyterhub/ 2>/dev/null || true
 	sudo cp ./cull_idle_servers.py $(FF_DATA_DIR)/config/jupyterhub
 	sudo cp ../share/static/images/featurehub.png $(FF_DATA_DIR)/config/jupyterhub
+	sudo cp -r ../share/appdata/* $(FF_DATA_DIR)
 
 .PHONY: teardown_files
 teardown_files:
