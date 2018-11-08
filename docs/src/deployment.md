@@ -12,24 +12,82 @@ A variety of resources facilitate easy deployment of FeatureHub:
 
 ## Installation
 
+In this section, we walk through the steps to install FeatureHub on the host machine, build
+Docker images, and spin up application containers. However, some of these steps will not
+make sense until you have [configured](#configuration) the application as you desire. You
+may want to go through these steps once to make sure everything runs okay, then update your
+configuration file and re-build.
+
 1. Install [Docker Engine](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) on your system.
 
-2. Download the FeatureHub repository.
+1. Download the FeatureHub repository.
     ```bash
     git clone https://github.com/HDI-Project/FeatureHub.git
     ```
 
-3. Ensure Python 3 is installed. On Amazon AMI:
-    ```bash
-    yum update -y
-    yum install -y python35 python35-pip
-    pip-3.5 install --upgrade pip
-    ```
+1. Ensure Python 3.5 is installed. 
 
-3. Install Python requirements for the host.
+    - On a virtual machine, one can use a system python.
+        ```bash
+        yum update -y
+        yum install -y python35 python35-pip
+        pip-3.5 install --upgrade pip
+        ```
+
+    - Otherwise, it is best to use a virtual environment, using `conda` for example:
+        ```bash
+        conda create -y -n featurehub python=3.5
+        conda activate featurehub
+        pip install --upgrade pip
+        ```
+
+1. Install Python requirements for the host.
     ```bash
     pip install -r deploy/requirements-host.txt
     ```
+
+1. Create a local configuration.
+    ```bash
+    cd deploy
+    perl -pe 's|XYZ|`openssl rand -hex 32`|g' .env.local.example > .env.local
+    ```
+
+1. Build the necessary docker images.
+    ```bash
+    make build
+    ```
+
+1. *(Optional)* Generate SSL certificate. This either generates a self-signed certificate
+   using openssl or generates a certificate using LetsEncrypt, based on the
+   `USE_LETSENCRYPT_CERT` configuration variable.
+    ```bash
+    make ssl
+    ```
+
+    ```eval_rst
+    .. note::
+
+        This Makefile target to generate certificates does not need to be re-executed unless you
+        remove the Docker data volume, the certificates expire, or your domain configuration
+        changes.
+    ```
+
+1. Launch the app.
+    ```bash
+    make up
+    ```
+
+At this point:
+- you should have three running containers: a hub, a database, and a machine
+  learning backend (eval server). Confirm that the output of `docker ps` shows these running
+  containers.
+- An unsecured login page should be visible at `http://localhost:8000` (not
+  visible over the internet).
+- You have not created any users, so no one will be able to login
+  yet. See [User Management](#user-management) and [Data Management](#data-management) to
+  continue.
+
+Proceed to configure your app.
 
 ## Configuration
 
@@ -37,20 +95,23 @@ FeatureHub allows configuration in several places.
 
 ### App Deployment
 
-
 Default app configuration variables are provided in `deploy/.env`.
 
 To override any of these defaults, set these variables in a new file `deploy/.env.local`.
 
-Definitely override values for these variables:
+These variables are always needed and the app will break if not provided:
 
-- `FF_DOMAIN_NAME`: fully-qualified domain name of this server, used for Let's Encrypt.
-- `FF_DOMAIN_EMAIL`: email associated with domain name registration
 - `MYSQL_ROOT_PASSWORD`: password for DB root user
 - `EVAL_API_TOKEN`: API token for eval server. You should generate a valid API token by
     executing `openssl rand -hex 32`.
 - `HUB_CLIENT_API_TOKEN` : API token for Hub API client script. You should generate a valid
     API token by executing `openssl rand -hex 32`.
+
+Definitely override values for these variables, as applicable (i.e. you are exposing app to
+the internet or have enabled Discourse integration):
+
+- `FF_DOMAIN_NAME`: fully-qualified domain name of this server, used for Let's Encrypt.
+- `FF_DOMAIN_EMAIL`: email associated with domain name registration
 - `DISCOURSE_DOMAIN_NAME` : domain name of the Discourse forum
 - `DISCOURSE_CLIENT_API_USERNAME` : Username for Discourse admin, to use with Discourse API
     client. You must use the same username when setting up the Discourse instance.
@@ -109,43 +170,7 @@ Optionally, you can provide a userlist in `deploy/userlist`. Include one user pe
 You may want to modify the default `deploy/jupyterhub_config.py` file. However, you should
 know what you're doing to not break things.
 
-## Build the app
-
-Build the necessary docker images.
-```
-make build
-```
-
-## Generate SSL certificate
-
-Generate SSL certificate. This either generates a self-signed certificate using openssl or
-generates a certificate using LetsEncrypt, based on the `USE_LETSENCRYPT_CERT` configuration
-variable. The resulting certificates are stored on a Docker data volume.
-
-```
-make ssl
-```
-
-```eval_rst
-.. note::
-
-    This Makefile target to generate certificates does not need to be re-executed unless you
-    remove the Docker data volume, the certificates expire, or your domain configuration
-    changes.
-```
-
-## Launch the app
-
-Launch the app.
-```
-make up
-```
-
-## User and data management
-
-Users can be added or deleted using `deploy/users.py`. This utility creates user accounts on
-the hub container, sets up notebooks templates, sets up authentication for each user with
-the DB, and optionally sets up user accounts on the Discourse forum.
+## Data management
 
 Most files are stored directly on the host machine and mounted in the Hub and User
 containers:
@@ -159,6 +184,36 @@ containers:
 The MySQL database is mounted on a docker data volume:
 
 - `db-data`
+
+### Prediction problem format
+
+**Data format.** All tables are CSV files with rows corresponding to examples and columns
+corresponding to variables.
+
+1. Entities table. Each row in the table corresponds to one entity to make a prediction for.
+2. Target table. Each row in the table corresponds to the actual target that you were trying
+   to predict. The ID is implicitly given by the index into the table, such that the *ith*
+   row of the target table must contain the target for the *ith* engity.
+3. Featurized entities table. Optional. A set of pre-extracted features used to initialize
+   machine learning models for evaluation. Recall that when users submit features, the ML
+   backend evaluates them by 1) extracting the feature values from the test data 2) building
+   a model from just that feature 3) computing metrics from the trained model. If a
+   featurized entities table is table, then step 2 is replaced by merging the newly
+   extracted feature values with the set of existing featurized. This can be
+   helpful if there are really obvious features that you don't want users to spend time
+   re-implementing one-by-one, or if there are several features that dominate performance
+   but that are already known, and improvements should be focused on the margins.
+4. "Static" tables. There can be many of these. Metadata that doesn't change over time,
+   other relational data.
+
+A train/test split should be created, where each split contains the same set of tables but
+with different cutoffs.
+
+## User management
+
+Users can be added or deleted using `deploy/users.py`. This utility creates user accounts on
+the hub container, sets up notebooks templates, sets up authentication for each user with
+the DB, and optionally sets up user accounts on the Discourse forum.
 
 ## App administration
 
@@ -228,6 +283,11 @@ Restart the app.
 make start
 ```
 
+Up the app.
+```
+make up
+```
+
 Down the app. This stops and removes the hub, user, and database containers. Note that hub
 state files persist, user notebooks, and the database dump persist on the filesystem.
 ```
@@ -257,19 +317,16 @@ In the [Installation](#installation) section above, the FeatureHub package is bu
 into a Docker image. If you want to install it locally, for development and testing, there
 are several additional considerations.
 
+This is largely untested.
+
 1. Follow the directions in above section to checkout the package and install Python 3.
 
 2. Install required MySQL and auto-sklearn libraries and dependencies. See
      [Dockerfile-user](../deploy/Dockerfile-user) for an example on Ubuntu. See
      [auto-sklearn Intallation](http://automl.github.io/auto-sklearn/stable/installation.html)
-     for details on installing auto-sklearn in your environment.
-
-3. Install other requirements.
-    ```bash
-    pip install -r requirements.txt
-    ```
+     for details on installing auto-sklearn dependencies in your environment.
 
 4. Install package.
     ```bash
     pip install -e src/
-    ```
+
