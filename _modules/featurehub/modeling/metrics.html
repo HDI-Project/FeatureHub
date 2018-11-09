@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -103,7 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -124,15 +114,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -148,7 +144,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">FeatureHub</a>
@@ -156,9 +152,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -188,12 +185,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-            
-              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/_modules/featurehub/modeling/metrics" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
     
   </ul>
@@ -208,9 +199,6 @@
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">MutableSequence</span>
 <span class="kn">import</span> <span class="nn">featurehub.modeling.model</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span>
 
 <div class="viewcode-block" id="Metric"><a class="viewcode-back" href="../../../featurehub.modeling.html#featurehub.modeling.metrics.Metric">[docs]</a><span class="k">class</span> <span class="nc">Metric</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Metric&quot;&quot;&quot;</span>
@@ -442,86 +430,10 @@
             <span class="k">return</span> <span class="n">result</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">()</span></div></div>
-
-<span class="c1"># Normalized Discounted Cumulative Gain metric</span>
-<span class="c1"># Source: https://gist.github.com/mblondel/7337391</span>
-<span class="k">def</span> <span class="nf">_dcg_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_score</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gains</span><span class="o">=</span><span class="s2">&quot;exponential&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Discounted cumulative gain (DCG) at rank k</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    y_true : array-like, shape = [n_samples]</span>
-<span class="sd">        Ground truth (true relevance labels).</span>
-
-<span class="sd">    y_score : array-like, shape = [n_samples]</span>
-<span class="sd">        Predicted scores.</span>
-
-<span class="sd">    k : int</span>
-<span class="sd">        Rank.</span>
-
-<span class="sd">    gains : str</span>
-<span class="sd">        Whether gains should be &quot;exponential&quot; (default) or &quot;linear&quot;.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    DCG @k : float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">y_score</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">order</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span>
-
-    <span class="k">if</span> <span class="n">gains</span> <span class="o">==</span> <span class="s2">&quot;exponential&quot;</span><span class="p">:</span>
-        <span class="n">gains</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">y_true</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="k">elif</span> <span class="n">gains</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
-        <span class="n">gains</span> <span class="o">=</span> <span class="n">y_true</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid gains option.&quot;</span><span class="p">)</span>
-
-    <span class="c1"># highest rank is 1 so +2 instead of +1</span>
-    <span class="n">discounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">))</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gains</span> <span class="o">/</span> <span class="n">discounts</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_ndcg_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_score</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gains</span><span class="o">=</span><span class="s2">&quot;exponential&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Normalized discounted cumulative gain (NDCG) at rank k</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    y_true : array-like, shape = [n_samples]</span>
-<span class="sd">        Ground truth (true relevance labels).</span>
-
-<span class="sd">    y_score : array-like, shape = [n_samples]</span>
-<span class="sd">        Predicted scores.</span>
-
-<span class="sd">    k : int</span>
-<span class="sd">        Rank.</span>
-
-<span class="sd">    gains : str</span>
-<span class="sd">        Whether gains should be &quot;exponential&quot; (default) or &quot;linear&quot;.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    NDCG @k : float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">best</span> <span class="o">=</span> <span class="n">_dcg_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">gains</span><span class="p">)</span>
-    <span class="n">actual</span> <span class="o">=</span> <span class="n">_dcg_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_score</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">gains</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">actual</span> <span class="o">/</span> <span class="n">best</span>
-
-<span class="n">_needs_proba</span><span class="o">=</span><span class="kc">False</span>
-<span class="n">ndcg_scorer</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">_ndcg_score</span><span class="p">,</span>
-    <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">needs_proba</span><span class="o">=</span><span class="n">_needs_proba</span><span class="p">)</span>
-
-<span class="c1"># RMSLE</span>
-<span class="k">def</span> <span class="nf">_root_mean_squared_log_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_true</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-
-<span class="n">rmsle_scorer</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">_root_mean_squared_log_error</span><span class="p">,</span>
-    <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">needs_proba</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -530,11 +442,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -549,36 +461,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

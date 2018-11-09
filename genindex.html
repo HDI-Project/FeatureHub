@@ -25,27 +25,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="#"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -103,7 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -124,15 +115,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -148,7 +145,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -156,9 +153,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -213,7 +211,9 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -231,12 +231,24 @@
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList.append">append() (featurehub.modeling.metrics.MetricList method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.append_feature_functions">append_feature_functions() (in module featurehub.admin.postprocessing)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.bulk_create_problem_yml">bulk_create_problem_yml() (featurehub.admin.admin.Commands method)</a>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.BINARY_METRIC_AGGREGATION">BINARY_METRIC_AGGREGATION (featurehub.modeling.model.Model attribute)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.build_and_save_all_features">build_and_save_all_features() (in module featurehub.admin.postprocessing)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.build_feature_matrix">build_feature_matrix() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.bullet">bullet (featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -244,15 +256,35 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.future.HubAuth.cache">cache (featurehub.evaluation.future.HubAuth attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.future.HubAuth.cache_max_age">cache_max_age (featurehub.evaluation.future.HubAuth attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorClient.check_if_registered">check_if_registered() (featurehub.evaluation.client.EvaluatorClient method)</a>
+
+      <ul>
+        <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorServer.check_if_registered">(featurehub.evaluation.client.EvaluatorServer method)</a>
+</li>
+      </ul></li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.CLASSIFICATION">CLASSIFICATION (featurehub.modeling.model.Model attribute)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.CLASSIFICATION_SCORING">CLASSIFICATION_SCORING (featurehub.modeling.model.Model attribute)</a>
+</li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.code">code (featurehub.admin.sqlalchemy_declarative.EvaluationAttempt attribute)</a>
 
       <ul>
         <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Feature.code">(featurehub.admin.sqlalchemy_declarative.Feature attribute)</a>
 </li>
       </ul></li>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands">Commands (class in featurehub.admin.admin)</a>
-</li>
       <li><a href="featurehub.html#featurehub.util.compute_dataset_hash">compute_dataset_hash() (in module featurehub.util)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.compute_metrics">compute_metrics() (featurehub.modeling.model.Model method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.compute_metrics_cv">compute_metrics_cv() (featurehub.modeling.model.Model method)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.compute_metrics_train_test">compute_metrics_train_test() (featurehub.modeling.model.Model method)</a>
 </li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.Metric.convert">convert() (featurehub.modeling.metrics.Metric method)</a>
 
@@ -260,12 +292,6 @@
         <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList.convert">(featurehub.modeling.metrics.MetricList method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.create_problem">create_problem() (featurehub.admin.admin.Commands method)</a>
-</li>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.create_problem_yml">create_problem_yml() (featurehub.admin.admin.Commands method)</a>
-</li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.created_at">created_at (featurehub.admin.sqlalchemy_declarative.EvaluationAttempt attribute)</a>
 
       <ul>
@@ -278,6 +304,8 @@
         <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.User.created_at">(featurehub.admin.sqlalchemy_declarative.User attribute)</a>
 </li>
       </ul></li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.cv_score_mean">cv_score_mean() (featurehub.modeling.model.Model method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -286,11 +314,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.data_dir_test">data_dir_test (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.data_dir_train">data_dir_train (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 </li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Feature.description">description (featurehub.admin.sqlalchemy_declarative.Feature attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic">DiscourseFeatureTopic (class in featurehub.evaluation.discourse)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate">DiscourseFeatureTopicTemplate (class in featurehub.evaluation.discourse)</a>
+</li>
+      <li><a href="featurehub.user.html#featurehub.user.session.Session.discover_features">discover_features() (featurehub.user.session.Session method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -302,16 +336,34 @@
 </li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.entities_table_name">entities_table_name (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorClient.evaluate">evaluate() (featurehub.evaluation.client.EvaluatorClient method)</a>
+
+      <ul>
+        <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorServer.evaluate">(featurehub.evaluation.client.EvaluatorServer method)</a>
+</li>
+        <li><a href="featurehub.user.html#featurehub.user.session.Session.evaluate">(featurehub.user.session.Session method)</a>
+</li>
+      </ul></li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt">EvaluationAttempt (class in featurehub.admin.sqlalchemy_declarative)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.evaluationattempts">evaluationattempts (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 
       <ul>
         <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.User.evaluationattempts">(featurehub.admin.sqlalchemy_declarative.User attribute)</a>
 </li>
       </ul></li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse">EvaluationResponse (class in featurehub.evaluation.response)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorClient">EvaluatorClient (class in featurehub.evaluation.client)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorServer">EvaluatorServer (class in featurehub.evaluation.client)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.extract_and_save_all_tables">extract_and_save_all_tables() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.extract_table">extract_table() (in module featurehub.admin.postprocessing)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -330,17 +382,35 @@
 </li>
       <li><a href="featurehub.admin.html#module-featurehub.admin">featurehub.admin (module)</a>
 </li>
-      <li><a href="featurehub.admin.html#module-featurehub.admin.admin">featurehub.admin.admin (module)</a>
+      <li><a href="featurehub.admin.html#module-featurehub.admin.postprocessing">featurehub.admin.postprocessing (module)</a>
 </li>
       <li><a href="featurehub.admin.html#module-featurehub.admin.sqlalchemy_declarative">featurehub.admin.sqlalchemy_declarative (module)</a>
 </li>
       <li><a href="featurehub.admin.html#module-featurehub.admin.sqlalchemy_main">featurehub.admin.sqlalchemy_main (module)</a>
 </li>
+      <li><a href="featurehub.evaluation.html#module-featurehub.evaluation">featurehub.evaluation (module)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#module-featurehub.evaluation.client">featurehub.evaluation.client (module)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#module-featurehub.evaluation.discourse">featurehub.evaluation.discourse (module)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#module-featurehub.evaluation.future">featurehub.evaluation.future (module)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#module-featurehub.evaluation.response">featurehub.evaluation.response (module)</a>
+</li>
+      <li><a href="featurehub.modeling.html#module-featurehub.modeling">featurehub.modeling (module)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.modeling.html#module-featurehub.modeling.metrics">featurehub.modeling.metrics (module)</a>
 </li>
+      <li><a href="featurehub.modeling.html#module-featurehub.modeling.model">featurehub.modeling.model (module)</a>
+</li>
+      <li><a href="featurehub.modeling.html#module-featurehub.modeling.scorers">featurehub.modeling.scorers (module)</a>
+</li>
       <li><a href="featurehub.user.html#module-featurehub.user">featurehub.user (module)</a>
+</li>
+      <li><a href="featurehub.user.html#module-featurehub.user.session">featurehub.user.session (module)</a>
 </li>
       <li><a href="featurehub.html#module-featurehub.util">featurehub.util (module)</a>
 </li>
@@ -352,6 +422,10 @@
       </ul></li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.files">files (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 </li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_code">format_code() (featurehub.evaluation.discourse.DiscourseFeatureTopic method)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_metrics">format_metrics() (featurehub.evaluation.discourse.DiscourseFeatureTopic method)</a>
+</li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.Metric.from_dict">from_dict() (featurehub.modeling.metrics.Metric class method)</a>
 </li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList.from_dict_user">from_dict_user() (featurehub.modeling.metrics.MetricList class method)</a>
@@ -360,13 +434,15 @@
 </li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList.from_object">from_object() (featurehub.modeling.metrics.MetricList class method)</a>
 </li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.from_string">from_string() (featurehub.evaluation.response.EvaluationResponse class method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.get_features">get_features() (featurehub.admin.admin.Commands method)</a>
+      <li><a href="featurehub.user.html#featurehub.user.session.Session.get_entity_features">get_entity_features() (featurehub.user.session.Session method)</a>
 </li>
       <li><a href="featurehub.html#featurehub.util.get_function">get_function() (in module featurehub.util)</a>
 </li>
@@ -374,11 +450,21 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.get_problems">get_problems() (featurehub.admin.admin.Commands method)</a>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.get_params">get_params() (featurehub.evaluation.discourse.DiscourseFeatureTopic method)</a>
+</li>
+      <li><a href="featurehub.user.html#featurehub.user.session.Session.get_sample_dataset">get_sample_dataset() (featurehub.user.session.Session method)</a>
 </li>
       <li><a href="featurehub.html#featurehub.util.get_source">get_source() (in module featurehub.util)</a>
 </li>
       <li><a href="featurehub.html#featurehub.util.get_top_level_function_name">get_top_level_function_name() (in module featurehub.util)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.future.HubAuth">HubAuth (class in featurehub.evaluation.future)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -400,9 +486,29 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.indent">indent (featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate attribute)</a>
+</li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList.insert">insert() (featurehub.modeling.metrics.MetricList method)</a>
 </li>
       <li><a href="featurehub.html#featurehub.util.is_positive_env">is_positive_env() (in module featurehub.util)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.load_dataset_from_dir">load_dataset_from_dir() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.load_feature_matrix">load_feature_matrix() (in module featurehub.admin.postprocessing)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.load_features_df">load_features_df() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.load_table">load_table() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.load_table1">load_table1() (in module featurehub.admin.postprocessing)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -418,11 +524,15 @@
         <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.Metric">(class in featurehub.modeling.metrics)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.MetricList">MetricList (class in featurehub.modeling.metrics)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Feature.metrics">metrics (featurehub.admin.sqlalchemy_declarative.Feature attribute)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model">Model (class in featurehub.modeling.model)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.MULTICLASS_METRIC_AGGREGATION">MULTICLASS_METRIC_AGGREGATION (featurehub.modeling.model.Model attribute)</a>
 </li>
       <li><a href="featurehub.html#featurehub.util.myhash">myhash() (in module featurehub.util)</a>
 </li>
@@ -444,6 +554,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.Metric.name_to_scoring">name_to_scoring() (featurehub.modeling.metrics.Metric static method)</a>
 </li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.scorers.ndcg_score">ndcg_score() (in module featurehub.modeling.scorers)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.null_feature">null_feature() (in module featurehub.admin.postprocessing)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -460,16 +574,22 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.html#featurehub.util.possibly_talking_action">possibly_talking_action() (in module featurehub.util)</a>
 </li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.post_feature">post_feature() (featurehub.evaluation.discourse.DiscourseFeatureTopic method)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.prepare_automl_file_name">prepare_automl_file_name() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.user.html#featurehub.user.session.Session.print_my_features">print_my_features() (featurehub.user.session.Session method)</a>
+</li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem">Problem (class in featurehub.admin.sqlalchemy_declarative)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.problem">problem (featurehub.admin.sqlalchemy_declarative.EvaluationAttempt attribute)</a>
 
       <ul>
         <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Feature.problem">(featurehub.admin.sqlalchemy_declarative.Feature attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.problem_id">problem_id (featurehub.admin.sqlalchemy_declarative.EvaluationAttempt attribute)</a>
 
       <ul>
@@ -486,6 +606,20 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.recover_function">recover_function() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.REGRESSION">REGRESSION (featurehub.modeling.model.Model attribute)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.REGRESSION_SCORING">REGRESSION_SCORING (featurehub.modeling.model.Model attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render">render() (featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate method)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render_title">render_title() (featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate method)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.scorers.rmsle_score">rmsle_score() (in module featurehub.modeling.scorers)</a>
+</li>
       <li><a href="featurehub.html#featurehub.util.run_isolated">run_isolated() (in module featurehub.util)</a>
 </li>
   </ul></td>
@@ -494,14 +628,46 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.save_feature_matrix">save_feature_matrix() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.save_submission">save_submission() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.save_table">save_table() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.save_table1">save_table1() (in module featurehub.admin.postprocessing)</a>
+</li>
+      <li><a href="featurehub.modeling.html#featurehub.modeling.model.Model.scores_to_metriclist">scores_to_metriclist() (featurehub.modeling.model.Model method)</a>
+</li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Metric.scoring">scoring (featurehub.admin.sqlalchemy_declarative.Metric attribute)</a>
+</li>
+      <li><a href="featurehub.user.html#featurehub.user.session.Session">Session (class in featurehub.user.session)</a>
+</li>
+      <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_main.ORMManager.session_scope">session_scope() (featurehub.admin.sqlalchemy_main.ORMManager method)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_AUTH">STATUS_CODE_BAD_AUTH (featurehub.evaluation.response.EvaluationResponse attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_main.ORMManager.session_scope">session_scope() (featurehub.admin.sqlalchemy_main.ORMManager method)</a>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_FEATURE">STATUS_CODE_BAD_FEATURE (featurehub.evaluation.response.EvaluationResponse attribute)</a>
 </li>
-      <li><a href="featurehub.admin.html#featurehub.admin.admin.Commands.set_up">set_up() (featurehub.admin.admin.Commands method)</a>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_REQUEST">STATUS_CODE_BAD_REQUEST (featurehub.evaluation.response.EvaluationResponse attribute)</a>
 </li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DB_ERROR">STATUS_CODE_DB_ERROR (featurehub.evaluation.response.EvaluationResponse attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE">STATUS_CODE_DUPLICATE_FEATURE (featurehub.evaluation.response.EvaluationResponse attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_OKAY">STATUS_CODE_OKAY (featurehub.evaluation.response.EvaluationResponse attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_SERVER_ERROR">STATUS_CODE_SERVER_ERROR (featurehub.evaluation.response.EvaluationResponse attribute)</a>
+</li>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorClient.submit">submit() (featurehub.evaluation.client.EvaluatorClient method)</a>
+
+      <ul>
+        <li><a href="featurehub.evaluation.html#featurehub.evaluation.client.EvaluatorServer.submit">(featurehub.evaluation.client.EvaluatorServer method)</a>
+</li>
+        <li><a href="featurehub.user.html#featurehub.user.session.Session.submit">(featurehub.user.session.Session method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -512,8 +678,12 @@
 </li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.Problem.target_table_name">target_table_name (featurehub.admin.sqlalchemy_declarative.Problem attribute)</a>
 </li>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.time_limit">time_limit() (in module featurehub.admin.postprocessing)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.admin.html#featurehub.admin.postprocessing.TimeoutException">TimeoutException</a>
+</li>
       <li><a href="featurehub.modeling.html#featurehub.modeling.metrics.Metric.to_string">to_string() (featurehub.modeling.metrics.Metric method)</a>
 
       <ul>
@@ -536,6 +706,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="featurehub.evaluation.html#featurehub.evaluation.future.HubAuth.user_for_token">user_for_token() (featurehub.evaluation.future.HubAuth method)</a>
+</li>
       <li><a href="featurehub.admin.html#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.user_id">user_id (featurehub.admin.sqlalchemy_declarative.EvaluationAttempt attribute)</a>
 
       <ul>
@@ -556,9 +728,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -567,11 +737,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -586,36 +756,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

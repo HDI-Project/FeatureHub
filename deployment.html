@@ -24,28 +24,19 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/>
-        <link rel="prev" title="FAQ" href="faq.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="FAQ" href="faq.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -103,7 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -124,15 +115,21 @@
 <li class="toctree-l3"><a class="reference internal" href="#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -148,7 +145,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -156,9 +153,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -217,21 +215,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -240,9 +223,9 @@
 <span id="deployment"></span><h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
 <p>A variety of resources facilitate easy deployment of FeatureHub:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">Makefile</span></code> to manage all resources</li>
-<li><code class="docutils literal"><span class="pre">docker</span></code></li>
-<li><code class="docutils literal"><span class="pre">docker-compose</span></code>, for actual deployment of Hub, User, and DB containers</li>
+<li><code class="docutils literal notranslate"><span class="pre">Makefile</span></code> to manage all resources</li>
+<li><code class="docutils literal notranslate"><span class="pre">docker</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">docker-compose</span></code>, for actual deployment of Hub, User, and DB containers</li>
 <li>shell utilities<ul>
 <li>create/delete users</li>
 <li>use LetsEncrypt to generate SSL certificate</li>
@@ -252,85 +235,147 @@
 </ul>
 <div class="section" id="installation">
 <span id="installation"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we walk through the steps to install FeatureHub on the host machine, build
+Docker images, and spin up application containers. However, some of these steps will not
+make sense until you have <a class="reference external" href="#configuration">configured</a> the application as you desire. You
+may want to go through these steps once to make sure everything runs okay, then update your
+configuration file and re-build.</p>
 <ol>
 <li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
 </li>
 <li><p class="first">Download the FeatureHub repository.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureHub.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureHub.git
 </pre></div>
 </div>
 </li>
-<li><p class="first">Ensure Python 3 is installed. On Amazon AMI:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>yum update -y
+<li><p class="first">Ensure Python 3.5 is installed.</p>
+<ul>
+<li><p class="first">On a virtual machine, one can use a system python.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum update -y
 yum install -y python35 python35-pip
 pip-3.5 install --upgrade pip
 </pre></div>
 </div>
 </li>
+<li><p class="first">Otherwise, it is best to use a virtual environment, using <code class="docutils literal notranslate"><span class="pre">conda</span></code> for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -y -n featurehub <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.5
+conda activate featurehub
+pip install --upgrade pip
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
 <li><p class="first">Install Python requirements for the host.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install -r deploy/requirements-host.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r deploy/requirements-host.txt
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a local configuration.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> deploy
+perl -pe <span class="s1">&#39;s|XYZ|`openssl rand -hex 32`|g&#39;</span> .env.local.example &gt; .env.local
+</pre></div>
+</div>
+</li>
+<li><p class="first">Build the necessary docker images.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make build
+</pre></div>
+</div>
+</li>
+<li><p class="first"><em>(Optional)</em> Generate SSL certificate. This either generates a self-signed certificate
+using openssl or generates a certificate using LetsEncrypt, based on the
+<code class="docutils literal notranslate"><span class="pre">USE_LETSENCRYPT_CERT</span></code> configuration variable.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make ssl
+</pre></div>
+</div>
+<div class="highlight-eval_rst notranslate"><div class="highlight"><pre><span></span>.. note::
+
+    This Makefile target to generate certificates does not need to be re-executed unless you
+    remove the Docker data volume, the certificates expire, or your domain configuration
+    changes.
+</pre></div>
+</div>
+</li>
+<li><p class="first">Launch the app.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make up
 </pre></div>
 </div>
 </li>
 </ol>
+<p>At this point:</p>
+<ul class="simple">
+<li>you should have three running containers: a hub, a database, and a machine
+learning backend (eval server). Confirm that the output of <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">ps</span></code> shows these running
+containers.</li>
+<li>An unsecured login page should be visible at <code class="docutils literal notranslate"><span class="pre">http://localhost:8000</span></code> (not
+visible over the internet).</li>
+<li>You have not created any users, so no one will be able to login
+yet. See <a class="reference external" href="#user-management">User Management</a> and <a class="reference external" href="#data-management">Data Management</a> to
+continue.</li>
+</ul>
+<p>Proceed to configure your app.</p>
 </div>
 <div class="section" id="configuration">
 <span id="configuration"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>FeatureHub allows configuration in several places.</p>
 <div class="section" id="app-deployment">
 <span id="app-deployment"></span><h3>App Deployment<a class="headerlink" href="#app-deployment" title="Permalink to this headline">¶</a></h3>
-<p>Default app configuration variables are provided in <code class="docutils literal"><span class="pre">deploy/.env</span></code>.</p>
-<p>To override any of these defaults, set these variables in a new file <code class="docutils literal"><span class="pre">deploy/.env.local</span></code>.</p>
-<p>Definitely override values for these variables:</p>
+<p>Default app configuration variables are provided in <code class="docutils literal notranslate"><span class="pre">deploy/.env</span></code>.</p>
+<p>To override any of these defaults, set these variables in a new file <code class="docutils literal notranslate"><span class="pre">deploy/.env.local</span></code>.</p>
+<p>These variables are always needed and the app will break if not provided:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let's Encrypt.</li>
-<li><code class="docutils literal"><span class="pre">FF_DOMAIN_EMAIL</span></code>: email associated with domain name registration</li>
-<li><code class="docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
-<li><code class="docutils literal"><span class="pre">EVAL_API_TOKEN</span></code>: API token for eval server. You should generate a valid API token by
-executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You should generate a valid
-API token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_DOMAIN_NAME</span></code> : domain name of the Discourse forum</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_USERNAME</span></code> : Username for Discourse admin, to use with Discourse API
+<li><code class="docutils literal notranslate"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>: password for DB root user</li>
+<li><code class="docutils literal notranslate"><span class="pre">EVAL_API_TOKEN</span></code>: API token for eval server. You should generate a valid API token by
+executing <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">HUB_CLIENT_API_TOKEN</span></code> : API token for Hub API client script. You should generate a valid
+API token by executing <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>.</li>
+</ul>
+<p>Definitely override values for these variables, as applicable (i.e. you are exposing app to
+the internet or have enabled Discourse integration):</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">FF_DOMAIN_NAME</span></code>: fully-qualified domain name of this server, used for Let’s Encrypt.</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_DOMAIN_EMAIL</span></code>: email associated with domain name registration</li>
+<li><code class="docutils literal notranslate"><span class="pre">DISCOURSE_DOMAIN_NAME</span></code> : domain name of the Discourse forum</li>
+<li><code class="docutils literal notranslate"><span class="pre">DISCOURSE_CLIENT_API_USERNAME</span></code> : Username for Discourse admin, to use with Discourse API
 client. You must use the same username when setting up the Discourse instance.</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_CLIENT_API_TOKEN</span></code> : API token for Discourse API client. You should generate a
-valid API token by executing <code class="docutils literal"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>. You must use the same token when
+<li><code class="docutils literal notranslate"><span class="pre">DISCOURSE_CLIENT_API_TOKEN</span></code> : API token for Discourse API client. You should generate a
+valid API token by executing <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">rand</span> <span class="pre">-hex</span> <span class="pre">32</span></code>. You must use the same token when
 setting up the Discourse instance.</li>
 </ul>
 <p>You can usually leave these variables at their default values:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">DOCKER_NETWORK_NAME</span></code>: name for docker network used for networking containers</li>
-<li><code class="docutils literal"><span class="pre">HUB_IMAGE_NAME</span></code>: name for docker Hub image</li>
-<li><code class="docutils literal"><span class="pre">HUB_CONTAINER_NAME</span></code>: name for docker Hub container</li>
-<li><code class="docutils literal"><span class="pre">HUB_API_PROT</span></code> : port for Hub REST API to list on</li>
-<li><code class="docutils literal"><span class="pre">FF_IMAGE_NAME</span></code>: name for docker User notebook server image</li>
-<li><code class="docutils literal"><span class="pre">FF_CONTAINER_NAME</span></code>: prefix for docker User containers. Actual containers will have
-<code class="docutils literal"><span class="pre">-username</span></code> appended.</li>
-<li><code class="docutils literal"><span class="pre">FF_DATA_DIR</span></code>: path to data directory on <em>host machine</em> (deployment machine)</li>
-<li><code class="docutils literal"><span class="pre">FF_PROJECT_NAME</span></code>: name for docker-compose app</li>
-<li><code class="docutils literal"><span class="pre">FF_IDLE_SERVER_TIMEOUT</span></code>: timeout interval for idle servers (i.e., user containers). If a
+<li><code class="docutils literal notranslate"><span class="pre">DOCKER_NETWORK_NAME</span></code>: name for docker network used for networking containers</li>
+<li><code class="docutils literal notranslate"><span class="pre">HUB_IMAGE_NAME</span></code>: name for docker Hub image</li>
+<li><code class="docutils literal notranslate"><span class="pre">HUB_CONTAINER_NAME</span></code>: name for docker Hub container</li>
+<li><code class="docutils literal notranslate"><span class="pre">HUB_API_PROT</span></code> : port for Hub REST API to list on</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_IMAGE_NAME</span></code>: name for docker User notebook server image</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_CONTAINER_NAME</span></code>: prefix for docker User containers. Actual containers will have
+<code class="docutils literal notranslate"><span class="pre">-username</span></code> appended.</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR</span></code>: path to data directory on <em>host machine</em> (deployment machine)</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_PROJECT_NAME</span></code>: name for docker-compose app</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_IDLE_SERVER_TIMEOUT</span></code>: timeout interval for idle servers (i.e., user containers). If a
 server is idle for this amount of time, then it will be automatically stopped. Due to some
-JupyterHub defaults, this value should be set to at least 5m 30s (<code class="docutils literal"><span class="pre">330</span></code>).</li>
-<li><code class="docutils literal"><span class="pre">FF_CONTAINER_MEMLIMIT</span></code>: memory limit for user containers. The value can either be an
-integer (bytes) or a string with a 'K', 'M', 'G' or 'T' prefix.</li>
-<li><code class="docutils literal"><span class="pre">MYSQL_CONTAINER_NAME</span></code>: name for docker DB container</li>
-<li><code class="docutils literal"><span class="pre">MYSQL_ROOT_USERNAME</span></code>: username for DB root user</li>
-<li><code class="docutils literal"><span class="pre">MYSQL_DATABASE</span></code>: competition database name in DB</li>
-<li><code class="docutils literal"><span class="pre">MYSQL_DATA_VOLUME_NAME</span></code>: name for DB data volume</li>
-<li><code class="docutils literal"><span class="pre">SECRETS_VOLUME_NAME</span></code>: name for Hub secrets volume</li>
-<li><code class="docutils literal"><span class="pre">USE_LETSENCRYPT_CERT</span></code>: flag to use Lets Encrypt certificate (<code class="docutils literal"><span class="pre">&quot;yes&quot;</span></code>). For testing
-purposes, can use <code class="docutils literal"><span class="pre">openssl</span></code> to issue a self-signed certificate (<code class="docutils literal"><span class="pre">&quot;no&quot;</span></code>).</li>
-<li><code class="docutils literal"><span class="pre">EVAL_IMAGE_NAME</span></code> : name for docker eval server image</li>
-<li><code class="docutils literal"><span class="pre">EVAL_CONTAINER_NAME</span></code> : name for docker eval server container. Since there is one eval
+JupyterHub defaults, this value should be set to at least 5m 30s (<code class="docutils literal notranslate"><span class="pre">330</span></code>).</li>
+<li><code class="docutils literal notranslate"><span class="pre">FF_CONTAINER_MEMLIMIT</span></code>: memory limit for user containers. The value can either be an
+integer (bytes) or a string with a ‘K’, ‘M’, ‘G’ or ‘T’ prefix.</li>
+<li><code class="docutils literal notranslate"><span class="pre">MYSQL_CONTAINER_NAME</span></code>: name for docker DB container</li>
+<li><code class="docutils literal notranslate"><span class="pre">MYSQL_ROOT_USERNAME</span></code>: username for DB root user</li>
+<li><code class="docutils literal notranslate"><span class="pre">MYSQL_DATABASE</span></code>: competition database name in DB</li>
+<li><code class="docutils literal notranslate"><span class="pre">MYSQL_DATA_VOLUME_NAME</span></code>: name for DB data volume</li>
+<li><code class="docutils literal notranslate"><span class="pre">SECRETS_VOLUME_NAME</span></code>: name for Hub secrets volume</li>
+<li><code class="docutils literal notranslate"><span class="pre">USE_LETSENCRYPT_CERT</span></code>: flag to use Lets Encrypt certificate (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>). For testing
+purposes, can use <code class="docutils literal notranslate"><span class="pre">openssl</span></code> to issue a self-signed certificate (<code class="docutils literal notranslate"><span class="pre">&quot;no&quot;</span></code>).</li>
+<li><code class="docutils literal notranslate"><span class="pre">EVAL_IMAGE_NAME</span></code> : name for docker eval server image</li>
+<li><code class="docutils literal notranslate"><span class="pre">EVAL_CONTAINER_NAME</span></code> : name for docker eval server container. Since there is one eval
 container, this will be the exact name.</li>
-<li><code class="docutils literal"><span class="pre">EVAL_CONTAINER_PORT</span></code> : port for eval server to listen on</li>
-<li><code class="docutils literal"><span class="pre">EVAL_FLASK_DEBUG</span></code> : whether eval server Flask app should be started with DEBUG flag</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_FEATURE_GROUP_NAME</span></code> : Group for new users to be added to on Discourse. This
+<li><code class="docutils literal notranslate"><span class="pre">EVAL_CONTAINER_PORT</span></code> : port for eval server to listen on</li>
+<li><code class="docutils literal notranslate"><span class="pre">EVAL_FLASK_DEBUG</span></code> : whether eval server Flask app should be started with DEBUG flag</li>
+<li><code class="docutils literal notranslate"><span class="pre">DISCOURSE_FEATURE_GROUP_NAME</span></code> : Group for new users to be added to on Discourse. This
 group will control the visibility of the feature category.</li>
-<li><code class="docutils literal"><span class="pre">DISCOURSE_FEATURE_CATEGORY_NAME</span></code> : Category for new features to be posted to on
+<li><code class="docutils literal notranslate"><span class="pre">DISCOURSE_FEATURE_CATEGORY_NAME</span></code> : Category for new features to be posted to on
 Discourse. Posts to this category will only be visible by members of the feature group
 (above) and administrators.</li>
-<li><code class="docutils literal"><span class="pre">USE_DISCOURSE</span></code>: flag to use Discourse integration (<code class="docutils literal"><span class="pre">&quot;yes&quot;</span></code>). If Discourse integration is
+<li><code class="docutils literal notranslate"><span class="pre">USE_DISCOURSE</span></code>: flag to use Discourse integration (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>). If Discourse integration is
 enabled, then forum posts are created for each feature that is successfully added.</li>
 </ul>
 </div>
@@ -338,67 +383,80 @@ enabled, then forum posts are created for each feature that is successfully adde
 <span id="userlist"></span><h3>Userlist<a class="headerlink" href="#userlist" title="Permalink to this headline">¶</a></h3>
 <p><em>Currently, this method does not allow setup of template notebooks and DB credentials. Thus,
 it should be avoided entirely in favor of <a class="reference external" href="#user-and-data-management">User and data management</a>.</em></p>
-<p>Optionally, you can provide a userlist in <code class="docutils literal"><span class="pre">deploy/userlist</span></code>. Include one user per row.</p>
+<p>Optionally, you can provide a userlist in <code class="docutils literal notranslate"><span class="pre">deploy/userlist</span></code>. Include one user per row.</p>
 <ul class="simple">
-<li>Specify normal users by their username only: <code class="docutils literal"><span class="pre">testuser</span></code></li>
-<li>Specify admin users by appending an indicator: <code class="docutils literal"><span class="pre">adminuser</span> <span class="pre">admin</span></code></li>
+<li>Specify normal users by their username only: <code class="docutils literal notranslate"><span class="pre">testuser</span></code></li>
+<li>Specify admin users by appending an indicator: <code class="docutils literal notranslate"><span class="pre">adminuser</span> <span class="pre">admin</span></code></li>
 </ul>
 </div>
 <div class="section" id="jupyterhub-and-jupyter-notebook">
 <span id="jupyterhub-and-jupyter-notebook"></span><h3>Jupyterhub and Jupyter Notebook<a class="headerlink" href="#jupyterhub-and-jupyter-notebook" title="Permalink to this headline">¶</a></h3>
-<p>You may want to modify the default <code class="docutils literal"><span class="pre">deploy/jupyterhub_config.py</span></code> file. However, you should
-know what you're doing to not break things.</p>
+<p>You may want to modify the default <code class="docutils literal notranslate"><span class="pre">deploy/jupyterhub_config.py</span></code> file. However, you should
+know what you’re doing to not break things.</p>
 </div>
 </div>
-<div class="section" id="build-the-app">
-<span id="build-the-app"></span><h2>Build the app<a class="headerlink" href="#build-the-app" title="Permalink to this headline">¶</a></h2>
-<p>Build the necessary docker images.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">build</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="launch-the-app">
-<span id="launch-the-app"></span><h2>Launch the app<a class="headerlink" href="#launch-the-app" title="Permalink to this headline">¶</a></h2>
-<p>Launch the app.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">up</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="user-and-data-management">
-<span id="user-and-data-management"></span><h2>User and data management<a class="headerlink" href="#user-and-data-management" title="Permalink to this headline">¶</a></h2>
-<p>Users can be added or deleted using <code class="docutils literal"><span class="pre">deploy/users.py</span></code>. This utility creates user accounts on
-the hub container, sets up notebooks templates, sets up authentication for each user with
-the DB, and optionally sets up user accounts on the Discourse forum.</p>
+<div class="section" id="data-management">
+<span id="data-management"></span><h2>Data management<a class="headerlink" href="#data-management" title="Permalink to this headline">¶</a></h2>
 <p>Most files are stored directly on the host machine and mounted in the Hub and User
 containers:</p>
 <ul class="simple">
-<li>Experiment data: <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/train</span></code> and <code class="docutils literal"><span class="pre">FF_DATA_DIR/data/test</span></code></li>
-<li>Problem definitions: <code class="docutils literal"><span class="pre">FF_DATA_DIR/problems</span></code></li>
-<li>Notebooks and other user-created files: <code class="docutils literal"><span class="pre">FF_DATA_DIR/users</span></code></li>
-<li>Configuration files for FeatureHub and JupyterHub: <code class="docutils literal"><span class="pre">FF_DATA_DIR/config</span></code></li>
-<li>Log files for Hub and eval server: <code class="docutils literal"><span class="pre">FF_DATA_DIR/log</span></code></li>
+<li>Experiment data: <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/data/train</span></code> and <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/data/test</span></code></li>
+<li>Problem definitions: <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/problems</span></code></li>
+<li>Notebooks and other user-created files: <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/users</span></code></li>
+<li>Configuration files for FeatureHub and JupyterHub: <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/config</span></code></li>
+<li>Log files for Hub and eval server: <code class="docutils literal notranslate"><span class="pre">FF_DATA_DIR/log</span></code></li>
 </ul>
 <p>The MySQL database is mounted on a docker data volume:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">db-data</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">db-data</span></code></li>
 </ul>
+<div class="section" id="prediction-problem-format">
+<span id="prediction-problem-format"></span><h3>Prediction problem format<a class="headerlink" href="#prediction-problem-format" title="Permalink to this headline">¶</a></h3>
+<p><strong>Data format.</strong> All tables are CSV files with rows corresponding to examples and columns
+corresponding to variables.</p>
+<ol class="simple">
+<li>Entities table. Each row in the table corresponds to one entity to make a prediction for.</li>
+<li>Target table. Each row in the table corresponds to the actual target that you were trying
+to predict. The ID is implicitly given by the index into the table, such that the <em>ith</em>
+row of the target table must contain the target for the <em>ith</em> engity.</li>
+<li>Featurized entities table. Optional. A set of pre-extracted features used to initialize
+machine learning models for evaluation. Recall that when users submit features, the ML
+backend evaluates them by 1) extracting the feature values from the test data 2) building
+a model from just that feature 3) computing metrics from the trained model. If a
+featurized entities table is table, then step 2 is replaced by merging the newly
+extracted feature values with the set of existing featurized. This can be
+helpful if there are really obvious features that you don’t want users to spend time
+re-implementing one-by-one, or if there are several features that dominate performance
+but that are already known, and improvements should be focused on the margins.</li>
+<li>“Static” tables. There can be many of these. Metadata that doesn’t change over time,
+other relational data.</li>
+</ol>
+<p>A train/test split should be created, where each split contains the same set of tables but
+with different cutoffs.</p>
+</div>
+</div>
+<div class="section" id="user-management">
+<span id="user-management"></span><h2>User management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
+<p>Users can be added or deleted using <code class="docutils literal notranslate"><span class="pre">deploy/users.py</span></code>. This utility creates user accounts on
+the hub container, sets up notebooks templates, sets up authentication for each user with
+the DB, and optionally sets up user accounts on the Discourse forum.</p>
 </div>
 <div class="section" id="app-administration">
 <span id="app-administration"></span><h2>App administration<a class="headerlink" href="#app-administration" title="Permalink to this headline">¶</a></h2>
 <p>Admins can perform administrative tasks with respect to the FeatureHub app as well as
 the FeatureHub data science experiment. Admin users can manage and organize an
 experiment without needing access to the host machine.</p>
-<p>Create an admin user using <code class="docutils literal"><span class="pre">users.py</span> <span class="pre">add</span> <span class="pre">--admin=True</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
+<p>Create an admin user using <code class="docutils literal notranslate"><span class="pre">users.py</span> <span class="pre">add</span> <span class="pre">--admin=True</span> <span class="pre">admin_username</span> <span class="pre">admin_password</span></code>.</p>
 <p>App admin</p>
 <ul class="simple">
 <li>Can log into JupyterHub via the admin web interface and add/remove users, restart/shutdown
 notebooks, and more.</li>
-<li>Can also create/remove users from the host machine command line using <code class="docutils literal"><span class="pre">users.py</span></code>.</li>
+<li>Can also create/remove users from the host machine command line using <code class="docutils literal notranslate"><span class="pre">users.py</span></code>.</li>
 <li>Can modify the experiment database.</li>
 </ul>
 <p>Experiment admin</p>
 <ul class="simple">
-<li>Can log into JupyterHub and use the <code class="docutils literal"><span class="pre">notebooks/admin/Admin.ipynb</span></code> notebook to initialize
+<li>Can log into JupyterHub and use the <code class="docutils literal notranslate"><span class="pre">notebooks/admin/Admin.ipynb</span></code> notebook to initialize
 experiments, restart experiments, and view features created.</li>
 <li>To create an experiment, the admin user must store data on the server, then execute
 Python commands to initialize the experiment and database, provide paths to the
@@ -406,19 +464,19 @@ experiment data, and configure experiment parameters.</li>
 </ul>
 <div class="section" id="hub-api-client">
 <span id="hub-api-client"></span><h3>Hub API client<a class="headerlink" href="#hub-api-client" title="Permalink to this headline">¶</a></h3>
-<p>Admins can also use a command line API client to interact with the Hub's REST API. To use
-this, you must set an API key for the client to use in the <code class="docutils literal"><span class="pre">HUB_CLIENT_API_TOKEN</span></code>
+<p>Admins can also use a command line API client to interact with the Hub’s REST API. To use
+this, you must set an API key for the client to use in the <code class="docutils literal notranslate"><span class="pre">HUB_CLIENT_API_TOKEN</span></code>
 environment variable. See <a class="reference external" href="#app-deployment">App Deployment</a> above.</p>
 <p>See the available commands:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span> <span class="o">--</span><span class="n">help</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span> <span class="o">--</span><span class="n">help</span>
 </pre></div>
 </div>
 <p>List all users:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="nb">list</span><span class="o">-</span><span class="n">users</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="nb">list</span><span class="o">-</span><span class="n">users</span>
 </pre></div>
 </div>
 <p>Start the server of a user that already exists:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="n">start</span><span class="o">-</span><span class="n">server</span> <span class="n">username</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hub_client</span><span class="o">.</span><span class="n">py</span> <span class="n">start</span><span class="o">-</span><span class="n">server</span> <span class="n">username</span>
 </pre></div>
 </div>
 </div>
@@ -426,7 +484,7 @@ environment variable. See <a class="reference external" href="#app-deployment">A
 <div class="section" id="manage-app-lifecycle">
 <span id="manage-app-lifecycle"></span><h2>Manage app lifecycle<a class="headerlink" href="#manage-app-lifecycle" title="Permalink to this headline">¶</a></h2>
 <p>The available tasks can be viewed with</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">help</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">help</span>
 </pre></div>
 </div>
 <div class="section" id="restarting-the-server">
@@ -436,40 +494,66 @@ FeatureHub code, or some other reason.</p>
 <p>Stop the app. This stops, but does <em>not</em> remove, the hub, user, and DB containers. Note that hub
 state files, user notebooks, and the database dump persist on the filesystem or in data
 volumes.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">stop</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">stop</span>
 </pre></div>
 </div>
 <p>Restart the app.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">start</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>Up the app.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">up</span>
 </pre></div>
 </div>
 <p>Down the app. This stops and removes the hub, user, and database containers. Note that hub
 state files persist, user notebooks, and the database dump persist on the filesystem.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">down</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">down</span>
 </pre></div>
 </div>
 <p><em>Optional</em>: Clean filesystem and containers. This stops and removes all FeatureHub
 containers, if not been already done. Additionally, user notebooks and config files are
 removed and data volumes are deleted.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
 </pre></div>
 </div>
-<p><em>Optional</em>: In addition to the steps taken by <code class="docutils literal"><span class="pre">make</span> <span class="pre">clean</span></code>, cleans images, network, in
+<p><em>Optional</em>: In addition to the steps taken by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code>, cleans images, network, in
 addition to filesystem and containers.  This removes all trace of FeatureHub beside the
 source repository and the experiment data directory. Built images are removed and the docker
 internal network is shut down.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean_all</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean_all</span>
 </pre></div>
 </div>
 </div>
 </div>
+<div class="section" id="other-topics">
+<span id="other-topics"></span><h2>Other topics<a class="headerlink" href="#other-topics" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="local-installation">
+<span id="local-installation"></span><h3>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this headline">¶</a></h3>
+<p>In the <a class="reference external" href="#installation">Installation</a> section above, the FeatureHub package is built
+into a Docker image. If you want to install it locally, for development and testing, there
+are several additional considerations.</p>
+<p>This is largely untested.</p>
+<ol>
+<li><p class="first">Follow the directions in above section to checkout the package and install Python 3.</p>
+</li>
+<li><p class="first">Install required MySQL and auto-sklearn libraries and dependencies. See
+<a class="reference external" href="../deploy/Dockerfile-user">Dockerfile-user</a> for an example on Ubuntu. See
+<a class="reference external" href="http://automl.github.io/auto-sklearn/stable/installation.html">auto-sklearn Intallation</a>
+for details on installing auto-sklearn dependencies in your environment.</p>
+</li>
+<li><p class="first">Install package.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e src/
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -485,11 +569,11 @@ internal network is shut down.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -504,36 +588,24 @@ internal network is shut down.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

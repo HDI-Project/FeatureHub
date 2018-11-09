@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -102,7 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -123,15 +114,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -147,7 +144,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -155,9 +152,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -216,21 +214,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -240,97 +223,116 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-featurehub.admin.admin">
-<span id="featurehub-admin-admin-module"></span><h2>featurehub.admin.admin module<a class="headerlink" href="#module-featurehub.admin.admin" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="featurehub.admin.admin.Commands">
-<em class="property">class </em><code class="descclassname">featurehub.admin.admin.</code><code class="descname">Commands</code><span class="sig-paren">(</span><em>problem=None</em>, <em>database='featurehub'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Admin interface for the database.</p>
-<p>Create the schema, add or remove problems, and view problems, users, and
-features.</p>
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.bulk_create_problem_yml">
-<code class="descname">bulk_create_problem_yml</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.bulk_create_problem_yml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.bulk_create_problem_yml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new problem entries in database from yml document stream.</p>
-<p>Can create a yml file with individual problems delimited into documents
-using the <code class="xref py py-obj docutils literal"><span class="pre">---</span></code> … <code class="xref py py-obj docutils literal"><span class="pre">---</span></code> document stream syntax.</p>
-<dl class="docutils">
-<dt>path: str or path-like</dt>
-<dd>Path to yml file</dd>
-</dl>
+<div class="section" id="featurehub-admin-admin-module">
+<h2>featurehub.admin.admin module<a class="headerlink" href="#featurehub-admin-admin-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-featurehub.admin.postprocessing">
+<span id="featurehub-admin-postprocessing-module"></span><h2>featurehub.admin.postprocessing module<a class="headerlink" href="#module-featurehub.admin.postprocessing" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="featurehub.admin.postprocessing.TimeoutException">
+<em class="property">exception </em><code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">TimeoutException</code><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#TimeoutException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.TimeoutException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.create_problem">
-<code class="descname">create_problem</code><span class="sig-paren">(</span><em>name=''</em>, <em>problem_type=''</em>, <em>problem_type_details={}</em>, <em>data_dir_train=''</em>, <em>data_dir_test=''</em>, <em>files=[]</em>, <em>table_names=[]</em>, <em>entities_table_name=''</em>, <em>entities_featurized_table_name=''</em>, <em>target_table_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.create_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.create_problem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates new problem entry in database.</p>
-<p>name : str
-problem_type : str</p>
-<blockquote>
-<div>Classification or regression</div></blockquote>
-<dl class="docutils">
-<dt>problem_type_details <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd>Dict with additional details about problem.
-For example, the dict may be {“classification_type” : “multiclass”}.</dd>
-<dt>data_dir_train <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Absolute path of containing directory of data files for training.</dd>
-<dt>data_dir_test <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Absolute path of containing directory of data files for testing</dd>
-<dt>files <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
-<dd>List of file paths relative to data_dir; files must be named
-identically within both data_dir directories.</dd>
-<dt>table_names <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
-<dd>List of table names, corresponding exactly to <code class="xref py py-obj docutils literal"><span class="pre">files</span></code></dd>
-<dt>entities_table_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Name of table that contains the entity variables. Must be found in
-<code class="xref py py-obj docutils literal"><span class="pre">table_names</span></code>.</dd>
-<dt>entities_featurized_table_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Name of table that contains the pre-processed, featurized, entity
-variables. Must be found in <code class="xref py py-obj docutils literal"><span class="pre">table_names</span></code>.</dd>
-<dt>target_table_name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd>Name of table that contains the target variable (label). Must be
-found in table_names. Table must hold a single column with label
-values only.</dd>
-</dl>
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.append_feature_functions">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">append_feature_functions</code><span class="sig-paren">(</span><em>features_df</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#append_feature_functions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.append_feature_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recover compiled functions and append column to DataFrame.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.create_problem_yml">
-<code class="descname">create_problem_yml</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.create_problem_yml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.create_problem_yml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new problem entry in database from yml file.</p>
-<dl class="docutils">
-<dt>path: str or path-like</dt>
-<dd>Path to yml file</dd>
-</dl>
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.build_and_save_all_features">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">build_and_save_all_features</code><span class="sig-paren">(</span><em>commands</em>, <em>session</em>, <em>suffix</em>, <em>splits=[]</em>, <em>problem_names=[]</em>, <em>features_on_disk=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#build_and_save_all_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.build_and_save_all_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build and save feature matrices.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+<span class="go">        build_and_save_all_features(commands, session, suffix)</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.get_features">
-<code class="descname">get_features</code><span class="sig-paren">(</span><em>user_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.get_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.get_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a DataFrame with the details about all registered features.</p>
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.build_feature_matrix">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">build_feature_matrix</code><span class="sig-paren">(</span><em>features_df</em>, <em>dataset</em>, <em>group_id</em>, <em>group_feature_indices</em>, <em>feature_extraction_time_limit=40</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#build_feature_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.build_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build feature matrix from human-generated features.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.get_problems">
-<code class="descname">get_problems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.get_problems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.get_problems" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of problems in the database.</p>
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.extract_and_save_all_tables">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">extract_and_save_all_tables</code><span class="sig-paren">(</span><em>session</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#extract_and_save_all_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.extract_and_save_all_tables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.extract_table">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">extract_table</code><span class="sig-paren">(</span><em>session</em>, <em>mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#extract_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.extract_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.load_dataset_from_dir">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">load_dataset_from_dir</code><span class="sig-paren">(</span><em>session</em>, <em>data_dir</em>, <em>problem_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#load_dataset_from_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.load_dataset_from_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.load_feature_matrix">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">load_feature_matrix</code><span class="sig-paren">(</span><em>problem_name</em>, <em>split</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#load_feature_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.load_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.load_features_df">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">load_features_df</code><span class="sig-paren">(</span><em>session</em>, <em>problem_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#load_features_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.load_features_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all features for a specific problem as a DataFrame.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="featurehub.admin.admin.Commands.set_up">
-<code class="descname">set_up</code><span class="sig-paren">(</span><em>drop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/admin.html#Commands.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.admin.Commands.set_up" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new DB and create the initial scheme.</p>
-<p>If the database exists and drop=True, the existing database is dropped
-and recreated. Regardless, any tables defined by the schema that do not
-exist are created.</p>
-<dl class="docutils">
-<dt>drop <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
-<dd>Drop database if it already exists.</dd>
-</dl>
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.load_table">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">load_table</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#load_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.load_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.load_table1">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">load_table1</code><span class="sig-paren">(</span><em>name</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#load_table1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.load_table1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.null_feature">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">null_feature</code><span class="sig-paren">(</span><em>entities</em>, <em>name='null_feature'</em>, <em>fill=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#null_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.null_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create null feature of an appropriate length.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.prepare_automl_file_name">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">prepare_automl_file_name</code><span class="sig-paren">(</span><em>problem_name</em>, <em>split</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#prepare_automl_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.prepare_automl_file_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.recover_function">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">recover_function</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#recover_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.recover_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recover compiled function from Feature object.</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.save_feature_matrix">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">save_feature_matrix</code><span class="sig-paren">(</span><em>feature_matrix</em>, <em>problem_name</em>, <em>split</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#save_feature_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.save_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.save_submission">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">save_submission</code><span class="sig-paren">(</span><em>df</em>, <em>problem_name</em>, <em>split_train</em>, <em>split_test</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#save_submission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.save_submission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.save_table">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">save_table</code><span class="sig-paren">(</span><em>df</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#save_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.save_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.save_table1">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">save_table1</code><span class="sig-paren">(</span><em>df</em>, <em>name</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#save_table1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.save_table1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="featurehub.admin.postprocessing.time_limit">
+<code class="descclassname">featurehub.admin.postprocessing.</code><code class="descname">time_limit</code><span class="sig-paren">(</span><em>seconds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/postprocessing.html#time_limit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.postprocessing.time_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-featurehub.admin.sqlalchemy_declarative">
@@ -338,7 +340,7 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_declarative.EvaluationAttempt">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_declarative.</code><code class="descname">EvaluationAttempt</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_declarative.html#EvaluationAttempt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
 <dl class="attribute">
 <dt id="featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.code">
 <code class="descname">code</code><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.EvaluationAttempt.code" title="Permalink to this definition">¶</a></dt>
@@ -379,7 +381,7 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_declarative.Feature">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_declarative.</code><code class="descname">Feature</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_declarative.html#Feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Feature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
 <dl class="attribute">
 <dt id="featurehub.admin.sqlalchemy_declarative.Feature.code">
 <code class="descname">code</code><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Feature.code" title="Permalink to this definition">¶</a></dt>
@@ -440,7 +442,7 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_declarative.Metric">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_declarative.</code><code class="descname">Metric</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_declarative.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
 <dl class="attribute">
 <dt id="featurehub.admin.sqlalchemy_declarative.Metric.created_at">
 <code class="descname">created_at</code><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Metric.created_at" title="Permalink to this definition">¶</a></dt>
@@ -481,7 +483,7 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_declarative.Problem">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_declarative.</code><code class="descname">Problem</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_declarative.html#Problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Problem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
 <dl class="attribute">
 <dt id="featurehub.admin.sqlalchemy_declarative.Problem.created_at">
 <code class="descname">created_at</code><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.Problem.created_at" title="Permalink to this definition">¶</a></dt>
@@ -557,7 +559,7 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_declarative.User">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_declarative.</code><code class="descname">User</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_declarative.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.User" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.ext.declarative.api.Base</span></code></p>
 <dl class="attribute">
 <dt id="featurehub.admin.sqlalchemy_declarative.User.created_at">
 <code class="descname">created_at</code><a class="headerlink" href="#featurehub.admin.sqlalchemy_declarative.User.created_at" title="Permalink to this definition">¶</a></dt>
@@ -591,21 +593,21 @@ exist are created.</p>
 <dl class="class">
 <dt id="featurehub.admin.sqlalchemy_main.ORMManager">
 <em class="property">class </em><code class="descclassname">featurehub.admin.sqlalchemy_main.</code><code class="descname">ORMManager</code><span class="sig-paren">(</span><em>database</em>, <em>admin=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_main.html#ORMManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_main.ORMManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Initialize the sqlalchemy ORM engine and starts a database session.</p>
 <dl class="docutils">
 <dt>database <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
 <dd>Name of database to connect to</dd>
 <dt>admin <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
 <dd>Whether to look up credentials in environment variables
-<code class="xref py py-obj docutils literal"><span class="pre">MYSQL_ROOT_USERNAME</span></code> and <code class="xref py py-obj docutils literal"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>. If so, logs in as root
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">MYSQL_ROOT_USERNAME</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">MYSQL_ROOT_PASSWORD</span></code>. If so, logs in as root
 user with admin permissions.</dd>
 </dl>
 <dl class="method">
 <dt id="featurehub.admin.sqlalchemy_main.ORMManager.session_scope">
 <code class="descname">session_scope</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/admin/sqlalchemy_main.html#ORMManager.session_scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.admin.sqlalchemy_main.ORMManager.session_scope" title="Permalink to this definition">¶</a></dt>
 <dd><p>Context manager to wrap a transaction.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">orm</span><span class="o">.</span><span class="n">session_scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 <span class="go">        session.query(User.name).all()</span>
 </pre></div>
 </div>
@@ -621,9 +623,7 @@ user with admin permissions.</dd>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -632,11 +632,11 @@ user with admin permissions.</dd>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -651,36 +651,24 @@ user with admin permissions.</dd>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

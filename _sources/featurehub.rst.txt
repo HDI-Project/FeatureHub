@@ -15,8 +15,8 @@ Subpackages
 Submodules
 ----------
 
-featurehub\.util module
------------------------
+featurehub.util module
+----------------------
 
 .. automodule:: featurehub.util
     :members:

@@ -24,20 +24,11 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/>
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
  
 
 
@@ -47,7 +38,7 @@
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -105,7 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -126,15 +117,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -150,7 +147,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -158,9 +155,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -188,12 +186,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-            
-              <a href="https://github.com/HDI-Project/FeatureHub/blob/master/docs/src/py-modindex" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
     
   </ul>
@@ -219,7 +211,7 @@
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-1" style="display: none" alt="-" /></td>
        <td>
-       <code class="xref">featurehub</code></td><td>
+       <a href="featurehub.html#module-featurehub"><code class="xref">featurehub</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -229,7 +221,7 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="featurehub.admin.html#module-featurehub.admin.admin"><code class="xref">featurehub.admin.admin</code></a></td><td>
+       <a href="featurehub.admin.html#module-featurehub.admin.postprocessing"><code class="xref">featurehub.admin.postprocessing</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -244,12 +236,57 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="featurehub.evaluation.html#module-featurehub.evaluation"><code class="xref">featurehub.evaluation</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.evaluation.html#module-featurehub.evaluation.client"><code class="xref">featurehub.evaluation.client</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.evaluation.html#module-featurehub.evaluation.discourse"><code class="xref">featurehub.evaluation.discourse</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.evaluation.html#module-featurehub.evaluation.future"><code class="xref">featurehub.evaluation.future</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.evaluation.html#module-featurehub.evaluation.response"><code class="xref">featurehub.evaluation.response</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.modeling.html#module-featurehub.modeling"><code class="xref">featurehub.modeling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="featurehub.modeling.html#module-featurehub.modeling.metrics"><code class="xref">featurehub.modeling.metrics</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="featurehub.modeling.html#module-featurehub.modeling.model"><code class="xref">featurehub.modeling.model</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.modeling.html#module-featurehub.modeling.scorers"><code class="xref">featurehub.modeling.scorers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="featurehub.user.html#module-featurehub.user"><code class="xref">featurehub.user</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="featurehub.user.html#module-featurehub.user.session"><code class="xref">featurehub.user.session</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -260,9 +297,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -271,11 +306,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -290,36 +325,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

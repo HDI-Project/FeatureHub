@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -102,7 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -123,15 +114,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -147,7 +144,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -155,9 +152,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -216,21 +214,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -240,8 +223,100 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="featurehub-user-session-module">
-<h2>featurehub.user.session module<a class="headerlink" href="#featurehub-user-session-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.user.session">
+<span id="featurehub-user-session-module"></span><h2>featurehub.user.session module<a class="headerlink" href="#module-featurehub.user.session" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.user.session.Session">
+<em class="property">class </em><code class="descclassname">featurehub.user.session.</code><code class="descname">Session</code><span class="sig-paren">(</span><em>problem</em>, <em>database='featurehub'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a user’s session within FeatureHub.</p>
+<p>Includes commands for discovering, testing, and registering new features.</p>
+<dl class="method">
+<dt id="featurehub.user.session.Session.discover_features">
+<code class="descname">discover_features</code><span class="sig-paren">(</span><em>code_fragment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.discover_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.discover_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print features written by other users.</p>
+<p>A code fragment can be used to filter search results. For each feature,
+prints feature id, feature description, metrics, and source code.</p>
+<dl class="docutils">
+<dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Source code fragment to filter for.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.user.session.Session.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature on training dataset and return key performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature and computes key cross-validated metrics. Prints results and
+returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, prints reason and returns empty dictionary.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.user.session.Session.get_entity_features">
+<code class="descname">get_entity_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.get_entity_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.get_entity_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads preprocessed entity-level features of problem training dataset.</p>
+<p>The entity-level features are the same length as the entity DataFrame
+and the target DataFrame.</p>
+<p>entity_features : pd.DataFrame or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.user.session.Session.get_sample_dataset">
+<code class="descname">get_sample_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.get_sample_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.get_sample_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads sample of problem training dataset.</p>
+<p>Returns the dataset a dict mapping table names to pandas DataFrames.</p>
+<dl class="docutils">
+<dt>dataset <span class="classifier-delimiter">:</span> <span class="classifier">dict (str =&gt; pd.DataFrame)</span></dt>
+<dd>A dict mapping table names to pandas DataFrames.</dd>
+<dt>target <span class="classifier-delimiter">:</span> <span class="classifier">pd.DataFrame</span></dt>
+<dd>A DataFrame that holds a single column: the target variable (label).</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">get_sample_dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;stores&quot;</span><span class="p">]</span> <span class="c1"># -&gt; returns DataFrame</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.user.session.Session.print_my_features">
+<code class="descname">print_my_features</code><span class="sig-paren">(</span><em>code_fragment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.print_my_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.print_my_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print features written by me.</p>
+<p>A code fragment can be used to filter search results. For each feature,
+prints feature id, feature description, metrics, and source code.</p>
+<dl class="docutils">
+<dt>code_fragment <span class="classifier-delimiter">:</span> <span class="classifier">string, default=None</span></dt>
+<dd>Source code fragment to filter for.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.user.session.Session.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/user/session.html#Session.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.user.session.Session.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submit feature to server for evaluation on test data.</p>
+<p>If successful, registers feature in feature database and returns key
+performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature, performs cross validation, and returns key performance
+metrics.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Feature description. If left empty, will prompt for user imput.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-featurehub.user">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurehub.user" title="Permalink to this headline">¶</a></h2>
@@ -250,9 +325,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -261,11 +334,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -280,36 +353,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>featurehub.evaluation.discourse &mdash; FeatureHub 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#user-management">User management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#local-installation">Local installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>featurehub.evaluation.discourse</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for featurehub.evaluation.discourse</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">pydiscourse</span> <span class="k">import</span> <span class="n">DiscourseClient</span>
+<span class="kn">from</span> <span class="nn">pydiscourse.exceptions</span> <span class="k">import</span> <span class="n">DiscourseClientError</span>
+
+<div class="viewcode-block" id="DiscourseFeatureTopicTemplate"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate">[docs]</a><span class="k">class</span> <span class="nc">DiscourseFeatureTopicTemplate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
+    <span class="n">bullet</span> <span class="o">=</span> <span class="s2">&quot; * &quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;[New Feature] </span><span class="si">{title}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;## A new feature was submitted!</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem_name</span> <span class="o">=</span> <span class="s2">&quot;* _Problem name_: </span><span class="si">{problem_name}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_description</span> <span class="o">=</span> <span class="s2">&quot;* _Feature description_: </span><span class="si">{feature_description}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_code</span> <span class="o">=</span> <span class="s2">&quot;* _Feature code_:</span><span class="se">\n\n</span><span class="si">{feature_code}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_metrics</span> <span class="o">=</span> <span class="s2">&quot;* _Feature metrics_:</span><span class="se">\n</span><span class="si">{feature_metrics}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;What do you think? What do you like about this &quot;</span>
+                       <span class="s2">&quot;feature? How could it be improved? Leave your &quot;</span>
+                       <span class="s2">&quot;comments below, or get to work with your ideas!</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;----------</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                      <span class="s2">&quot;(submitted by user &lt;em&gt;</span><span class="si">{user_name}</span><span class="s2">&lt;/em&gt;)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DiscourseFeatureTopicTemplate.render"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">feature_description</span><span class="p">,</span> <span class="n">feature_code</span><span class="p">,</span>
+            <span class="n">feature_metrics</span><span class="p">,</span> <span class="n">user_name</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">problem_name</span><span class="o">=</span><span class="n">problem_name</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_description</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">feature_description</span><span class="o">=</span><span class="n">feature_description</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_code</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">feature_code</span><span class="o">=</span><span class="n">feature_code</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">user_name</span><span class="o">=</span><span class="n">user_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="DiscourseFeatureTopicTemplate.render_title"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render_title">[docs]</a>    <span class="k">def</span> <span class="nf">render_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="DiscourseFeatureTopic"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic">[docs]</a><span class="k">class</span> <span class="nc">DiscourseFeatureTopic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span> <span class="o">=</span> <span class="n">feature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">DiscourseClient</span><span class="p">(</span>
+                <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DISCOURSE_DOMAIN_NAME&quot;</span><span class="p">)),</span>
+                <span class="n">api_username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DISCOURSE_CLIENT_API_USERNAME&quot;</span><span class="p">),</span>
+                <span class="n">api_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DISCOURSE_CLIENT_API_TOKEN&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+
+
+<div class="viewcode-block" id="DiscourseFeatureTopic.format_code"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_code">[docs]</a>    <span class="k">def</span> <span class="nf">format_code</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">DiscourseFeatureTopicTemplate</span><span class="o">.</span><span class="n">indent</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;```&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">code</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;```&quot;</span><span class="p">)</span>
+        <span class="n">feature_code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feature_code</span></div>
+
+<div class="viewcode-block" id="DiscourseFeatureTopic.format_metrics"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">format_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+        <span class="n">bullet</span> <span class="o">=</span> <span class="n">DiscourseFeatureTopicTemplate</span><span class="o">.</span><span class="n">bullet</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;db&quot;</span><span class="p">)</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bullet</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span>
+        <span class="n">feature_metrics</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feature_metrics</span></div>
+
+<div class="viewcode-block" id="DiscourseFeatureTopic.get_params"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">problem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format_code</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format_metrics</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="DiscourseFeatureTopic.post_feature"><a class="viewcode-back" href="../../../featurehub.evaluation.html#featurehub.evaluation.discourse.DiscourseFeatureTopic.post_feature">[docs]</a>    <span class="k">def</span> <span class="nf">post_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">DiscourseFeatureTopicTemplate</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">create_post</span><span class="p">(</span>
+                    <span class="n">category</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DISCOURSE_FEATURE_CATEGORY_NAME&quot;</span><span class="p">),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">description</span><span class="p">),</span>
+                    <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># return the url of the new post</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://</span><span class="si">{}</span><span class="s2">/t/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DISCOURSE_DOMAIN_NAME&quot;</span><span class="p">),</span>
+                    <span class="n">post</span><span class="p">[</span><span class="s2">&quot;topic_slug&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="c1"># TODO</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">raise</span> <span class="n">err</span>
+
+        <span class="k">return</span> <span class="n">url</span></div></div>
+
+<span class="k">def</span> <span class="nf">_escape_user_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replace `_` in name with `&amp;lowbar;`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;lowbar;&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

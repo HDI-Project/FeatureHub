@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/>
-        <link rel="next" title="FAQ" href="faq.html"/>
-        <link rel="prev" title="User Guide" href="user-guide.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FAQ" href="faq.html" />
+    <link rel="prev" title="User Guide" href="user-guide.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -104,7 +95,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -125,15 +116,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -149,7 +146,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -157,9 +154,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -363,7 +361,11 @@ div.nboutput div.output_area.stderr {
 .ansi-white-intense-fg { color: #A1A6B2; }
 .ansi-white-intense-bg { background-color: #A1A6B2; }
 
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
 .ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
 
 /* CSS overrides for sphinx_rtd_theme */
 
@@ -378,21 +380,6 @@ div.nboutput div.output_area.stderr {
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -422,15 +409,15 @@ high-quality features.</p>
 <div class="section" id="Prepare-your-session">
 <h2>Prepare your session<a class="headerlink" href="#Prepare-your-session" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="#Outline">back to top</a>)</p>
-<p>We import <code class="docutils literal"><span class="pre">commands</span></code>, the FeatureHub client, into our workspace. We’ll
+<p>We import <code class="docutils literal notranslate"><span class="pre">commands</span></code>, the FeatureHub client, into our workspace. We’ll
 use this client to acquire data, evaluate our features, and register
 them with the Feature database.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">featurehub.problems.demo</span> <span class="k">import</span> <span class="n">commands</span>
 </pre></div>
 </div>
@@ -438,58 +425,58 @@ them with the Feature database.</p>
 </div>
 <div class="section" id="Acquire-dataset">
 <h2>Acquire dataset<a class="headerlink" href="#Acquire-dataset" title="Permalink to this headline">¶</a></h2>
-<p>We use <code class="docutils literal"><span class="pre">get_sample_dataset</span></code> to load the training data into our
-workspace. The result is a tuple where the first element is <code class="docutils literal"><span class="pre">dataset</span></code>,
-a dictionary mapping table names to Pandas <code class="docutils literal"><span class="pre">DataFrame</span></code>s, and the
-second element is <code class="docutils literal"><span class="pre">target</span></code>, a Pandas <code class="docutils literal"><span class="pre">DataFrame</span></code> with one column.
+<p>We use <code class="docutils literal notranslate"><span class="pre">get_sample_dataset</span></code> to load the training data into our
+workspace. The result is a tuple where the first element is <code class="docutils literal notranslate"><span class="pre">dataset</span></code>,
+a dictionary mapping table names to Pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>s, and the
+second element is <code class="docutils literal notranslate"><span class="pre">target</span></code>, a Pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with one column.
 This one column is what we are trying to predict.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">dataset</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">get_sample_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <p>We can explore our data inline in the Notebook.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">target</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -499,65 +486,65 @@ This one column is what we are trying to predict.</p>
 <h2>Explore existing features<a class="headerlink" href="#Explore-existing-features" title="Permalink to this headline">¶</a></h2>
 <p>We can use several methods to see what features have already been
 registered to the Feature database.</p>
-<p>The first method, <code class="docutils literal"><span class="pre">print_my_features</span></code>, prints the features that you
+<p>The first method, <code class="docutils literal notranslate"><span class="pre">print_my_features</span></code>, prints the features that you
 have registered to the database.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">print_my_features</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<p>We can also pass additional parameters to <code class="docutils literal"><span class="pre">print_my_features</span></code> to
+<p>We can also pass additional parameters to <code class="docutils literal notranslate"><span class="pre">print_my_features</span></code> to
 filter by code fragments or to see a certain type of metric, if
 available.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">print_my_features</span><span class="p">(</span><span class="n">code_fragment</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;dataset[&quot;users&quot;][&quot;name&quot;]&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <p>To see detailed documentation, try using Jupyter Notebook’s built-in
-documentation system by appending a <code class="docutils literal"><span class="pre">?</span></code> to the end of a method name.</p>
+documentation system by appending a <code class="docutils literal notranslate"><span class="pre">?</span></code> to the end of a method name.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span>commands.print_my_features<span class="o">?</span>
 </pre></div>
 </div>
 </div>
-<p>The second method, <code class="docutils literal"><span class="pre">discover_features</span></code>, prints features that other
+<p>The second method, <code class="docutils literal notranslate"><span class="pre">discover_features</span></code>, prints features that other
 participants have registered to the Feature database. This allows you to
 discover code that has already been written, so you can either avoid
 duplicating work or come up with new ideas.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">discover_features</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<p>The same additional parameters, <code class="docutils literal"><span class="pre">code_fragment</span></code> and <code class="docutils literal"><span class="pre">metric_name</span></code>,
+<p>The same additional parameters, <code class="docutils literal notranslate"><span class="pre">code_fragment</span></code> and <code class="docutils literal notranslate"><span class="pre">metric_name</span></code>,
 are available.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">discover_features</span><span class="p">(</span><span class="n">code_fragment</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;fillna(&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -569,15 +556,13 @@ are available.</p>
 <p>FeatureHub asks you to observe some rudimentary scaffolding when you
 write a new feature.</p>
 <p>Your feature is a function that should</p>
-<ul style="list-style: none;"><li><p>✓ accept a single parameter, <code class="docutils literal"><span class="pre">dataset</span></code></p>
+<ul style="list-style: none;"><li><p>✓ accept a single parameter, <code class="docutils literal notranslate"><span class="pre">dataset</span></code></p>
 </li><li><p>✓ return a <em>single column</em> of values</p>
-<ul><div class="highlight-default"><div class="highlight"><pre><span></span>    &lt;li&gt; that has as many rows as there are entities in the dataset &lt;/li&gt;
-    &lt;li&gt; that is *ordered* in the same way as the entities (that is, don&#39;t sort your feature values!) &lt;/li&gt;
-    &lt;li&gt; that can be coerced to a `DataFrame` &lt;/li&gt;
-&lt;/ul&gt;
-</pre></div>
-</div>
-</li><li><p>✓ be defined in the global scope</p>
+<ul><li><p>that has as many rows as there are entities in the dataset</p>
+</li><li><p>that is <em>ordered</em> in the same way as the entities (that is, don’t sort
+your feature values!)</p>
+</li><li><p>that can be coerced to a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</li></ul></li><li><p>✓ be defined in the global scope</p>
 </li><li><p>✓ import all required modules that it requires within the function body</p>
 </li></ul><p>Your feature should <em>not</em></p>
 <ul style="list-style: none;"><li><p>✗ modify the underlying dataset</p>
@@ -588,11 +573,11 @@ bad features in FeatureHub.</p>
 <p>Here is one good example of a feature. You can execute the feature right
 away to see what it returns.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">hi_lo_age</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">binarize</span>
     <span class="n">cutoff</span> <span class="o">=</span> <span class="mi">30</span>
@@ -609,7 +594,7 @@ away to see what it returns.</p>
 <p>Now that we have written a candidate feature, we can evaluate it on
 training data. The evaluation routine proceeds as follows.</p>
 <ol class="arabic simple">
-<li>Obtains a valid dataset. That is, if the <code class="docutils literal"><span class="pre">dataset</span></code> has been
+<li>Obtains a valid dataset. That is, if the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> has been
 modified, it is reloaded.</li>
 <li>Extracts features. That is, your function is called with the dataset
 as its parameter, returning a column of values.</li>
@@ -624,7 +609,7 @@ regression, etc.), a model is chosen and fit given the full feature
 matrix. Then, appropriate metrics are computed via cross-validation
 and displayed.</li>
 </ol>
-<p>In your workflow, you may run the <code class="docutils literal"><span class="pre">evaluate</span></code> function several times.
+<p>In your workflow, you may run the <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> function several times.
 At first, it may reveal bugs or syntax errors that you will fix. Next,
 it may reveal that your feature did not meet some of the FeatureHub
 requirements, such as returning a single column of values or using
@@ -632,14 +617,14 @@ function-scope imports. Finally, you may find that your feature’s
 performance, in terms of metrics like classification accuracy or mean
 squared error, are not as good as you hoped, and you may modify it or
 jettison it altogether.</p>
-<p>The <code class="docutils literal"><span class="pre">evaluate</span></code> function takes a single argument: the candidate
+<p>The <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> function takes a single argument: the candidate
 feature.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">hi_lo_age</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -651,7 +636,7 @@ feature.</p>
 <p>Now that you have evaluated your feature locally on training data, and
 are happy with its performance, you can submit it to the Feature
 Evaluation Server. The evaluation server will essentially repeat the
-steps in <code class="docutils literal"><span class="pre">evaluate</span></code>, with some slight changes. For example, it fits
+steps in <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>, with some slight changes. For example, it fits
 the model on the training dataset and evaluates it on the <em>test
 dataset</em>, without performing cross-validation.</p>
 <p>During submission, you are asked to write a natural language description
@@ -662,18 +647,18 @@ to a non-technical colleague. This description should be - <em>clear</em> -
 does)</p>
 <p>You will be prompted to type in a description to a textbox input.
 Alternately, you can pass a string using the keyword argument
-<code class="docutils literal"><span class="pre">description</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">description</span></code>.</p>
 <p>If there are no issues, the feature and its associated performance
 metrics are added to the Feature database (“registered”).</p>
 <p>The feature may also be posted automatically to the FeatureHub forum
 (not applicable for this Tutorial). A link will be printed, and you can
 navigate directly to your post to join the conversation.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">commands</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">hi_lo_age</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -687,11 +672,11 @@ features, if applicable to the problem. Problem descriptions will
 describe the transformations done during preprocessing. You can also
 inspect the entity-level features directly.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">entity_features</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="n">get_entity_features</span><span class="p">()</span>
 <span class="n">entity_features</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -707,7 +692,7 @@ FeatureHub. Here, we are just talking about the <em>scaffolding</em> of the
 feature, and not whether the feature has predictive power in a machine
 learning model or any semantic meaning.</p>
 <p>Here are some examples of good and bad features, with explanations:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># good - one parameter, imports numpy within function scope,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># good - one parameter, imports numpy within function scope,</span>
 <span class="c1">#        returns column of values of the right shape.</span>
 <span class="k">def</span> <span class="nf">all_zeros</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">zeros</span>
@@ -733,8 +718,8 @@ learning model or any semantic meaning.</p>
     <span class="k">return</span> <span class="bp">None</span>
 </pre></div>
 </div>
-<div class="section" id="Don't-use-global-variables">
-<h3>Don’t use global variables<a class="headerlink" href="#Don't-use-global-variables" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="Don’t-use-global-variables">
+<h3>Don’t use global variables<a class="headerlink" href="#Don’t-use-global-variables" title="Permalink to this headline">¶</a></h3>
 <p>Your feature will be evaluated by FeatureHub in an isolated namespace.
 This means that your feature cannot expect variables or modules that you
 have defined at the global scope to exist. By “global scope”, we mean
@@ -743,14 +728,14 @@ definition.</p>
 <p>Similarly, <em>all module imports should be done within your function</em>. In
 the next section, we’ll demonstrate an easy-to-use workflow that gets
 around this limitation.</p>
-<p>This feature is <em>invalid</em>, because it uses a variable, <code class="docutils literal"><span class="pre">cutoff</span></code>,
+<p>This feature is <em>invalid</em>, because it uses a variable, <code class="docutils literal notranslate"><span class="pre">cutoff</span></code>,
 defined at the global scope (outside of the function definition):</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># bad</span>
 <span class="n">cutoff</span> <span class="o">=</span> <span class="mi">30</span>
 <span class="k">def</span> <span class="nf">hi_lo_age</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
@@ -762,11 +747,11 @@ defined at the global scope (outside of the function definition):</p>
 <p>This feature is okay, because it moves the variable into the function
 definition:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># better</span>
 <span class="k">def</span> <span class="nf">hi_lo_age</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">binarize</span>
@@ -778,11 +763,11 @@ definition:</p>
 <p>One exception to this requirement is that you can use helper <em>functions</em>
 that you define at the global scope:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">first_name_is_longer</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="n">first</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
@@ -799,16 +784,16 @@ that you define at the global scope:</p>
 <p>You might want to import the same set of modules in many different
 features without re-typing them. You can use a helper function to import
 them, while still avoiding using global variables.</p>
-<p>In the following example, we define a function <code class="docutils literal"><span class="pre">imports</span></code> that declares
-<code class="docutils literal"><span class="pre">pd</span></code> and <code class="docutils literal"><span class="pre">np</span></code> as global variables and then imports the corresponding
+<p>In the following example, we define a function <code class="docutils literal notranslate"><span class="pre">imports</span></code> that declares
+<code class="docutils literal notranslate"><span class="pre">pd</span></code> and <code class="docutils literal notranslate"><span class="pre">np</span></code> as global variables and then imports the corresponding
 libraries. This function can then be called in any feature to make those
 libraries available.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">imports</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">pd</span><span class="p">,</span> <span class="n">np</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -842,9 +827,7 @@ Guide</a></li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -862,11 +845,11 @@ Guide</a></li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -881,36 +864,24 @@ Guide</a></li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

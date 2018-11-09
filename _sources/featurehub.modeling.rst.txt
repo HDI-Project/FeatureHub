@@ -1,21 +1,37 @@
-featurehub\.modeling package
-============================
+featurehub.modeling package
+===========================
 
 Submodules
 ----------
 
-featurehub\.modeling\.metrics module
-------------------------------------
+featurehub.modeling.automl module
+---------------------------------
+
+.. automodule:: featurehub.modeling.automl
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+featurehub.modeling.metrics module
+----------------------------------
 
 .. automodule:: featurehub.modeling.metrics
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.modeling\.model module
-----------------------------------
+featurehub.modeling.model module
+--------------------------------
 
 .. automodule:: featurehub.modeling.model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+featurehub.modeling.scorers module
+----------------------------------
+
+.. automodule:: featurehub.modeling.scorers
     :members:
     :undoc-members:
     :show-inheritance:

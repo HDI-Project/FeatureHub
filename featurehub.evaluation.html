@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -102,7 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -123,15 +114,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -147,7 +144,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -155,9 +152,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -216,21 +214,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -240,31 +223,271 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="featurehub-evaluation-client-module">
-<h2>featurehub.evaluation.client module<a class="headerlink" href="#featurehub-evaluation-client-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.evaluation.client">
+<span id="featurehub-evaluation-client-module"></span><h2>featurehub.evaluation.client module<a class="headerlink" href="#module-featurehub.evaluation.client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.evaluation.client.EvaluatorClient">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.client.</code><code class="descname">EvaluatorClient</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em>, <em>dataset={}</em>, <em>target=None</em>, <em>entities_featurized=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorClient.check_if_registered">
+<code class="descname">check_if_registered</code><span class="sig-paren">(</span><em>feature</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorClient.check_if_registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorClient.check_if_registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if feature is registered.</p>
+<p>Extracts source code, then looks for the identical source code in the
+feature database.</p>
+<p>feature : function
+verbose : bool</p>
+<blockquote>
+<div>Whether to print output.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorClient.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorClient.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorClient.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature on training dataset and return key performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature and computes key cross-validated metrics. Prints results and
+returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, prints reason and returns empty dictionary.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorClient.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorClient.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorClient.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submit feature to server for evaluation on test data.</p>
+<p>If successful, registers feature in feature database and returns key
+performance metrics.</p>
+<p>Runs the feature in an isolated environment to extract the feature
+values. Validates the feature values. Then, builds a model on that one
+feature, performs cross validation, and returns key performance
+metrics.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Feature description</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurehub.evaluation.client.EvaluatorServer">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.client.</code><code class="descname">EvaluatorServer</code><span class="sig-paren">(</span><em>problem_id</em>, <em>username</em>, <em>orm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#featurehub.evaluation.client.EvaluatorClient" title="featurehub.evaluation.client.EvaluatorClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">featurehub.evaluation.client.EvaluatorClient</span></code></a></p>
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorServer.check_if_registered">
+<code class="descname">check_if_registered</code><span class="sig-paren">(</span><em>code</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorServer.check_if_registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorServer.check_if_registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if feature is registered.</p>
+<p>Overwrites client method by expecting code to be passed directly. This
+is because on the server, we are limited to be unable to do code -&gt;
+function -&gt; code.</p>
+<p>code : str
+verbose : bool, optional (default=False)</p>
+<blockquote>
+<div>Whether to print output.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorServer.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorServer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorServer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate feature.</p>
+<p>Returns a dictionary with (metric =&gt; value) entries. If the feature is
+invalid, re-raises the ValueError.</p>
+<dl class="docutils">
+<dt>feature <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd>Feature to evaluate</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.client.EvaluatorServer.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>feature</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/client.html#EvaluatorServer.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.client.EvaluatorServer.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing.</p>
+<p>This class is instantiated at the server, thus we are already
+registering the feature.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="featurehub-evaluation-discourse-module">
-<h2>featurehub.evaluation.discourse module<a class="headerlink" href="#featurehub-evaluation-discourse-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.evaluation.discourse">
+<span id="featurehub-evaluation-discourse-module"></span><h2>featurehub.evaluation.discourse module<a class="headerlink" href="#module-featurehub.evaluation.discourse" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopic">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.discourse.</code><code class="descname">DiscourseFeatureTopic</code><span class="sig-paren">(</span><em>feature</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopic.format_code">
+<code class="descname">format_code</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopic.format_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopic.format_metrics">
+<code class="descname">format_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopic.format_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopic.format_metrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopic.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopic.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopic.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopic.post_feature">
+<code class="descname">post_feature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopic.post_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopic.post_feature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.discourse.</code><code class="descname">DiscourseFeatureTopicTemplate</code><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopicTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.bullet">
+<code class="descname">bullet</code><em class="property"> = ' * '</em><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.bullet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.indent">
+<code class="descname">indent</code><em class="property"> = '    '</em><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.indent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>problem_name</em>, <em>feature_description</em>, <em>feature_code</em>, <em>feature_metrics</em>, <em>user_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopicTemplate.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render_title">
+<code class="descname">render_title</code><span class="sig-paren">(</span><em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/discourse.html#DiscourseFeatureTopicTemplate.render_title"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.discourse.DiscourseFeatureTopicTemplate.render_title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="featurehub-evaluation-future-module">
-<h2>featurehub.evaluation.future module<a class="headerlink" href="#featurehub-evaluation-future-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.evaluation.future">
+<span id="featurehub-evaluation-future-module"></span><h2>featurehub.evaluation.future module<a class="headerlink" href="#module-featurehub.evaluation.future" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.evaluation.future.HubAuth">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.future.</code><code class="descname">HubAuth</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/future.html#HubAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.future.HubAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">jupyterhub.services.auth.HubAuth</span></code></p>
+<dl class="attribute">
+<dt id="featurehub.evaluation.future.HubAuth.cache">
+<code class="descname">cache</code><a class="headerlink" href="#featurehub.evaluation.future.HubAuth.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>A trait whose value must be an instance of a specified class.</p>
+<p>The value can also be an instance of a subclass of the specified class.</p>
+<p>Subclasses can declare default classes by overriding the klass attribute</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.future.HubAuth.cache_max_age">
+<code class="descname">cache_max_age</code><a class="headerlink" href="#featurehub.evaluation.future.HubAuth.cache_max_age" title="Permalink to this definition">¶</a></dt>
+<dd><p>An int trait.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.evaluation.future.HubAuth.user_for_token">
+<code class="descname">user_for_token</code><span class="sig-paren">(</span><em>token</em>, <em>use_cache=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/future.html#HubAuth.user_for_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.future.HubAuth.user_for_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask the Hub to identify the user for a given token.
+Args:</p>
+<blockquote>
+<div>token (str): the token
+use_cache (bool): Specify use_cache=False to skip cached cookie values (default: True)</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>user_model (dict): The user model, if a user is identified, None if authentication fails.
+The ‘name’ field contains the user’s name.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="featurehub-evaluation-response-module">
-<h2>featurehub.evaluation.response module<a class="headerlink" href="#featurehub-evaluation-response-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.evaluation.response">
+<span id="featurehub-evaluation-response-module"></span><h2>featurehub.evaluation.response module<a class="headerlink" href="#module-featurehub.evaluation.response" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.evaluation.response.EvaluationResponse">
+<em class="property">class </em><code class="descclassname">featurehub.evaluation.response.</code><code class="descname">EvaluationResponse</code><span class="sig-paren">(</span><em>status_code='okay'</em>, <em>metrics=None</em>, <em>topic_url=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/response.html#EvaluationResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flask.wrappers.Response</span></code></p>
+<p>Wrapper class for response from evaluation server.</p>
+<dl class="docutils">
+<dt>status_code <span class="classifier-delimiter">:</span> <span class="classifier">string, optional (default=EvaluationResponse.STATUS_CODE_OKAY)</span></dt>
+<dd>Possible values are EvaluationResponse static members.</dd>
+<dt>metrics <span class="classifier-delimiter">:</span> <span class="classifier">list of Metric, optional (default=None)</span></dt>
+<dd>List of Metric objects, which each encode metric name, metric scoring
+method, and value.</dd>
+</dl>
+<p>topic_url : str</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EvaluationResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">EvaluationResponse</span><span class="o">.</span><span class="n">STATUS_CODE_SERVER_ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_AUTH">
+<code class="descname">STATUS_CODE_BAD_AUTH</code><em class="property"> = 'bad_auth'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_FEATURE">
+<code class="descname">STATUS_CODE_BAD_FEATURE</code><em class="property"> = 'bad_feature'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_FEATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_REQUEST">
+<code class="descname">STATUS_CODE_BAD_REQUEST</code><em class="property"> = 'bad_request'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_BAD_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DB_ERROR">
+<code class="descname">STATUS_CODE_DB_ERROR</code><em class="property"> = 'db_error'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DB_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE">
+<code class="descname">STATUS_CODE_DUPLICATE_FEATURE</code><em class="property"> = 'duplicate_feature'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_DUPLICATE_FEATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_OKAY">
+<code class="descname">STATUS_CODE_OKAY</code><em class="property"> = 'okay'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_OKAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_SERVER_ERROR">
+<code class="descname">STATUS_CODE_SERVER_ERROR</code><em class="property"> = 'server_error'</em><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.STATUS_CODE_SERVER_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="featurehub.evaluation.response.EvaluationResponse.from_string">
+<em class="property">classmethod </em><code class="descname">from_string</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/evaluation/response.html#EvaluationResponse.from_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.evaluation.response.EvaluationResponse.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate EvaluationResponse from a json-dumped string.</p>
+<p>This is useful for recreating the instance on the receiving end of the
+web connection.</p>
+<dl class="docutils">
+<dt>string <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Json-dumped string encoding the response.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="featurehub-evaluation-server-module">
 <h2>featurehub.evaluation.server module<a class="headerlink" href="#featurehub-evaluation-server-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.evaluation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurehub.evaluation" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -273,11 +496,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -292,36 +515,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

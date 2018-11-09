@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="FeatureHub 0.3.0 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -102,7 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#Final-notes">Final notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don't-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
 </ul>
 </li>
@@ -123,15 +114,21 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#build-the-app">Build the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#launch-the-app">Launch the app</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-and-data-management">User and data management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#app-administration">App administration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#hub-api-client">Hub API client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#local-installation">Local installation</a></li>
 </ul>
 </li>
 </ul>
@@ -147,7 +144,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">FeatureHub</a>
@@ -155,9 +152,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -216,21 +214,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -240,12 +223,15 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="featurehub-modeling-automl-module">
+<h2>featurehub.modeling.automl module<a class="headerlink" href="#featurehub-modeling-automl-module" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-featurehub.modeling.metrics">
 <span id="featurehub-modeling-metrics-module"></span><h2>featurehub.modeling.metrics module<a class="headerlink" href="#module-featurehub.modeling.metrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="featurehub.modeling.metrics.Metric">
 <em class="property">class </em><code class="descclassname">featurehub.modeling.metrics.</code><code class="descname">Metric</code><span class="sig-paren">(</span><em>name</em>, <em>scoring</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="featurehub.modeling.metrics.Metric.convert">
 <code class="descname">convert</code><span class="sig-paren">(</span><em>kind='user'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#Metric.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.Metric.convert" title="Permalink to this definition">¶</a></dt>
@@ -284,11 +270,12 @@ floats.</p>
 <dl class="class">
 <dt id="featurehub.modeling.metrics.MetricList">
 <em class="property">class </em><code class="descclassname">featurehub.modeling.metrics.</code><code class="descname">MetricList</code><span class="sig-paren">(</span><em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.abc.MutableSequence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableSequence</span></code></p>
 <dl class="method">
 <dt id="featurehub.modeling.metrics.MetricList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.append" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>S.append(value) – append value to the end of the sequence</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="featurehub.modeling.metrics.MetricList.convert">
@@ -326,7 +313,8 @@ values to Python floats.</p>
 <dl class="method">
 <dt id="featurehub.modeling.metrics.MetricList.insert">
 <code class="descname">insert</code><span class="sig-paren">(</span><em>ii</em>, <em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/metrics.html#MetricList.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.metrics.MetricList.insert" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>S.insert(index, value) – insert value before index</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="featurehub.modeling.metrics.MetricList.to_string">
@@ -337,19 +325,137 @@ values to Python floats.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="featurehub-modeling-model-module">
-<h2>featurehub.modeling.model module<a class="headerlink" href="#featurehub-modeling-model-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.modeling.model">
+<span id="featurehub-modeling-model-module"></span><h2>featurehub.modeling.model module<a class="headerlink" href="#module-featurehub.modeling.model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="featurehub.modeling.model.Model">
+<em class="property">class </em><code class="descclassname">featurehub.modeling.model.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>problem_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Versatile modeling object.</p>
+<p>Handles classification and regression problems and computes variety of
+performance metrics.</p>
+<dl class="docutils">
+<dt>problem_type <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>One of “classification” or “regression”</dd>
+</dl>
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.BINARY_METRIC_AGGREGATION">
+<code class="descname">BINARY_METRIC_AGGREGATION</code><em class="property"> = 'micro'</em><a class="headerlink" href="#featurehub.modeling.model.Model.BINARY_METRIC_AGGREGATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.CLASSIFICATION">
+<code class="descname">CLASSIFICATION</code><em class="property"> = 'classification'</em><a class="headerlink" href="#featurehub.modeling.model.Model.CLASSIFICATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.CLASSIFICATION_SCORING">
+<code class="descname">CLASSIFICATION_SCORING</code><em class="property"> = [{'name': 'Accuracy', 'scoring': 'accuracy'}, {'name': 'Precision', 'scoring': 'precision'}, {'name': 'Recall', 'scoring': 'recall'}, {'name': 'ROC AUC', 'scoring': 'roc_auc'}]</em><a class="headerlink" href="#featurehub.modeling.model.Model.CLASSIFICATION_SCORING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.MULTICLASS_METRIC_AGGREGATION">
+<code class="descname">MULTICLASS_METRIC_AGGREGATION</code><em class="property"> = 'micro'</em><a class="headerlink" href="#featurehub.modeling.model.Model.MULTICLASS_METRIC_AGGREGATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.REGRESSION">
+<code class="descname">REGRESSION</code><em class="property"> = 'regression'</em><a class="headerlink" href="#featurehub.modeling.model.Model.REGRESSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="featurehub.modeling.model.Model.REGRESSION_SCORING">
+<code class="descname">REGRESSION_SCORING</code><em class="property"> = [{'name': 'Root Mean Squared Error', 'scoring': 'root_mean_squared_error'}, {'name': 'R-squared', 'scoring': 'r2'}]</em><a class="headerlink" href="#featurehub.modeling.model.Model.REGRESSION_SCORING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.model.Model.compute_metrics">
+<code class="descname">compute_metrics</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>kind='cv'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model.compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model.compute_metrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.model.Model.compute_metrics_cv">
+<code class="descname">compute_metrics_cv</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model.compute_metrics_cv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model.compute_metrics_cv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute cross-validated metrics.</p>
+<p>Trains this model on data X with labels Y.</p>
+<p>Returns a MetricList with the name, scoring type, and value for each
+Metric. Note that these values may be numpy floating points, and should
+be converted prior to insertion in a database.</p>
+<dl class="docutils">
+<dt>X <span class="classifier-delimiter">:</span> <span class="classifier">numpy array-like or pd.DataFrame</span></dt>
+<dd>data</dd>
+<dt>Y <span class="classifier-delimiter">:</span> <span class="classifier">numpy array-like or pd.DataFrame or pd.DataSeries</span></dt>
+<dd>labels</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.model.Model.compute_metrics_train_test">
+<code class="descname">compute_metrics_train_test</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model.compute_metrics_train_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model.compute_metrics_train_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute metrics on test set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.model.Model.cv_score_mean">
+<code class="descname">cv_score_mean</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>scorings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model.cv_score_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model.cv_score_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute mean score across cross validation folds.</p>
+<p>Split data and labels into cross validation folds and fit the model for
+each fold. Then, for each scoring type in scorings, compute the score.
+Finally, average the scores across folds. Returns a dictionary mapping
+scoring to score.</p>
+<dl class="docutils">
+<dt>X <span class="classifier-delimiter">:</span> <span class="classifier">numpy array-like</span></dt>
+<dd>data</dd>
+<dt>Y <span class="classifier-delimiter">:</span> <span class="classifier">numpy array-like</span></dt>
+<dd>labels</dd>
+<dt>scorings <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
+<dd>scoring types</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="featurehub.modeling.model.Model.scores_to_metriclist">
+<code class="descname">scores_to_metriclist</code><span class="sig-paren">(</span><em>scorings</em>, <em>scores</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/model.html#Model.scores_to_metriclist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.model.Model.scores_to_metriclist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-featurehub.modeling.scorers">
+<span id="featurehub-modeling-scorers-module"></span><h2>featurehub.modeling.scorers module<a class="headerlink" href="#module-featurehub.modeling.scorers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="featurehub.modeling.scorers.ndcg_score">
+<code class="descclassname">featurehub.modeling.scorers.</code><code class="descname">ndcg_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>k=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/scorers.html#ndcg_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.scorers.ndcg_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized discounted cumulative gain (NDCG) at rank k</p>
+<p>This specific score function operates under the assumption that the
+relevance for the correct label is 1 and the relevance for all other labels
+is 0.</p>
+<dl class="docutils">
+<dt>y_true <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape = [n_samples,]</span></dt>
+<dd>Ground truth (true relevance labels). These must be encoded to integer
+values, by using LabelEncoder, for example.</dd>
+<dt>y_pred <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape = [n_samples, n_classes]</span></dt>
+<dd>Probability predictions for each class.</dd>
+<dt>k <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Rank.</dd>
+</dl>
+<p>NDCG &#64;k : float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="featurehub.modeling.scorers.rmsle_score">
+<code class="descclassname">featurehub.modeling.scorers.</code><code class="descname">rmsle_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/featurehub/modeling/scorers.html#rmsle_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#featurehub.modeling.scorers.rmsle_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-featurehub.modeling">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-featurehub.modeling" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -358,11 +464,11 @@ values to Python floats.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Micah Smith.
+        &copy; Copyright 2017, Micah Smith
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -377,36 +483,24 @@ values to Python floats.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

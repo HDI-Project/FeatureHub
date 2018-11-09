@@ -1,11 +1,11 @@
-featurehub\.user package
-========================
+featurehub.user package
+=======================
 
 Submodules
 ----------
 
-featurehub\.user\.session module
---------------------------------
+featurehub.user.session module
+------------------------------
 
 .. automodule:: featurehub.user.session
     :members:

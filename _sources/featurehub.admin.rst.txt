@@ -1,27 +1,35 @@
-featurehub\.admin package
-=========================
+featurehub.admin package
+========================
 
 Submodules
 ----------
 
-featurehub\.admin\.admin module
--------------------------------
+featurehub.admin.admin module
+-----------------------------
 
 .. automodule:: featurehub.admin.admin
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.admin\.sqlalchemy\_declarative module
--------------------------------------------------
+featurehub.admin.postprocessing module
+--------------------------------------
+
+.. automodule:: featurehub.admin.postprocessing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+featurehub.admin.sqlalchemy\_declarative module
+-----------------------------------------------
 
 .. automodule:: featurehub.admin.sqlalchemy_declarative
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.admin\.sqlalchemy\_main module
-------------------------------------------
+featurehub.admin.sqlalchemy\_main module
+----------------------------------------
 
 .. automodule:: featurehub.admin.sqlalchemy_main
     :members:

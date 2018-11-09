@@ -1,5 +1,5 @@
-featurehub\.problems package
-============================
+featurehub.problems package
+===========================
 
 Module contents
 ---------------

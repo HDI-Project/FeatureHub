@@ -1,43 +1,43 @@
-featurehub\.evaluation package
-==============================
+featurehub.evaluation package
+=============================
 
 Submodules
 ----------
 
-featurehub\.evaluation\.client module
--------------------------------------
+featurehub.evaluation.client module
+-----------------------------------
 
 .. automodule:: featurehub.evaluation.client
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.evaluation\.discourse module
-----------------------------------------
+featurehub.evaluation.discourse module
+--------------------------------------
 
 .. automodule:: featurehub.evaluation.discourse
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.evaluation\.future module
--------------------------------------
+featurehub.evaluation.future module
+-----------------------------------
 
 .. automodule:: featurehub.evaluation.future
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.evaluation\.response module
----------------------------------------
+featurehub.evaluation.response module
+-------------------------------------
 
 .. automodule:: featurehub.evaluation.response
     :members:
     :undoc-members:
     :show-inheritance:
 
-featurehub\.evaluation\.server module
--------------------------------------
+featurehub.evaluation.server module
+-----------------------------------
 
 .. automodule:: featurehub.evaluation.server
     :members:

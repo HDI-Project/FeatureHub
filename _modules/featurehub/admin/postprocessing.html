@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>featurehub.admin.postprocessing &mdash; FeatureHub 0.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> FeatureHub
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub">Accessing FeatureHub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#accessing-featurehub-discourse-forum">Accessing FeatureHub Discourse forum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user-guide.html#using-jupyter-notebook">Using Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorial.html">FeatureHub Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Prepare-your-session">Prepare your session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Acquire-dataset">Acquire dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Explore-existing-features">Explore existing features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Write-a-new-feature">Write a new feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Evaluate-a-feature-on-training-data">Evaluate a feature on training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Submit-a-feature-to-Feature-database">Submit a feature to Feature database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Final-notes">Final notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#More-feature-scaffolding">More feature scaffolding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Don’t-use-global-variables">Don’t use global variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../Tutorial.html#Use-a-helper-function-for-imports">Use a helper function for imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Tutorial.html#Getting-help">Getting help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-do-i-restart-my-featurehub-server">How do I restart my FeatureHub server?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#why-is-my-feature-rejected-by-the-submit-function">Why is my feature rejected by the submit function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../faq.html#how-can-i-see-every-column-of-a-wide-dataframe">How can I see every column of a wide DataFrame?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#userlist">Userlist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#data-management">Data management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#prediction-problem-format">Prediction problem format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#user-management">User management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#app-administration">App administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#hub-api-client">Hub API client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#manage-app-lifecycle">Manage app lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#restarting-the-server">Restarting the server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../deployment.html#other-topics">Other topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../deployment.html#local-installation">Local installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">FeatureHub</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>featurehub.admin.postprocessing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for featurehub.admin.postprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">dill</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">featurehub.admin.sqlalchemy_declarative</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="n">FEATURE_EXTRACTION_TIME_LIMIT</span> <span class="o">=</span> <span class="mi">40</span>
+
+<div class="viewcode-block" id="load_features_df"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.load_features_df">[docs]</a><span class="k">def</span> <span class="nf">load_features_df</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Get all features for a specific problem as a DataFrame.&quot;&quot;&quot;</span>
+    <span class="n">problem_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span>
+            <span class="n">problem_name</span><span class="p">)</span><span class="o">.</span><span class="n">scalar</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">extract_table</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Feature</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;problem_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">problem_id</span><span class="p">,</span> <span class="p">:]</span></div>
+
+<div class="viewcode-block" id="recover_function"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.recover_function">[docs]</a><span class="k">def</span> <span class="nf">recover_function</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recover compiled function from Feature object.&quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote_to_bytes</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;feature_dill_quoted&quot;</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="append_feature_functions"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.append_feature_functions">[docs]</a><span class="k">def</span> <span class="nf">append_feature_functions</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Recover compiled functions and append column to DataFrame.&quot;&quot;&quot;</span>
+    <span class="n">feature_functions</span> <span class="o">=</span> <span class="n">features_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">recover_function</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">features_df</span><span class="p">[</span><span class="s2">&quot;feature_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_functions</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">features_df</span> <span class="o">=</span> <span class="n">features_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">features_df</span><span class="p">[</span><span class="s2">&quot;feature_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_functions</span>
+        <span class="k">return</span> <span class="n">features_df</span></div>
+
+<div class="viewcode-block" id="TimeoutException"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.TimeoutException">[docs]</a><span class="k">class</span> <span class="nc">TimeoutException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="time_limit"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.time_limit">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">time_limit</span><span class="p">(</span><span class="n">seconds</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">TimeoutException</span><span class="p">(</span><span class="s2">&quot;Timed out!&quot;</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="build_feature_matrix"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.build_feature_matrix">[docs]</a><span class="k">def</span> <span class="nf">build_feature_matrix</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">group_feature_indices</span><span class="p">,</span>
+        <span class="n">feature_extraction_time_limit</span><span class="o">=</span><span class="n">FEATURE_EXTRACTION_TIME_LIMIT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build feature matrix from human-generated features.&quot;&quot;&quot;</span>
+    <span class="n">feature_functions</span> <span class="o">=</span> <span class="n">features_df</span><span class="p">[</span><span class="s2">&quot;feature_function&quot;</span><span class="p">]</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_functions</span><span class="p">)</span>
+
+    <span class="c1"># extract feature values and names, giving a time limit on execution.</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f_id</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">feature_functions</span><span class="p">,</span> <span class="n">group_feature_indices</span><span class="p">)):</span>
+        <span class="n">feature_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{:04d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_id</span><span class="p">,</span> <span class="n">f_id</span><span class="p">)</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{n}</span><span class="s2">/</span><span class="si">{N}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">num_features</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting feature </span><span class="si">{name:40.40}</span><span class="s2"> (</span><span class="si">{frac:&gt;10.10}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">frac</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">time_limit</span><span class="p">(</span><span class="n">feature_extraction_time_limit</span><span class="p">):</span>
+                <span class="n">feature</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">TimeoutException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature extraction (index </span><span class="si">{index}</span><span class="s2">, name </span><span class="si">{name}</span><span class="s2">) timed &quot;</span>
+                  <span class="s2">&quot;out.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">),</span>
+                  <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="c1"># TODO needs entities table</span>
+            <span class="k">if</span> <span class="n">features</span><span class="p">:</span>
+                <span class="n">feature</span> <span class="o">=</span> <span class="n">null_feature</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t create null feature from empty&quot;</span>
+                                 <span class="s2">&quot; features list.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature extraction (index </span><span class="si">{index}</span><span class="s2">, name </span><span class="si">{name}</span><span class="s2">) raised &quot;</span>
+                  <span class="s2">&quot;Exception&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">),</span>
+                  <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="c1"># TODO needs entities table</span>
+            <span class="k">if</span> <span class="n">features</span><span class="p">:</span>
+                <span class="n">feature</span> <span class="o">=</span> <span class="n">null_feature</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t create null feature from empty&quot;</span>
+                                 <span class="s2">&quot; features list.&quot;</span><span class="p">)</span>
+
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">feature</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">done&quot;</span><span class="p">)</span>
+
+    <span class="n">feature_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+    <span class="n">feature_matrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">feature_names</span>
+    <span class="k">return</span> <span class="n">feature_matrix</span></div>
+
+<div class="viewcode-block" id="null_feature"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.null_feature">[docs]</a><span class="k">def</span> <span class="nf">null_feature</span><span class="p">(</span><span class="n">entities</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;null_feature&#39;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create null feature of an appropriate length.&quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">entities</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="save_feature_matrix"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.save_feature_matrix">[docs]</a><span class="k">def</span> <span class="nf">save_feature_matrix</span><span class="p">(</span><span class="n">feature_matrix</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;output/features/</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.pkl.bz2&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="n">save_table</span><span class="p">(</span><span class="n">feature_matrix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="load_feature_matrix"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.load_feature_matrix">[docs]</a><span class="k">def</span> <span class="nf">load_feature_matrix</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;output/features/</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.pkl.bz2&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">load_table</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="build_and_save_all_features"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.build_and_save_all_features">[docs]</a><span class="k">def</span> <span class="nf">build_and_save_all_features</span><span class="p">(</span><span class="n">commands</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">problem_names</span><span class="o">=</span><span class="p">[],</span> <span class="n">features_on_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build and save feature matrices.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; with orm.session_scope() as session:</span>
+<span class="sd">            build_and_save_all_features(commands, session, suffix)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># assumes problem names/orderings constant across extractions</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;demo&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">problem_names</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">problem_names</span><span class="p">))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">problem_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+    <span class="n">problem_ids</span>   <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">splits</span><span class="p">:</span>
+        <span class="n">splits</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">problem_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">problem_names</span><span class="p">,</span> <span class="n">problem_ids</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">splits</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing features for problem </span><span class="si">{}</span><span class="s2">, split </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">))</span>
+
+            <span class="c1"># load data</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">entities_featurized</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> \
+                <span class="n">commands</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">problem_name</span><span class="o">=</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">)</span>
+
+            <span class="c1"># extract features and indices</span>
+            <span class="k">if</span> <span class="n">features_on_disk</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">load_table1</span><span class="p">(</span><span class="s2">&quot;output/tables/features&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">extract_table</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Feature</span><span class="p">)</span>
+            <span class="n">group_feature_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;problem_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">problem_id</span><span class="p">))</span>
+            <span class="n">features_df</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">group_feature_indices</span><span class="p">,</span> <span class="p">:]</span>
+    
+            <span class="c1"># compute feature functions</span>
+            <span class="n">append_feature_functions</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">feature_matrix</span> <span class="o">=</span> <span class="n">build_feature_matrix</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span>
+                    <span class="n">suffix</span><span class="p">,</span> <span class="n">group_feature_indices</span><span class="p">)</span>
+
+            <span class="c1"># save results</span>
+            <span class="n">save_feature_matrix</span><span class="p">(</span><span class="n">feature_matrix</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="extract_and_save_all_tables"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.extract_and_save_all_tables">[docs]</a><span class="k">def</span> <span class="nf">extract_and_save_all_tables</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">mapper</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Feature</span><span class="p">,</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">EvaluationAttempt</span><span class="p">,</span> <span class="n">Metric</span><span class="p">]:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">extract_table</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">mapper</span><span class="p">)</span>
+        <span class="n">save_table1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mapper</span><span class="o">.</span><span class="n">__tablename__</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="extract_table"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.extract_table">[docs]</a><span class="k">def</span> <span class="nf">extract_table</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">mapper</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">result_records</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">result_records</span><span class="p">)</span>
+    <span class="n">tablename</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="n">__tablename__</span>
+    <span class="k">if</span> <span class="s2">&quot;_sa_instance_state&quot;</span> <span class="ow">in</span> <span class="n">result_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">result_df</span><span class="p">[</span><span class="s2">&quot;_sa_instance_state&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result_df</span></div>
+
+<div class="viewcode-block" id="save_table1"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.save_table1">[docs]</a><span class="k">def</span> <span class="nf">save_table1</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">underscore</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="k">if</span> <span class="n">suffix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">name1</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="n">underscore</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.pkl.bz2&quot;</span>
+    <span class="n">save_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="save_table"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.save_table">[docs]</a><span class="k">def</span> <span class="nf">save_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_table1"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.load_table1">[docs]</a><span class="k">def</span> <span class="nf">load_table1</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">underscore</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="k">if</span> <span class="n">suffix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">name1</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="n">underscore</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.pkl.bz2&quot;</span>
+    <span class="k">return</span> <span class="n">load_table</span><span class="p">(</span><span class="n">name1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_table"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.load_table">[docs]</a><span class="k">def</span> <span class="nf">load_table</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="prepare_automl_file_name"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.prepare_automl_file_name">[docs]</a><span class="k">def</span> <span class="nf">prepare_automl_file_name</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;automl_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_dataset_from_dir"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.load_dataset_from_dir">[docs]</a><span class="k">def</span> <span class="nf">load_dataset_from_dir</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">):</span>
+
+    <span class="c1"># query db for import parameters to load files</span>
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Problem</span><span class="p">)</span>\
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">problem_name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+    <span class="n">problem_files</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+    <span class="n">problem_table_names</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">table_names</span><span class="p">)</span>
+    <span class="n">problem_entities_featurized_table_name</span> <span class="o">=</span> \
+        <span class="n">problem</span><span class="o">.</span><span class="n">entities_featurized_table_name</span>
+    <span class="n">problem_target_table_name</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">target_table_name</span>
+
+    <span class="n">problem_data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">)</span>
+
+    <span class="c1"># load entities and other tables</span>
+
+    <span class="c1"># load other tables</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span> <span class="p">(</span><span class="n">problem_table_names</span><span class="p">,</span>
+            <span class="n">problem_files</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">table_name</span> <span class="o">==</span> <span class="n">problem_entities_featurized_table_name</span> <span class="ow">or</span> \
+           <span class="n">table_name</span> <span class="o">==</span> <span class="n">problem_target_table_name</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">abs_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">problem_data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_filename</span><span class="p">,</span>
+                <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># if empty string, we simply don&#39;t have any features to add</span>
+    <span class="k">if</span> <span class="n">problem_entities_featurized_table_name</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">problem_table_names</span><span class="p">)</span>
+        <span class="n">ind_features</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">problem_entities_featurized_table_name</span><span class="p">)</span>
+        <span class="n">abs_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">problem_data_dir</span><span class="p">,</span>
+                <span class="n">problem_files</span><span class="p">[</span><span class="n">ind_features</span><span class="p">])</span>
+        <span class="n">entities_featurized</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_filename</span><span class="p">,</span>
+                <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># load target</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">problem_table_names</span><span class="p">)</span>
+    <span class="n">ind_target</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">problem_target_table_name</span><span class="p">)</span>
+    <span class="n">abs_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">problem_data_dir</span><span class="p">,</span>
+            <span class="n">problem_files</span><span class="p">[</span><span class="n">ind_target</span><span class="p">])</span>
+
+    <span class="c1"># target might not exist if we are making predictions on unseen</span>
+    <span class="c1"># test data</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">abs_filename</span><span class="p">):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_filename</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">entities_featurized</span><span class="p">,</span> <span class="n">target</span></div>
+
+<div class="viewcode-block" id="save_submission"><a class="viewcode-back" href="../../../featurehub.admin.html#featurehub.admin.postprocessing.save_submission">[docs]</a><span class="k">def</span> <span class="nf">save_submission</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">split_train</span><span class="p">,</span> <span class="n">split_test</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">underscore</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="k">if</span> <span class="n">suffix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">name1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="s2">&quot;submissions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;submission_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}{}{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_name</span><span class="p">,</span> <span class="n">split_train</span><span class="p">,</span>
+                <span class="n">split_test</span><span class="p">,</span> <span class="n">underscore</span><span class="p">,</span> <span class="n">suffix</span><span class="p">))</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">,</span> <span class="n">name1</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Submission saved as </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullname</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Micah Smith
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
