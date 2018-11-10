@@ -18,27 +18,20 @@ make sense until you have [configured](#configuration) the application as you de
 may want to go through these steps once to make sure everything runs okay, then update your
 configuration file and re-build.
 
-1. Install [Docker Engine](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) on your system.
+1. Install git, [Docker Engine](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) on your system.
 
 1. Download the FeatureHub repository.
     ```bash
     git clone https://github.com/HDI-Project/FeatureHub.git
     ```
 
-1. Ensure Python 3.5 is installed. 
+1. Ensure Python 3.5 is installed. It is recommended to use `conda`:
 
-    - On a virtual machine, one can use a system python.
-        ```bash
-        yum update -y
-        yum install -y python35 python35-pip
-        pip-3.5 install --upgrade pip
-        ```
-
-    - Otherwise, it is best to use a virtual environment, using `conda` for example:
+    - Install [miniconda](https://conda.io/miniconda.html).
+    - Create a new conda environment:
         ```bash
         conda create -y -n featurehub python=3.5
-        conda activate featurehub
-        pip install --upgrade pip
+        source activate featurehub
         ```
 
 1. Install Python requirements for the host.
@@ -49,7 +42,7 @@ configuration file and re-build.
 1. Create a local configuration.
     ```bash
     cd deploy
-    perl -pe 's|XYZ|`openssl rand -hex 32`|g' .env.local.example > .env.local
+    ./make_env_local.py > .env.local
     ```
 
 1. Build the necessary docker images.
@@ -57,19 +50,9 @@ configuration file and re-build.
     make build
     ```
 
-1. *(Optional)* Generate SSL certificate. This either generates a self-signed certificate
-   using openssl or generates a certificate using LetsEncrypt, based on the
-   `USE_LETSENCRYPT_CERT` configuration variable.
+1. *(Optional)* Generate SSL certificate (see [SSL Configuration](#ssl-configuration))..
     ```bash
     make ssl
-    ```
-
-    ```eval_rst
-    .. note::
-
-        This Makefile target to generate certificates does not need to be re-executed unless you
-        remove the Docker data volume, the certificates expire, or your domain configuration
-        changes.
     ```
 
 1. Launch the app.
@@ -154,6 +137,20 @@ You can usually leave these variables at their default values:
     (above) and administrators.
 - `USE_DISCOURSE`: flag to use Discourse integration (`"yes"`). If Discourse integration is
     enabled, then forum posts are created for each feature that is successfully added.
+
+### SSL Configuration
+
+Generate SSL certificates:
+```bash
+make ssl
+```
+
+The certificate will be generated using Let's Encrypt if `USE_LETSENCRYPT_CERT` is truthy,
+otherwise it will be a self-signed certificate generated using OpenSSL.
+
+This Makefile target to generate certificates does not need to be re-executed unless you
+remove the Docker data volume, the certificates expire, or your domain configuration
+changes.
 
 ### Userlist
 
