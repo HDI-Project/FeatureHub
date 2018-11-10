@@ -6,10 +6,12 @@ files:
     - users.csv
     - groups.csv
     - target.csv
+    - features.csv
 table_names:
     - users
     - groups
     - target
+    - features
 entities_table_name: users
-entities_featurized_table_name:
+entities_featurized_table_name: features
 target_table_name: target
