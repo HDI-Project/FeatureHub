@@ -111,6 +111,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#app-deployment">App Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ssl-configuration">SSL Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#userlist">Userlist</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#jupyterhub-and-jupyter-notebook">Jupyterhub and Jupyter Notebook</a></li>
 </ul>
@@ -241,26 +242,20 @@ make sense until you have <a class="reference external" href="#configuration">co
 may want to go through these steps once to make sure everything runs okay, then update your
 configuration file and re-build.</p>
 <ol>
-<li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
+<li><p class="first">Install git, <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker Engine</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a> on your system.</p>
 </li>
 <li><p class="first">Download the FeatureHub repository.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/HDI-Project/FeatureHub.git
 </pre></div>
 </div>
 </li>
-<li><p class="first">Ensure Python 3.5 is installed.</p>
+<li><p class="first">Ensure Python 3.5 is installed. It is recommended to use <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
 <ul>
-<li><p class="first">On a virtual machine, one can use a system python.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum update -y
-yum install -y python35 python35-pip
-pip-3.5 install --upgrade pip
-</pre></div>
-</div>
+<li><p class="first">Install <a class="reference external" href="https://conda.io/miniconda.html">miniconda</a>.</p>
 </li>
-<li><p class="first">Otherwise, it is best to use a virtual environment, using <code class="docutils literal notranslate"><span class="pre">conda</span></code> for example:</p>
+<li><p class="first">Create a new conda environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -y -n featurehub <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.5
-conda activate featurehub
-pip install --upgrade pip
+<span class="nb">source</span> activate featurehub
 </pre></div>
 </div>
 </li>
@@ -273,7 +268,7 @@ pip install --upgrade pip
 </li>
 <li><p class="first">Create a local configuration.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> deploy
-perl -pe <span class="s1">&#39;s|XYZ|`openssl rand -hex 32`|g&#39;</span> .env.local.example &gt; .env.local
+./make_env_local.py &gt; .env.local
 </pre></div>
 </div>
 </li>
@@ -282,17 +277,8 @@ perl -pe <span class="s1">&#39;s|XYZ|`openssl rand -hex 32`|g&#39;</span> .env.l
 </pre></div>
 </div>
 </li>
-<li><p class="first"><em>(Optional)</em> Generate SSL certificate. This either generates a self-signed certificate
-using openssl or generates a certificate using LetsEncrypt, based on the
-<code class="docutils literal notranslate"><span class="pre">USE_LETSENCRYPT_CERT</span></code> configuration variable.</p>
+<li><p class="first"><em>(Optional)</em> Generate SSL certificate (see <a class="reference external" href="#ssl-configuration">SSL Configuration</a>)..</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make ssl
-</pre></div>
-</div>
-<div class="highlight-eval_rst notranslate"><div class="highlight"><pre><span></span>.. note::
-
-    This Makefile target to generate certificates does not need to be re-executed unless you
-    remove the Docker data volume, the certificates expire, or your domain configuration
-    changes.
 </pre></div>
 </div>
 </li>
@@ -378,6 +364,18 @@ Discourse. Posts to this category will only be visible by members of the feature
 <li><code class="docutils literal notranslate"><span class="pre">USE_DISCOURSE</span></code>: flag to use Discourse integration (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>). If Discourse integration is
 enabled, then forum posts are created for each feature that is successfully added.</li>
 </ul>
+</div>
+<div class="section" id="ssl-configuration">
+<span id="ssl-configuration"></span><h3>SSL Configuration<a class="headerlink" href="#ssl-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Generate SSL certificates:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make ssl
+</pre></div>
+</div>
+<p>The certificate will be generated using Let’s Encrypt if <code class="docutils literal notranslate"><span class="pre">USE_LETSENCRYPT_CERT</span></code> is truthy,
+otherwise it will be a self-signed certificate generated using OpenSSL.</p>
+<p>This Makefile target to generate certificates does not need to be re-executed unless you
+remove the Docker data volume, the certificates expire, or your domain configuration
+changes.</p>
 </div>
 <div class="section" id="userlist">
 <span id="userlist"></span><h3>Userlist<a class="headerlink" href="#userlist" title="Permalink to this headline">¶</a></h3>
