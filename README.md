@@ -24,8 +24,15 @@ features, and data- and user-management tools.
 
 ## Citing FeatureHub
 
-Please consider referencing the following paper:
+Please consider referencing our [paper about FeatureHub](https://www.micahsmith.com/files/featurehub-smith.pdf):
 
-> M. J. Smith, R. Wedge, and K. Veeramachaneni, ["FeatureHub: Towards collaborative data
-> science,"](https://www.micahsmith.com/files/featurehub-smith.pdf) in Data Science and
-> Advanced Analytics (DSAA), 2017. *IEEE International Conference on.* IEEE, 2017, pp. 1-11.
+```
+@inproceedings{smith2017featurehub,
+  title={FeatureHub: Towards collaborative data science},
+  author={Smith, Micah J and Wedge, Roy and Veeramachaneni, Kalyan},
+  booktitle={2017 IEEE International Conference on Data Science and Advanced Analytics (DSAA)},
+  pages={590--600},
+  year={2017},
+  organization={IEEE}
+}
+```
